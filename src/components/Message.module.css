@@ -1,0 +1,201 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    animation: slideUpFadeIn 0.4s ease-out;
+}
+
+@keyframes slideUpFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.userMessage {
+    align-items: flex-end;
+}
+
+.assistantMessage {
+    align-items: flex-start;
+}
+
+.content {
+    max-width: 70%;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    transition: all 0.2s ease;
+}
+
+.content:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.userMessage .content {
+    background: var(--color-primary);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.assistantMessage .content {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-bottom-left-radius: 4px;
+}
+
+.text {
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.userMessage .timestamp {
+    margin-left: auto;
+    margin-right: 0.5rem;
+}
+
+/* Sources */
+.sources {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sourcesLabel {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.sourceList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sourceList li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Files */
+.files {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.file {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.fileIcon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.fileInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.fileName {
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fileSize {
+    margin: 0;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.downloadButton {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    transition: transform 0.2s;
+}
+
+.downloadButton:hover {
+    transform: scale(1.2);
+}
+
+/* Error */
+.error {
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px solid #ef4444;
+    border-radius: 4px;
+}
+
+.errorMessage {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #dc2626;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .content {
+        max-width: 90%;
+    }
+
+    .container {
+        margin-bottom: 0.75rem;
+    }
+
+    .content {
+        padding: 0.75rem;
+    }
+}

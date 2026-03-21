@@ -1,0 +1,35 @@
+.link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    text-decoration: underline;
+    color: var(--color-primary-dark);
+}
+
+.icon {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+}
+
+.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .link {
+        font-size: 0.75rem;
+    }
+}

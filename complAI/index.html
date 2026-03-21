@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajuntament del Prat de Llobregat - Demo ComplAI</title>
+    <style>
+        /* --- ELPRAT.CAT REPLICA STYLES --- */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #0056b3;
+        }
+        header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0056b3;
+            text-transform: uppercase;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #0056b3;
+        }
+        .hero {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Ajuntament_del_Prat_de_Llobregat.jpg/1200px-Ajuntament_del_Prat_de_Llobregat.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        .hero h1 {
+            font-size: 48px;
+            background: rgba(0, 86, 179, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .content {
+            padding: 50px;
+            text-align: center;
+            background-color: white;
+            min-height: 500px;
+        }
+
+        /* --- COMPLAI CHATBOT WIDGET STYLES --- */
+        #chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #0056b3;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        #chatbot-btn:hover {
+            transform: scale(1.1);
+        }
+        #chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 500px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            border: 1px solid #ddd;
+        }
+        .chat-header {
+            background-color: #0056b3;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .mode-selection {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+        .mode-selection button {
+            padding: 8px 12px;
+            border: none;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            transition: background 0.3s;
+        }
+        .mode-selection button.active {
+            background-color: #0056b3;
+            color: white;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .msg-user {
+            background-color: #0056b3;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .msg-bot {
+            background-color: #e0e0e0;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .chat-input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: white;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chat-input button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Ajuntament del Prat</div>
+    <nav>
+        <a href="#">L'Ajuntament</a>
+        <a href="#">Tràmits</a>
+        <a href="#">Serveis</a>
+        <a href="#">Actualitat</a>
+    </nav>
+</header>
+
+<div class="hero">
+    <h1>Benvinguts al Prat de Llobregat</h1>
+</div>
+
+<div class="content">
+    <h2>La teva ciutat, més connectada.</h2>
+    <p>Aquesta és una demostració del nou assistent virtual ComplAI per a l'atenció ciutadana.</p>
+</div>
+
+<div id="chatbot-btn" onclick="toggleChat()">💬</div>
+
+<div id="chatbot-window">
+    <div class="chat-header">
+        <span>Assistència ComplAI</span>
+        <span class="close-btn" onclick="toggleChat()">✖</span>
+    </div>
+
+    <div class="mode-selection">
+        <button id="mode-ask" class="active" onclick="setMode('ask')">Fer una pregunta</button>
+        <button id="mode-redact" onclick="setMode('redact')">Redactar queixa</button>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+        <div class="message msg-bot">Hola! Sóc l'assistent virtual de l'Ajuntament. Com et puc ajudar avui?</div>
+    </div>
+
+    <div class="chat-input" style="flex-direction: column; gap: 4px; padding: 10px; border-top: 1px solid #ddd; background-color: white;">
+        <div id="redact-fields" style="display:none; flex-direction: column; gap: 4px; width: 100%; min-width: 0;">
+            <div style="display: flex; gap: 4px; width: 100%;">
+                <input type="text" id="requester-name" placeholder="Nom (Cl@ve)" autocomplete="off" style="flex:1; min-width:0;" />
+                <input type="text" id="requester-surname" placeholder="Cognom (Cl@ve)" autocomplete="off" style="flex:1; min-width:0;" />
+            </div>
+            <div style="display: flex; width: 100%;">
+                <input type="text" id="requester-id" placeholder="DNI/NIE/ID (Cl@ve)" autocomplete="off" style="width:100%; min-width:0;" />
+            </div>
+            <div style="display: flex; width: 100%; gap: 4px; align-items: center;">
+                <input type="text" id="chat-input-field" placeholder="Escriu el teu missatge aquí..." onkeypress="handleEnter(event)" style="flex:1;" />
+                <button onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+        <div id="ask-fields" style="width:100%; display:flex; gap:4px;">
+            <input type="text" id="chat-input-field-ask" placeholder="Escriu el teu missatge aquí..." onkeypress="handleEnter(event)" style="flex:1;" />
+            <button onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // API Base URL - Update this to match where your Micronaut backend is running.
+    const API_BASE_URL = 'http://127.0.0.1:3000/complai';
+
+    let currentMode = 'ask'; // Default mode
+    let isChatOpen = false;
+    let conversationId = newGUID(); // Static conversation ID for demo purposes
+    let isWaitingForResponse = false;
+
+    function newGUID() {
+        // Simple GUID generator for conversation IDs
+        return 'xxxx-xxxx-xxxx-xxxx'.replace(/[x]/g, function() {
+            return Math.floor(Math.random() * 16).toString(16);
+        });
+    }
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatbot-window');
+        isChatOpen = !isChatOpen;
+        chatWindow.style.display = isChatOpen ? 'flex' : 'none';
+    }
+
+    function clearChatMessages() {
+        const chatMessages = document.getElementById('chat-messages');
+        // Remove all children
+        while (chatMessages.firstChild) {
+            chatMessages.removeChild(chatMessages.firstChild);
+        }
+        // Add initial greeting
+        addMessage("Hola! Sóc l'assistent virtual de l'Ajuntament. Com et puc ajudar avui?", 'bot');
+    }
+
+    function setSendButtonEnabled() {
+        let btn, inputField;
+        if (currentMode === 'redact') {
+            btn = document.querySelector('#redact-fields button');
+            inputField = document.getElementById('chat-input-field');
+        } else {
+            btn = document.querySelector('#ask-fields button');
+            inputField = document.getElementById('chat-input-field-ask');
+        }
+        if (btn && inputField) {
+            btn.disabled = isWaitingForResponse || inputField.value.trim() === '';
+        }
+    }
+
+    function setupInputListeners() {
+        const redactInput = document.getElementById('chat-input-field');
+        const askInput = document.getElementById('chat-input-field-ask');
+        if (redactInput) {
+            redactInput.addEventListener('input', setSendButtonEnabled);
+        }
+        if (askInput) {
+            askInput.addEventListener('input', setSendButtonEnabled);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', setupInputListeners);
+    // Script is at the end of the body; ensure listeners are set and button state initialized
+    setupInputListeners();
+    setSendButtonEnabled();
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('mode-ask').classList.remove('active');
+        document.getElementById('mode-redact').classList.remove('active');
+        document.getElementById(`mode-${mode}`).classList.add('active');
+
+        // Show/hide redact and ask fields
+        const redactFields = document.getElementById('redact-fields');
+        const askFields = document.getElementById('ask-fields');
+        if (mode === 'redact') {
+            redactFields.style.display = 'flex';
+            askFields.style.display = 'none';
+        } else {
+            redactFields.style.display = 'none';
+            askFields.style.display = 'flex';
+        }
+
+        // Clear chat and show initial greeting
+        clearChatMessages();
+
+        // Add a contextual bot message to let the user know the mode changed
+        let systemMsg = mode === 'ask'
+            ? "Mode 'Pregunta' activat. Què necessites saber sobre tràmits o l'ajuntament?"
+            : "Mode 'Queixa' activat. Explica'm el problema i t'ajudaré a redactar la instància.";
+        addMessage(systemMsg, 'bot');
+
+        setSendButtonEnabled(); // Update button state on mode change
+    }
+
+    function handleEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function extractBotResponseFromJson(data) {
+        if (!data || typeof data !== 'object') return '';
+        if (typeof data.message === 'string') return data.message;
+        if (data.message && typeof data.message === 'object') {
+            if (typeof data.message.content === 'string') return data.message.content;
+            if (typeof data.message.text === 'string') return data.message.text;
+        }
+        if (typeof data.content === 'string') return data.content;
+        return '';
+    }
+
+    async function sendMessage() {
+        let inputField, messageText;
+        if (currentMode === 'redact') {
+            inputField = document.getElementById('chat-input-field');
+        } else {
+            inputField = document.getElementById('chat-input-field-ask');
+        }
+        messageText = inputField.value.trim();
+        if (!messageText) {
+            setSendButtonEnabled();
+            return;
+        }
+
+        isWaitingForResponse = true;
+        setSendButtonEnabled(); // Disable send button while waiting
+
+        // Display User Message
+        addMessage(messageText, 'user');
+        inputField.value = ''; // Clear input
+        setSendButtonEnabled(); // Update button state after clearing input
+
+        // Determine endpoint based on selected mode
+        const endpoint = currentMode === 'ask' ? '/ask' : '/redact';
+        const url = `${API_BASE_URL}${endpoint}`;
+
+        // Get redact fields if in redact mode
+        let requesterName = '', requesterSurname = '', requesterIdNumber = '';
+        if (currentMode === 'redact') {
+            requesterName = document.getElementById('requester-name').value.trim();
+            requesterSurname = document.getElementById('requester-surname').value.trim();
+            requesterIdNumber = document.getElementById('requester-id').value.trim();
+        }
+
+        try {
+            // Add a "typing" indicator temporarily
+            const typingId = "typing-" + Date.now();
+            addMessage("Escribint...", "bot", typingId);
+
+            // Build request body based on mode
+            let requestBody;
+            if (currentMode === 'redact') {
+                requestBody = {
+                    text: messageText,
+                    format: 'pdf',
+                    conversationId: conversationId,
+                    requesterName: requesterName,
+                    requesterSurname: requesterSurname,
+                    requesterIdNumber: requesterIdNumber
+                };
+            } else {
+                requestBody = {
+                    text: messageText,
+                    conversationId: conversationId,
+                    cityId: "el-prat"
+                };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMmUtbG9jYWwiLCJpc3MiOiJjb21wbGFpIiwiaWF0IjoxNzczNDAyMjQ1LCJleHAiOjE4MDQ5MzgyNDUsImNpdHkiOiJlbHByYXQifQ.A7X7AejP1q1aQA8PWYEOjjYyAZD-_BON0b3szjEPPIA'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            // Remove typing indicator
+            document.getElementById(typingId).remove();
+
+            // Handle non-streaming response
+            if (response.ok) {
+                let botResponse = '';
+                let sources = [];
+                let pdfUrl = null;
+
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    const data = await response.json();
+
+                    if (data.error) {
+                        addMessage(`Error: ${data.error}`, 'bot');
+                        return;
+                    }
+
+                    botResponse = extractBotResponseFromJson(data);
+
+                    if (data.sources && Array.isArray(data.sources)) {
+                        sources = data.sources;
+                    }
+
+                    if (data.pdfUrl) {
+                        pdfUrl = data.pdfUrl;
+                    }
+                } else {
+                    botResponse = await response.text();
+                }
+
+                if (currentMode === 'redact' && pdfUrl) {
+                    addBotMessageWithLink(botResponse, pdfUrl, 'Descarrega PDF');
+                } else if (currentMode === 'ask' && sources.length > 0) {
+                    addBotMessageWithSources(botResponse, sources);
+                } else {
+                    addMessage(botResponse, 'bot');
+                }
+            } else {
+                let errorDetail = '';
+                try {
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const errJson = await response.json();
+                        if (errJson && errJson.error) errorDetail = errJson.error;
+                    } else {
+                        errorDetail = await response.text();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                addMessage(`Error: No s'ha pogut connectar amb el servidor (${response.status})${errorDetail ? ` - ${errorDetail}` : ''}`, 'bot');
+            }
+
+            // Clear redact fields after sending
+            if (currentMode === 'redact') {
+                document.getElementById('requester-name').value = '';
+                document.getElementById('requester-surname').value = '';
+                document.getElementById('requester-id').value = '';
+            }
+
+            isWaitingForResponse = false;
+            setSendButtonEnabled(); // Re-enable send button after response
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            // Remove typing indicator in case of network failure
+            const typingNode = document.querySelector('[id^="typing-"]');
+            if(typingNode) typingNode.remove();
+
+            const errorMessage = "S'ha produït un error de xarxa en contactar amb ComplAI.";
+            addMessage(errorMessage, 'bot');
+            
+            // Store message data for retry
+            const retryData = {
+                messageText: messageText,
+                requesterName: requesterName,
+                requesterSurname: requesterSurname,
+                requesterIdNumber: requesterIdNumber,
+                retryCount: 0,
+                maxRetries: 5
+            };
+            
+            // Auto-retry after 2 seconds
+            setTimeout(() => {
+                addMessage("Reintentant la connexió...", 'bot');
+                retrySendMessage(retryData);
+            }, 2000);
+            
+            isWaitingForResponse = false;
+            setSendButtonEnabled(); // Re-enable send button on error
+        }
+    }
+
+    async function retrySendMessage(retryData) {
+        retryData.retryCount++;
+        
+        // Check if we've exceeded max retries
+        if (retryData.retryCount > retryData.maxRetries) {
+            addMessage(`Error: S'ha superat el nombre màxim d'intents (${retryData.maxRetries}). Si us plau, torna-ho intentar més tard.`, 'bot');
+            return;
+        }
+
+        isWaitingForResponse = true;
+        setSendButtonEnabled(); // Disable send button while retrying
+
+        // Determine endpoint based on selected mode
+        const endpoint = currentMode === 'ask' ? '/ask' : '/redact';
+        const url = `${API_BASE_URL}${endpoint}`;
+
+        try {
+            // Add a "typing" indicator temporarily
+            const typingId = "typing-" + Date.now();
+            addMessage("Escribint...", "bot", typingId);
+
+            // Build request body based on mode
+            let requestBody;
+            if (currentMode === 'redact') {
+                requestBody = {
+                    text: retryData.messageText,
+                    format: 'pdf',
+                    conversationId: conversationId,
+                    requesterName: retryData.requesterName,
+                    requesterSurname: retryData.requesterSurname,
+                    requesterIdNumber: retryData.requesterIdNumber
+                };
+            } else {
+                requestBody = {
+                    text: retryData.messageText,
+                    conversationId: conversationId
+                };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMmUtbG9jYWwiLCJpc3MiOiJjb21wbGFpIiwiaWF0IjoxNzczNDAyMjQ1LCJleHAiOjE4MDQ5MzgyNDUsImNpdHkiOiJlbHByYXQifQ.A7X7AejP1q1aQA8PWYEOjjYyAZD-_BON0b3szjEPPIA'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            // Remove typing indicator
+            document.getElementById(typingId).remove();
+
+            // Handle non-streaming response in retry
+            if (response.ok) {
+                let botResponse = '';
+                let sources = [];
+                let pdfUrl = null;
+
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    const data = await response.json();
+
+                    if (data.error) {
+                        addMessage(`Error: ${data.error}`, 'bot');
+                        return;
+                    }
+
+                    botResponse = extractBotResponseFromJson(data);
+
+                    if (data.sources && Array.isArray(data.sources)) {
+                        sources = data.sources;
+                    }
+
+                    if (data.pdfUrl) {
+                        pdfUrl = data.pdfUrl;
+                    }
+                } else {
+                    botResponse = await response.text();
+                }
+
+                if (currentMode === 'redact' && pdfUrl) {
+                    addBotMessageWithLink(botResponse, pdfUrl, 'Descarrega PDF');
+                } else if (currentMode === 'ask' && sources.length > 0) {
+                    addBotMessageWithSources(botResponse, sources);
+                } else {
+                    addMessage(botResponse, 'bot');
+                }
+            } else {
+                let errorDetail = '';
+                try {
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const errJson = await response.json();
+                        if (errJson && errJson.error) errorDetail = errJson.error;
+                    } else {
+                        errorDetail = await response.text();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                addMessage(`Error: No s'ha pogut connectar amb el servidor (${response.status})${errorDetail ? ` - ${errorDetail}` : ''}`, 'bot');
+            }
+
+            isWaitingForResponse = false;
+            setSendButtonEnabled(); // Re-enable send button after response
+
+        } catch (error) {
+            console.error('Retry fetch error:', error);
+            // Remove typing indicator in case of network failure
+            const typingNode = document.querySelector('[id^="typing-"]');
+            if(typingNode) typingNode.remove();
+
+            // Check if we should retry again
+            if (retryData.retryCount < retryData.maxRetries) {
+                addMessage(`Error de xarxa (${retryData.retryCount}/${retryData.maxRetries}). Reintentant en 2 segons...`, 'bot');
+                setTimeout(() => {
+                    retrySendMessage(retryData);
+                }, 2000);
+            } else {
+                addMessage(`Error: S'ha superat el nombre màxim d'intents (${retryData.maxRetries}). Si us plau, torna-ho intentar més tard.`, 'bot');
+            }
+            
+            isWaitingForResponse = false;
+            setSendButtonEnabled(); // Re-enable send button on error
+        }
+    }
+
+    function addMessage(text, sender, id = null) {
+        const chatMessages = document.getElementById('chat-messages');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', `msg-${sender}`);
+        if(id) msgDiv.id = id;
+        if (sender === 'bot') {
+            msgDiv.innerHTML = text; // Render HTML for bot messages
+        } else {
+            msgDiv.textContent = text; // Always escape user input
+        }
+        chatMessages.appendChild(msgDiv);
+
+        // Auto-scroll to the bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    /**
+     * Validate a URL and return a safe string for use in href.
+     * Returns null if the URL is invalid or potentially unsafe.
+     */
+    function sanitizeUrl(href) {
+        if (!href || typeof href !== 'string') return null;
+        try {
+            const u = new URL(href);
+            // Only allow http(s) schemes
+            if (u.protocol === 'http:' || u.protocol === 'https:') {
+                return u.toString();
+            }
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /**
+     * Add a bot message that includes sources in a formatted way.
+     * This constructs DOM elements to avoid XSS and provides a clean layout.
+     */
+    function addBotMessageWithSources(text, sources) {
+        const chatMessages = document.getElementById('chat-messages');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', 'msg-bot');
+
+        // Main text content
+        const textContainer = document.createElement('div');
+        textContainer.innerHTML = text || '';
+        msgDiv.appendChild(textContainer);
+
+        // Add sources section if sources array is not empty
+        if (sources && Array.isArray(sources) && sources.length > 0) {
+            const sourcesContainer = document.createElement('div');
+            sourcesContainer.style.marginTop = '12px';
+            sourcesContainer.style.paddingTop = '8px';
+            sourcesContainer.style.borderTop = '1px solid #ccc';
+            
+            const sourcesTitle = document.createElement('div');
+            sourcesTitle.style.fontWeight = 'bold';
+            sourcesTitle.style.fontSize = '12px';
+            sourcesTitle.style.color = '#666';
+            sourcesTitle.style.marginBottom = '6px';
+            sourcesTitle.textContent = 'Fonts:';
+            sourcesContainer.appendChild(sourcesTitle);
+
+            sources.forEach((source, index) => {
+                const sourceItem = document.createElement('div');
+                sourceItem.style.fontSize = '11px';
+                sourceItem.style.color = '#555';
+                sourceItem.style.marginBottom = '4px';
+                sourceItem.style.paddingLeft = '12px';
+                sourceItem.style.position = 'relative';
+                
+                // Add bullet point
+                const bullet = document.createElement('span');
+                bullet.style.position = 'absolute';
+                bullet.style.left = '0';
+                bullet.style.top = '0';
+                bullet.textContent = '•';
+                sourceItem.appendChild(bullet);
+
+                // Add source text
+                const sourceText = document.createElement('span');
+                sourceText.style.marginLeft = '4px';
+                
+                // Handle different source formats (string or object)
+                if (typeof source === 'string') {
+                    // Treat string as URL if it looks like one, otherwise as text
+                    if (source.match(/^https?:\/\//)) {
+                        const link = document.createElement('a');
+                        link.href = sanitizeUrl(source) || '#';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.textContent = source;
+                        link.style.color = '#0056b3';
+                        link.style.textDecoration = 'underline';
+                        sourceText.appendChild(link);
+                    } else {
+                        sourceText.textContent = source;
+                    }
+                } else if (source && typeof source === 'object') {
+                    // If source is an object, use title and url props
+                    const sourceTextParts = [];
+                    
+                    if (source.title && source.url) {
+                        const link = document.createElement('a');
+                        link.href = sanitizeUrl(source.url) || '#';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.textContent = source.title;
+                        link.style.color = '#0056b3';
+                        link.style.textDecoration = 'underline';
+                        sourceText.appendChild(link);
+                    } else if (source.title) {
+                        sourceText.textContent = source.title;
+                    } else if (source.url) {
+                        const link = document.createElement('a');
+                        link.href = sanitizeUrl(source.url) || '#';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.textContent = source.url;
+                        link.style.color = '#0056b3';
+                        link.style.textDecoration = 'underline';
+                        sourceText.appendChild(link);
+                    } else {
+                        // Handle name and description when no title/url
+                        if (source.name) {
+                            sourceTextParts.push(source.name);
+                        }
+                        if (source.description) {
+                            sourceTextParts.push(source.description);
+                        }
+                        
+                        if (sourceTextParts.length > 0) {
+                            const textNode = document.createTextNode(sourceTextParts.join(' - '));
+                            sourceText.appendChild(textNode);
+                        }
+                    }
+                }
+                
+                if (sourceText.childNodes.length === 0) {
+                    sourceText.textContent = `Font ${index + 1}`;
+                }
+                
+                sourceItem.appendChild(sourceText);
+                sourcesContainer.appendChild(sourceItem);
+            });
+
+            msgDiv.appendChild(sourcesContainer);
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    /**
+     * Add a bot message that includes a safe anchor link which opens in a new tab.
+     * This constructs DOM elements (no innerHTML injection) to avoid XSS.
+     */
+    function addBotMessageWithLink(text, href, linkText = 'Descarrega PDF') {
+        const chatMessages = document.getElementById('chat-messages');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', 'msg-bot');
+
+        // Main text (may contain HTML, render it)
+        // We use a container to safely set HTML for the textual part only when needed.
+        const textContainer = document.createElement('div');
+        textContainer.innerHTML = text || '';
+        msgDiv.appendChild(textContainer);
+
+        const safeHref = sanitizeUrl(href);
+        if (safeHref) {
+            const br = document.createElement('br');
+            msgDiv.appendChild(br);
+            const a = document.createElement('a');
+            a.href = safeHref;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = linkText;
+            a.style.display = 'inline-block';
+            a.style.marginTop = '6px';
+            a.style.color = '#0056b3';
+            msgDiv.appendChild(a);
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+</script>
+</body>
+</html>

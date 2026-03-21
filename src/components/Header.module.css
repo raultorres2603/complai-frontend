@@ -1,0 +1,243 @@
+.header {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+
+    .controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .modeButton {
+        padding: 0.45rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+        background: var(--color-background);
+        color: var(--color-text);
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .modeButton:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    }
+
+    .modeButton.on {
+        background: linear-gradient(90deg, #f97316, #ef4444);
+        color: white;
+        border-color: transparent;
+    }
+
+    border-radius: 16px;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.25s ease,
+    transform 0.18s ease;
+}
+
+.toggle:hover {
+    transform: scale(1.03);
+}
+
+.toggle.on {
+    background: linear-gradient(90deg, #f97316, #ef4444);
+}
+
+.knob {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(2, 6, 23, 0.12);
+    transform: translateX(0);
+    transition: transform 0.25s cubic-bezier(.2, .9, .3, 1);
+}
+
+.toggle.on .knob {
+    transform: translateX(18px);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.75rem 1rem;
+    }
+
+    .title {
+        font-size: 1.25rem;
+    }
+
+    .subtitle {
+        font-size: 0.7rem;
+    }
+}
+
+.tokenButton:active {
+    transform: translateY(0);
+}
+
+/* Token Modal */
+.tokenModal {
+    position: absolute;
+    top: 100%;
+    right: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    margin-top: 0.5rem;
+    z-index: 200;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tokenContent {
+    padding: 1.5rem;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tokenLabel {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tokenInput {
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: var(--color-text);
+    background: var(--color-background);
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.tokenInput:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.tokenButtons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.buttonPrimary,
+.buttonSecondary,
+.buttonDanger {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.buttonPrimary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+}
+
+.buttonPrimary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.buttonSecondary {
+    background: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.buttonSecondary:hover {
+    background: var(--color-border);
+}
+
+.buttonDanger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.buttonDanger:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .brand {
+        width: 100%;
+        text-align: center;
+        min-width: auto;
+    }
+
+    .title {
+        font-size: 1.25rem;
+    }
+
+    .center {
+        width: 100%;
+        order: 3;
+    }
+
+    .auth {
+        width: 100%;
+        order: 4;
+        justify-content: space-between;
+    }
+
+    .tokenContent {
+        width: calc(100vw - 2rem);
+        max-width: 350px;
+    }
+
+    .tokenModal {
+        left: 1rem;
+        right: 1rem;
+    }
+}
