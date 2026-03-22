@@ -1,26 +1,25 @@
 .header {
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
-    position: sticky;
-    top: 0;
     z-index: 100;
-    box-shadow: var(--shadow-sm);
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 1rem 1.5rem;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
 }
 
 .brand {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .title {
@@ -34,28 +33,31 @@
     font-size: 0.75rem;
     color: var(--color-text-secondary);
     margin: 0;
+    line-height: 1.4;
 }
 
 .controls {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .accessibilityButton {
     padding: 0.5rem;
-    width: 40px;
+    width: 100%;
     height: 40px;
     border-radius: 8px;
     border: 1px solid var(--color-border);
     background: var(--color-background);
     color: var(--color-text);
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 600;
 }
 
 .accessibilityButton:hover {
@@ -73,7 +75,7 @@
 }
 
 .modeButton {
-    padding: 0.45rem 0.85rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
     border: 1px solid var(--color-border);
     background: var(--color-background);
@@ -82,6 +84,8 @@
     font-weight: 600;
     font-size: 0.875rem;
     transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    text-align: center;
 }
 
 .modeButton:hover {
@@ -104,10 +108,28 @@
     border-color: transparent;
 }
 
-/* Mobile responsive */
+/* Mobile responsive - revert to horizontal layout */
 @media (max-width: 768px) {
+    .header {
+        border-bottom: 1px solid var(--color-border);
+        border-left: none;
+        padding: 1rem 1.5rem;
+    }
+
     .container {
-        padding: 0.75rem 1rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+        padding-bottom: 0;
+        border-bottom: none;
     }
 
     .title {
@@ -119,10 +141,19 @@
     }
 
     .controls {
+        flex-direction: row;
         gap: 0.375rem;
+        width: auto;
+    }
+
+    .accessibilityButton {
+        width: 40px;
+        height: 40px;
+        padding: 0.5rem;
     }
 
     .modeButton {
+        width: auto;
         padding: 0.4rem 0.7rem;
         font-size: 0.75rem;
     }

@@ -12,6 +12,7 @@ import { complaiService } from './services/apiService';
 import { sessionService } from './services/sessionService';
 import { MainLayout } from './layouts/MainLayout';
 import { ChatWindow } from './components/ChatWindow';
+import { ControlPanel } from './components/ControlPanel';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { TabConflictModal } from './components/TabConflictModal';
 import './App.css';
@@ -115,6 +116,29 @@ function App() {
     return <div className="loading">Loading...</div>;
   }
 
+  // Create ChatWindow component instance
+  const chatWindowComponent = (
+    <ChatWindow
+      messages={chatState.state.messages}
+      isLoading={chatState.state.isLoading}
+    />
+  );
+
+  // Create ControlPanel component instance
+  const controlPanelComponent = (
+    <ControlPanel
+      messages={chatState.state.messages}
+      isLoading={chatState.state.isLoading}
+      error={chatState.state.currentError}
+      isComplaintMode={isComplaintMode}
+      onToggleComplaint={() => setIsComplaintMode((v) => !v)}
+      onSendQuestion={handleSendQuestion}
+      onSendComplaint={handleSendComplaint}
+      jwtToken={jwtToken}
+      onClearHistory={chatState.clearMessages}
+    />
+  );
+
   return (
     <ErrorBoundary>
       <TabConflictModal
@@ -124,18 +148,7 @@ function App() {
           setTabConflictDismissed(true);
         }}
       />
-      <MainLayout isComplaintMode={isComplaintMode} onToggleComplaint={() => setIsComplaintMode((v) => !v)}>
-        <ChatWindow
-          messages={chatState.state.messages}
-          isLoading={chatState.state.isLoading}
-          error={chatState.state.currentError}
-          onSendQuestion={handleSendQuestion}
-          onSendComplaint={handleSendComplaint}
-          jwtToken={jwtToken}
-          isComplaintMode={isComplaintMode}
-          onClearHistory={chatState.clearMessages}
-        />
-      </MainLayout>
+      <MainLayout chatWindow={chatWindowComponent} controlPanel={controlPanelComponent} />
     </ErrorBoundary>
   );
 }

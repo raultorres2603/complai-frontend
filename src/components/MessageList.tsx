@@ -14,11 +14,16 @@ interface MessageListProps {
 }
 
 export const MessageList: React.FC<MessageListProps> = ({ messages, loading }) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
+  // IMPORTANT: Only scroll the internal list container, NOT the window
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (listRef.current) {
+      // Scroll only the message list container to the bottom
+      // This prevents the entire page from scrolling
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
   }, [messages, loading]);
 
   return (
@@ -28,12 +33,11 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, loading }) =
           <p className={styles.emptyText}>No messages yet. Start a conversation!</p>
         </div>
       ) : (
-        <div className={styles.list}>
+        <div ref={listRef} className={styles.list}>
           {messages.map((message) => (
             <Message key={message.id} message={message} />
           ))}
           {loading && <LoadingSpinner message="Waiting for response..." size="small" />}
-          <div ref={messagesEndRef} />
         </div>
       )}
     </div>

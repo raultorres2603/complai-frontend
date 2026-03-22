@@ -1,22 +1,29 @@
 /**
- * MainLayout Component - Header + Chat Window layout
+ * MainLayout Component - Two-column layout with ChatWindow on left, ControlPanel on right
+ * 
+ * Responsibility: Renders two-column grid layout
+ * 
+ * Props:
+ * - chatWindow: React node containing ChatWindow component
+ * - controlPanel: React node containing ControlPanel component
  */
 
 import type { ReactNode } from 'react';
-import { Header } from '../components/Header';
 import styles from './MainLayout.module.css';
 
 interface MainLayoutProps {
-  children: ReactNode;
-  isComplaintMode?: boolean;
-  onToggleComplaint?: () => void;
+  chatWindow: ReactNode;
+  controlPanel: ReactNode;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children, isComplaintMode, onToggleComplaint }) => {
+export const MainLayout: React.FC<MainLayoutProps> = ({ chatWindow, controlPanel }) => {
   return (
     <div className={styles.layout}>
-      <Header isComplaintMode={isComplaintMode} onToggleComplaint={onToggleComplaint} />
-      <main className={styles.main}>{children}</main>
+      {/* Left column: Chat area with message list */}
+      <main className={styles.main}>{chatWindow}</main>
+
+      {/* Right column: Control panel with header, input, and controls */}
+      <aside className={styles.sidebar}>{controlPanel}</aside>
     </div>
   );
 };

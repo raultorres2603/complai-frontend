@@ -84,6 +84,18 @@ export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn 
     }
   }, [enabled]);
 
+  /**
+   * Helper function to strip HTML tags from text
+   * Ensures TTS reads clean text without HTML markup
+   */
+  const stripHtmlTags = useCallback((htmlText: string): string => {
+    // Create a temporary element and use textContent to extract plain text
+    // This safely handles all HTML entities and tags
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlText;
+    return temp.textContent || temp.innerText || htmlText;
+  }, []);
+
   const readText = useCallback((text: string, messageId: string) => {
     if (!enabled) {
       setState((prev) => ({
@@ -105,7 +117,9 @@ export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn 
     synthesisRef.current.cancel();
 
     try {
-      const utterance = new SpeechSynthesisUtterance(text);
+      // Strip HTML tags before creating utterance
+      const cleanText = stripHtmlTags(text);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
 
       // Set voice
       if (state.selectedVoiceUri && state.availableVoices.length > 0) {
@@ -129,7 +143,7 @@ export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn 
           isPlaying: true,
           isPaused: false,
           currentMessageId: messageId,
-          currentText: text,
+          currentText: stripHtmlTags(text),
           error: null,
         }));
       };
@@ -177,7 +191,7 @@ export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn 
         error: `Error creating utterance: ${err instanceof Error ? err.message : String(err)}`,
       }));
     }
-  }, [enabled, state.selectedVoiceUri, state.currentRate, state.availableVoices]);
+  }, [enabled, state.selectedVoiceUri, state.currentRate, state.availableVoices, stripHtmlTags]);
 
   const pause = useCallback(() => {
     if (synthesisRef.current && synthesisRef.current.speaking && !synthesisRef.current.paused) {
