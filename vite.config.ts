@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.VITE_DEPLOYMENT_ENV === 'production' ? '/complai-frontend/' : '/complai-frontend/complai-frontend-dev/',
+  base: process.env.VITE_DEPLOYMENT_ENV === 'production' 
+    ? '/complai-frontend/' 
+    : process.env.VITE_DEPLOYMENT_ENV === 'development'
+    ? '/complai-frontend/complai-frontend-dev/'
+    : '/', // Local development
   plugins: [react()],
   server: {
     port: 5173,
