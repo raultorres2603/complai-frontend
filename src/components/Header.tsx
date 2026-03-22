@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import AccessibilityPanel from './AccessibilityPanel';
 import { LanguageSelector } from './LanguageSelector';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -16,6 +17,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -32,8 +34,8 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
             <button
               className={styles.accessibilityButton}
               onClick={() => setIsAccessibilityPanelOpen(true)}
-              aria-label="Open accessibility settings"
-              title="Accessibility Settings"
+              aria-label={t('accessibility_tooltip')}
+              title={t('accessibility_tooltip')}
             >
               ♿
             </button>

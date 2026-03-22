@@ -4,9 +4,8 @@
 
 import React, { useState } from 'react';
 import { useAccessibility } from '../hooks/useAccessibility';
-import { useLanguage } from '../hooks/useLanguage';
+import { useTranslation } from '../hooks/useTranslation';
 import { COLORBLINDNESS_FILTERS, type ColorBlindnessType } from '../types/accessibility.types';
-import { LanguageSelector } from './LanguageSelector';
 import styles from './AccessibilityPanel.module.css';
 
 export interface AccessibilityPanelProps {
@@ -16,14 +15,14 @@ export interface AccessibilityPanelProps {
 
 /**
  * Accessibility panel for managing user accessibility preferences
- * Includes color blindness filter, TTS, STT, and language selection
+ * Includes color blindness filter, TTS, and STT
  */
 export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
   isVisible,
   onClose,
 }) => {
   const { settings, updateSettings } = useAccessibility();
-  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+  const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['daltonism']));
 
   const toggleSection = (section: string) => {
@@ -44,13 +43,13 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
     <div className={styles.overlay} onClick={onClose} aria-label="Close accessibility settings">
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Accessibility Settings</h2>
+          <h2 className={styles.title}>{t('accessibility_settings')}</h2>
           {onClose && (
             <button
               className={styles.closeButton}
               onClick={onClose}
-              aria-label="Close"
-              title="Close accessibility panel"
+              aria-label={t('close')}
+              title={t('close')}
             >
               ✕
             </button>
@@ -68,7 +67,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
             >
               <span className={styles.sectionTitle}>
                 <span className={styles.icon}>♿</span>
-                Color Blindness Filter
+                {t('color_blindness_filter')}
               </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('daltonism') ? '▼' : '▶'}
@@ -78,7 +77,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
             {expandedSections.has('daltonism') && (
               <div id="daltonism-content" className={styles.sectionContent}>
                 <label htmlFor="colorblindness-select" className={styles.label}>
-                  Vision Type:
+                  {t('vision_type')}
                 </label>
                 <select
                   id="colorblindness-select"
@@ -87,7 +86,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                     updateSettings({ colorBlindnessType: e.target.value as ColorBlindnessType })
                   }
                   className={styles.select}
-                  aria-label="Color blindness filter type"
+                  aria-label={'Color blindness filter type'}
                 >
                   {Object.entries(COLORBLINDNESS_FILTERS).map(([key, label]) => (
                     <option key={key} value={key}>
@@ -97,7 +96,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                 </select>
 
                 <div className={styles.preview}>
-                  <p className={styles.previewLabel}>Preview:</p>
+                  <p className={styles.previewLabel}>{t('preview')}:</p>
                   <div
                     className={styles.previewBox}
                     style={{
@@ -132,7 +131,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
             >
               <span className={styles.sectionTitle}>
                 <span className={styles.icon}>🔊</span>
-                Text-to-Speech
+                {t('text_to_speech')}
               </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('tts') ? '▼' : '▶'}
@@ -146,15 +145,15 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                     type="checkbox"
                     checked={settings.ttsEnabled}
                     onChange={(e) => updateSettings({ ttsEnabled: e.target.checked })}
-                    aria-label="Enable text-to-speech"
+                    aria-label={t('enable_tts')}
                   />
-                  <span>Enable Text-to-Speech</span>
+                  <span>{t('enable_tts')}</span>
                 </label>
 
                 {settings.ttsEnabled && (
                   <div className={styles.subOptions}>
                     <label htmlFor="tts-rate" className={styles.label}>
-                      Speed: {settings.ttsRate.toFixed(1)}x
+                      {t('voice_rate')} {settings.ttsRate.toFixed(1)}x
                     </label>
                     <input
                       id="tts-rate"
@@ -165,7 +164,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                       value={settings.ttsRate}
                       onChange={(e) => updateSettings({ ttsRate: parseFloat(e.target.value) })}
                       className={styles.slider}
-                      aria-label="Text-to-speech speed"
+                      aria-label={t('voice_rate')}
                     />
                   </div>
                 )}
@@ -183,7 +182,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
             >
               <span className={styles.sectionTitle}>
                 <span className={styles.icon}>🎤</span>
-                Speech-to-Text
+                {t('speech_recognition')}
               </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('stt') ? '▼' : '▶'}
@@ -197,9 +196,9 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                     type="checkbox"
                     checked={settings.sttEnabled}
                     onChange={(e) => updateSettings({ sttEnabled: e.target.checked })}
-                    aria-label="Enable speech-to-text"
+                    aria-label={t('enable_stt')}
                   />
-                  <span>Enable Speech-to-Text</span>
+                  <span>{t('enable_stt')}</span>
                 </label>
 
                 {settings.sttEnabled && (
@@ -225,42 +224,6 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                     </select>
                   </div>
                 )}
-              </div>
-            )}
-          </div>
-
-          {/* Language Selection Section */}
-          <div className={styles.section} data-section="language">
-            <button
-              className={styles.sectionHeader}
-              onClick={() => toggleSection('language')}
-              aria-expanded={expandedSections.has('language')}
-              aria-controls="language-content"
-            >
-              <span className={styles.sectionTitle}>
-                <span className={styles.icon}>🌐</span>
-                Language
-              </span>
-              <span className={styles.expandIcon}>
-                {expandedSections.has('language') ? '▼' : '▶'}
-              </span>
-            </button>
-
-            {expandedSections.has('language') && (
-              <div id="language-content" className={styles.sectionContent}>
-                <label htmlFor="language-selector" className={styles.label}>
-                  Interface Language:
-                </label>
-                <div className={styles.languageSelectorWrapper}>
-                  <LanguageSelector
-                    currentLanguage={currentLanguage}
-                    onSelectLanguage={setLanguage}
-                    availableLanguages={availableLanguages}
-                  />
-                </div>
-                <p className={styles.description}>
-                  Changes the language of the interface and API requests.
-                </p>
               </div>
             )}
           </div>
