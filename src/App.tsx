@@ -7,6 +7,7 @@ import { usePdfPolling } from './hooks/usePdfPolling';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
 import { useTabDetection } from './hooks/useTabDetection';
+import { useAccessibility } from './hooks/useAccessibility';
 import { complaiService } from './services/apiService';
 import { sessionService } from './services/sessionService';
 import { MainLayout } from './layouts/MainLayout';
@@ -17,6 +18,7 @@ import './App.css';
 
 function App() {
   const { jwtToken, isInitialized, getCityFromToken } = useAuth();
+  const { settings } = useAccessibility(); // Initialize accessibility hook
 
   // Determine city from JWT token
   const cityId = (jwtToken && getCityFromToken(jwtToken)) || 'elprat';
