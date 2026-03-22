@@ -50,6 +50,7 @@ jobs:
           VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
           VITE_DEFAULT_CITY: ${{ vars.VITE_DEFAULT_CITY }}
           VITE_JWT_TOKEN: ${{ secrets.VITE_JWT_TOKEN }}
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'ComplAI' }}
           VITE_DEPLOYMENT_ENV: development
 
       - name: Deploy to GitHub Pages
@@ -94,6 +95,7 @@ jobs:
           VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
           VITE_DEFAULT_CITY: ${{ vars.VITE_DEFAULT_CITY }}
           VITE_JWT_TOKEN: ${{ secrets.VITE_JWT_TOKEN }}
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'ComplAI' }}
           VITE_DEPLOYMENT_ENV: production
 
       - name: Deploy to GitHub Pages

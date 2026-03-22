@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const { t } = useTranslation();
+  const appName = import.meta.env.VITE_APP_NAME || 'ComplAI';
 
   return (
     <>
@@ -25,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
         <div className={styles.container}>
           {/* Brand/Logo */}
           <div className={styles.brand}>
-            <h1 className={styles.title}>ComplAI</h1>
+            <h1 className={styles.title}>{appName}</h1>
             <p className={styles.subtitle}>Citizen Support Chatbot</p>
           </div>
 

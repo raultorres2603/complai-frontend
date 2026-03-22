@@ -1,0 +1,260 @@
+/**
+ * useTextToSpeech Hook - Text-to-Speech functionality using Web Speech API
+ * Provides voice synthesis with voice selection, rate control, and playback management
+ * 
+ * Can be dynamically enabled/disabled via the `enabled` parameter to control
+ * Web Speech API initialization without page refresh
+ */
+
+import { useEffect, useState, useRef, useCallback } from 'react';
+import type { TextToSpeechState } from '../types/accessibility.types';
+
+export interface UseTextToSpeechReturn {
+  state: TextToSpeechState;
+  readText: (text: string, messageId: string) => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  setRate: (rate: number) => void;
+  selectVoice: (voiceUri: string) => void;
+}
+
+/**
+ * Custom hook for text-to-speech functionality
+ * 
+ * @param enabled - Whether TTS is enabled. When false, Voice API is not initialized
+ *                  and readText will fail gracefully.
+ * @returns TTS state and control methods
+ */
+export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn {
+  const [state, setState] = useState<TextToSpeechState>({
+    isPlaying: false,
+    isPaused: false,
+    currentMessageId: null,
+    currentText: '',
+    currentRate: 1.0,
+    availableVoices: [],
+    selectedVoiceUri: undefined,
+    error: null,
+  });
+
+  const synthesisRef = useRef<SpeechSynthesis | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Initialize Speech Synthesis only when enabled
+  useEffect(() => {
+    if (!enabled) {
+      // Cleanup: cancel any ongoing speech and reset refs
+      if (synthesisRef.current) {
+        synthesisRef.current.cancel();
+      }
+      // Reset state when disabled
+      setState((prev) => ({
+        ...prev,
+        isPlaying: false,
+        isPaused: false,
+        currentMessageId: null,
+        currentText: '',
+        availableVoices: [],
+      }));
+      return;
+    }
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      synthesisRef.current = window.speechSynthesis;
+
+      // Load available voices
+      const loadVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        setState((prev) => ({
+          ...prev,
+          availableVoices: voices,
+          // Set first voice as default if not already set
+          selectedVoiceUri: prev.selectedVoiceUri || (voices[0]?.voiceURI || undefined),
+        }));
+      };
+
+      // Voices might load asynchronously
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+
+      return () => {
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+    }
+  }, [enabled]);
+
+  /**
+   * Helper function to strip HTML tags from text
+   * Ensures TTS reads clean text without HTML markup
+   */
+  const stripHtmlTags = useCallback((htmlText: string): string => {
+    // Create a temporary element and use textContent to extract plain text
+    // This safely handles all HTML entities and tags
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlText;
+    return temp.textContent || temp.innerText || htmlText;
+  }, []);
+
+  const readText = useCallback((text: string, messageId: string) => {
+    if (!enabled) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Text-to-Speech is not enabled. Enable it in accessibility settings.',
+      }));
+      return;
+    }
+
+    if (!synthesisRef.current) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Speech Synthesis not supported in this browser',
+      }));
+      return;
+    }
+
+    // Cancel any ongoing speech
+    synthesisRef.current.cancel();
+
+    try {
+      // Strip HTML tags before creating utterance
+      const cleanText = stripHtmlTags(text);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+
+      // Set voice
+      if (state.selectedVoiceUri && state.availableVoices.length > 0) {
+        const selectedVoice = state.availableVoices.find(
+          (v) => v.voiceURI === state.selectedVoiceUri
+        );
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+      }
+
+      // Set rate and other properties
+      utterance.rate = state.currentRate;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      // Event handlers
+      utterance.onstart = () => {
+        setState((prev) => ({
+          ...prev,
+          isPlaying: true,
+          isPaused: false,
+          currentMessageId: messageId,
+          currentText: stripHtmlTags(text),
+          error: null,
+        }));
+      };
+
+      utterance.onpause = () => {
+        setState((prev) => ({
+          ...prev,
+          isPaused: true,
+          isPlaying: false,
+        }));
+      };
+
+      utterance.onresume = () => {
+        setState((prev) => ({
+          ...prev,
+          isPaused: false,
+          isPlaying: true,
+        }));
+      };
+
+      utterance.onend = () => {
+        setState((prev) => ({
+          ...prev,
+          isPlaying: false,
+          isPaused: false,
+          currentMessageId: null,
+          currentText: '',
+        }));
+      };
+
+      utterance.onerror = (event) => {
+        setState((prev) => ({
+          ...prev,
+          isPlaying: false,
+          isPaused: false,
+          error: `Speech synthesis error: ${event.error}`,
+        }));
+      };
+
+      utteranceRef.current = utterance;
+      synthesisRef.current.speak(utterance);
+    } catch (err) {
+      setState((prev) => ({
+        ...prev,
+        error: `Error creating utterance: ${err instanceof Error ? err.message : String(err)}`,
+      }));
+    }
+  }, [enabled, state.selectedVoiceUri, state.currentRate, state.availableVoices, stripHtmlTags]);
+
+  const pause = useCallback(() => {
+    if (synthesisRef.current && synthesisRef.current.speaking && !synthesisRef.current.paused) {
+      synthesisRef.current.pause();
+      setState((prev) => ({
+        ...prev,
+        isPaused: true,
+        isPlaying: false,
+      }));
+    }
+  }, []);
+
+  const resume = useCallback(() => {
+    if (synthesisRef.current && synthesisRef.current.paused) {
+      synthesisRef.current.resume();
+      setState((prev) => ({
+        ...prev,
+        isPaused: false,
+        isPlaying: true,
+      }));
+    }
+  }, []);
+
+  const stop = useCallback(() => {
+    if (synthesisRef.current) {
+      synthesisRef.current.cancel();
+      setState((prev) => ({
+        ...prev,
+        isPlaying: false,
+        isPaused: false,
+        currentMessageId: null,
+        currentText: '',
+      }));
+    }
+  }, []);
+
+  const setRate = useCallback((rate: number) => {
+    const clampedRate = Math.max(0.5, Math.min(2.0, rate));
+    setState((prev) => ({
+      ...prev,
+      currentRate: clampedRate,
+    }));
+
+    // Update current utterance if playing
+    if (utteranceRef.current && synthesisRef.current?.speaking) {
+      utteranceRef.current.rate = clampedRate;
+    }
+  }, []);
+
+  const selectVoice = useCallback((voiceUri: string) => {
+    setState((prev) => ({
+      ...prev,
+      selectedVoiceUri: voiceUri,
+    }));
+  }, []);
+
+  return {
+    state,
+    readText,
+    pause,
+    resume,
+    stop,
+    setRate,
+    selectVoice,
+  };
+}
