@@ -2,7 +2,7 @@
  * MicrophoneButton Component Tests - Tests for translation of listening status and tooltips
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/__tests__/test-utils';
 import { MicrophoneButton } from './MicrophoneButton';
 

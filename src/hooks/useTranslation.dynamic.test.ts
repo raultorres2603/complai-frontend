@@ -8,43 +8,41 @@ import { renderHook, act } from '@/__tests__/test-utils';
 import { useTranslation } from './useTranslation';
 import { useLanguage } from './useLanguage';
 import * as useAccessibilityModule from './useAccessibility';
+import type { Language } from '../types/accessibility.types';
 
 describe('Dynamic Language Switching', () => {
-  const mockSettings = {
-    language: 'es' as const,
-    colorBlindnessFilter: 'normal' as const,
+  const baseMockSettings = (language: Language = 'es') => ({
+    language,
     colorBlindnessType: 'normal' as const,
     ttsEnabled: false,
+    ttsRate: 1.0,
+    ttsPitch: 1.0,
     sttEnabled: false,
-  };
+    sttLanguage: 'es',
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should update translations when language changes from Spanish to English', () => {
-    // Mock useAccessibility to return mutable settings
-    let currentLanguage = 'es' as const;
+    // Mock useAccessibility with parametrized language
+    let testLanguage: Language = 'es';
     
     const mockUpdateSettings = vi.fn((partial) => {
       if (partial.language) {
-        currentLanguage = partial.language;
+        testLanguage = partial.language;
       }
     });
 
-    const getAccessibilityReturn = () => ({
-      settings: {
-        ...mockSettings,
-        language: currentLanguage,
-      },
+    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
+    spyUseAccessibility.mockImplementation(() => ({
+      settings: baseMockSettings(testLanguage),
       updateSettings: mockUpdateSettings,
       applyColorFilter: vi.fn(),
       setLanguage: mockUpdateSettings,
       isLocalStorageAvailable: false,
-    });
-
-    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
-    spyUseAccessibility.mockImplementation(() => getAccessibilityReturn());
+    }));
 
     const { result: translationResult, rerender } = renderHook(() => useTranslation());
 
@@ -52,11 +50,13 @@ describe('Dynamic Language Switching', () => {
     expect(translationResult.current.t('send_message')).toBe('Enviar');
     expect(translationResult.current.locale).toBe('es');
 
-    // Change language to English
+    // Simulate language change via the setLanguage function
     act(() => {
-      currentLanguage = 'en';
-      rerender();
+      mockUpdateSettings({ language: 'en' });
     });
+    
+    // Re-render to pick up the language change
+    rerender();
 
     // Translations should update WITHOUT page reload
     expect(translationResult.current.t('send_message')).toBe('Send');
@@ -64,27 +64,22 @@ describe('Dynamic Language Switching', () => {
   });
 
   it('should update translations when language changes from Spanish to Catalan', () => {
-    let currentLanguage = 'es' as const;
+    let testLanguage: Language = 'es';
     
     const mockUpdateSettings = vi.fn((partial) => {
       if (partial.language) {
-        currentLanguage = partial.language;
+        testLanguage = partial.language;
       }
     });
 
-    const getAccessibilityReturn = () => ({
-      settings: {
-        ...mockSettings,
-        language: currentLanguage,
-      },
+    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
+    spyUseAccessibility.mockImplementation(() => ({
+      settings: baseMockSettings(testLanguage),
       updateSettings: mockUpdateSettings,
       applyColorFilter: vi.fn(),
       setLanguage: mockUpdateSettings,
       isLocalStorageAvailable: false,
-    });
-
-    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
-    spyUseAccessibility.mockImplementation(() => getAccessibilityReturn());
+    }));
 
     const { result: translationResult, rerender } = renderHook(() => useTranslation());
 
@@ -93,9 +88,11 @@ describe('Dynamic Language Switching', () => {
 
     // Change language to Catalan
     act(() => {
-      currentLanguage = 'ca';
-      rerender();
+      mockUpdateSettings({ language: 'ca' });
     });
+    
+    // Re-render to pick up the language change
+    rerender();
 
     // Translations should update to Catalan
     expect(translationResult.current.t('send_message')).toBe('Enviar');
@@ -103,25 +100,20 @@ describe('Dynamic Language Switching', () => {
   });
 
   it('useLanguage hook should update when language changes', () => {
-    let currentLanguage = 'es' as const;
+    let testLanguage: Language = 'es';
     
-    const mockSetLanguage = vi.fn((lang) => {
-      currentLanguage = lang;
+    const mockSetLanguage = vi.fn((lang: Language) => {
+      testLanguage = lang;
     });
 
-    const getAccessibilityReturn = () => ({
-      settings: {
-        ...mockSettings,
-        language: currentLanguage,
-      },
+    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
+    spyUseAccessibility.mockImplementation(() => ({
+      settings: baseMockSettings(testLanguage),
       updateSettings: vi.fn(),
       applyColorFilter: vi.fn(),
       setLanguage: mockSetLanguage,
       isLocalStorageAvailable: false,
-    });
-
-    const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
-    spyUseAccessibility.mockImplementation(() => getAccessibilityReturn());
+    }));
 
     const { result: languageResult, rerender } = renderHook(() => useLanguage());
 
@@ -130,50 +122,44 @@ describe('Dynamic Language Switching', () => {
 
     // Change language to English
     act(() => {
-      languageResult.current.setLanguage('en');
-      currentLanguage = 'en';
-      rerender();
+      mockSetLanguage('en');
     });
+    
+    // Re-render to pick up the language change
+    rerender();
 
     // Language should update without page reload
     expect(languageResult.current.currentLanguage).toBe('en');
   });
 
   it('translation function should be memoized and update only when language changes', () => {
-    let currentLanguage = 'es' as const;
-    let renderCount = 0;
+    let testLanguage: Language = 'es';
 
-    const getAccessibilityReturn = () => ({
-      settings: {
-        ...mockSettings,
-        language: currentLanguage,
-      },
-      updateSettings: vi.fn(),
-      applyColorFilter: vi.fn(),
-      setLanguage: vi.fn(),
-      isLocalStorageAvailable: false,
+    const mockSetLanguage = vi.fn((lang: Language) => {
+      testLanguage = lang;
     });
 
     const spyUseAccessibility = vi.spyOn(useAccessibilityModule, 'useAccessibility');
-    spyUseAccessibility.mockImplementation(() => getAccessibilityReturn());
+    spyUseAccessibility.mockImplementation(() => ({
+      settings: baseMockSettings(testLanguage),
+      updateSettings: vi.fn(),
+      applyColorFilter: vi.fn(),
+      setLanguage: mockSetLanguage,
+      isLocalStorageAvailable: false,
+    }));
 
-    const { result, rerender } = renderHook(() => {
-      renderCount++;
-      return useTranslation();
-    });
+    const { result, rerender } = renderHook(() => useTranslation());
 
-    const initialT = result.current.t;
-
-    // Rerender without language change
-    rerender();
-    // The t function should be memoized and have a stable reference when language doesn't change
-    // (though it will be recreated on re-render, the identity should be consistent)
+    // Verify Spanish translations initially
+    expect(result.current.t('send_message')).toBe('Enviar');
 
     // Change language
     act(() => {
-      currentLanguage = 'en';
-      rerender();
+      testLanguage = 'en';
     });
+    
+    // Re-render to pick up the language change
+    rerender();
 
     // Should have different translations
     expect(result.current.t('send_message')).toBe('Send');

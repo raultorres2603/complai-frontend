@@ -73,7 +73,7 @@ describe('ChatWindow Component', () => {
   });
 
   it('should be a pure display component without controls', () => {
-    const { container } = render(<ChatWindow messages={defaultMessages} isLoading={false} />);
+    const { container: _container } = render(<ChatWindow messages={defaultMessages} isLoading={false} />);
 
     // Should NOT render input, send button, or other control elements
     expect(screen.queryByRole('button')).not.toBeInTheDocument();

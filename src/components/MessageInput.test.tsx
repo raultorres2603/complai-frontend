@@ -2,7 +2,7 @@
  * MessageInput Component Tests - Tests for translation of placeholders and labels
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/__tests__/test-utils';
 import { MessageInput } from './MessageInput';
 

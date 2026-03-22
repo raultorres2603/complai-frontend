@@ -28,26 +28,34 @@ describe('SpeechControls Component Translation', () => {
     vi.spyOn(useAccessibilityModule, 'useAccessibility').mockReturnValue({
       settings: {
         language: 'es',
-        colorBlindnessFilter: 'normal',
+        colorBlindnessType: 'normal',
         ttsEnabled: true,
+        ttsRate: 1.0,
+        ttsPitch: 1.0,
         sttEnabled: false,
+        sttLanguage: 'es',
       },
       setLanguage: vi.fn(),
-      setColorBlindnessFilter: vi.fn(),
-      setTtsEnabled: vi.fn(),
-      setSttEnabled: vi.fn(),
+      updateSettings: vi.fn(),
+      applyColorFilter: vi.fn(),
+      isLocalStorageAvailable: true,
     });
 
     // Mock useTextToSpeech to return voices and controls
     vi.spyOn(useTextToSpeechModule, 'useTextToSpeech').mockReturnValue({
       state: {
         isPlaying: false,
+        isPaused: false,
         currentRate: 1,
         selectedVoiceUri: 'es-ES-voice1',
         availableVoices: mockVoices,
         currentMessageId: '',
+        currentText: '',
+        error: null,
       },
       readText: vi.fn(),
+      pause: vi.fn(),
+      resume: vi.fn(),
       stop: vi.fn(),
       setRate: vi.fn(),
       selectVoice: vi.fn(),

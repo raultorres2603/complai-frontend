@@ -3,13 +3,12 @@
  * Provides custom render and renderHook functions with proper setup
  */
 
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import {
   render as rtlRender,
-  RenderOptions,
   renderHook as rtlRenderHook,
-  RenderHookOptions,
 } from '@testing-library/react';
+import type { RenderOptions, RenderHookOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -68,6 +67,6 @@ export function renderHook<TProps, TResult>(
 }
 
 // Re-export common testing utilities
-export { screen, waitFor, act } from '@testing-library/react';
+export { screen, waitFor, act, within } from '@testing-library/react';
 export { userEvent };
 export type { RenderResult } from '@testing-library/react';

@@ -163,12 +163,6 @@ select:disabled {
   cursor: not-allowed;
 }
 
-@media (max-width: 1024px) {
-  border-right: none;
-  border-bottom: 1px solid var(--border);
-}
-}
-
 #next-steps ul {
   list-style: none;
   padding: 0;

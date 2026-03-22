@@ -66,8 +66,8 @@ export interface ChatState {
  * Complaint redaction context
  */
 export interface ComplaintRedactContext {
-  conversationId: string;
-  format: OutputFormat;
+  conversationId?: string;
+  format?: OutputFormat;
   requesterName?: string;
   requesterSurname?: string;
   requesterIdNumber?: string;

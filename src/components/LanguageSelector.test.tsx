@@ -160,7 +160,7 @@ describe('LanguageSelector', () => {
 
   it('closes dropdown when clicking outside', async () => {
     const mockCallback = vi.fn();
-    const { container } = render(
+    const { container: _container } = render(
       <div>
         <div data-testid="outside">Outside</div>
         <LanguageSelector

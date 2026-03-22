@@ -5,9 +5,7 @@
 
 import type { Language } from '../types/accessibility.types';
 
-export type TranslationKey = keyof typeof translations.es;
-
-export const translations: Record<Language, Record<TranslationKey, string>> = {
+export const translations = {
   es: {
     accessibility_settings: 'Configuración de Accesibilidad',
     close: 'Cerrar',
@@ -158,7 +156,12 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     continue_this_tab: 'Continuar amb aquesta pestanya',
     closing_tabs_status: 'Tancant pestanyes...',
   },
-};
+} as const;
+
+/**
+ * Type for translation keys - derived from the Spanish translations object
+ */
+export type TranslationKey = keyof typeof translations.es;
 
 /**
  * Get translation for a given key in the current language

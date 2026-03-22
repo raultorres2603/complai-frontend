@@ -24,7 +24,7 @@ export const TAB_MESSAGE_TYPES = {
 // localStorage keys
 const TAB_ID_KEY = 'complai_tab_ids';
 const FORCE_CLOSE_KEY = 'complai_force_close';
-const CLOSING_TABS_KEY = 'complai_closing_tabs';
+const _CLOSING_TABS_KEY = 'complai_closing_tabs';
 
 // Channel name for BroadcastChannel
 const CHANNEL_NAME = 'complai_tab_channel';
@@ -33,7 +33,7 @@ const CHANNEL_NAME = 'complai_tab_channel';
 const HEARTBEAT_INTERVAL = 500; // Check every 500ms for other tabs
 const TAB_EXPIRY_TIME = 2000; // Consider tab dead after 2 seconds without heartbeat
 const MESSAGE_ACK_TIMEOUT = 2000; // Timeout for message acknowledgment
-const CLOSURE_TIMEOUT = 3000; // Force closure after 3 seconds
+const _CLOSURE_TIMEOUT = 3000; // Force closure after 3 seconds
 const DEBUG = false; // Set to true for verbose logging
 
 interface TabDetectionState {

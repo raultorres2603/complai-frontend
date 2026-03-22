@@ -70,7 +70,7 @@ describe('AccessibilityPanel', () => {
   it('should have color blindness section expanded by default', () => {
     render(<AccessibilityPanel isVisible={true} />);
     const buttons = screen.getAllByRole('button');
-    const daltonismButton = buttons.find((btn) => btn.textContent.includes('Filtro de Daltonismo'));
+    const daltonismButton = buttons.find((btn: HTMLElement) => btn.textContent.includes('Filtro de Daltonismo'));
     expect(daltonismButton).toHaveAttribute('aria-expanded', 'true');
   });
 

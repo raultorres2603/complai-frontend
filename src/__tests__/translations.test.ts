@@ -29,7 +29,7 @@ describe('Translation System', () => {
 
     it('should not have undefined or null values in any language', () => {
       languages.forEach((lang) => {
-        Object.entries(translations[lang]).forEach(([key, value]) => {
+        Object.entries(translations[lang]).forEach(([_key, value]) => {
           expect(value).toBeDefined();
           expect(value).not.toBeNull();
           expect(typeof value).toBe('string');
@@ -39,8 +39,8 @@ describe('Translation System', () => {
 
     it('should have non-empty translation strings', () => {
       languages.forEach((lang) => {
-        Object.entries(translations[lang]).forEach(([key, value]) => {
-          expect(value.length).toBeGreaterThan(0);
+        Object.entries(translations[lang]).forEach(([_key, value]) => {
+          expect((value as string).length).toBeGreaterThan(0);
         });
       });
     });

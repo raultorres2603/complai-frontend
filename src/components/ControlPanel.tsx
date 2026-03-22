@@ -130,7 +130,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Footer with clear history button */}
       <div className={styles.footer}>
         <button className={styles.clearButton} onClick={onClearHistory} disabled={messages.length === 0}>
-          🗑️ {t('clear_history')}
+          🗑️ {t('clear_chat')}
         </button>
       </div>
     </div>

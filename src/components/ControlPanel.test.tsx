@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@/__tests__/test-utils';
+import { render, screen } from '@/__tests__/test-utils';
 import { ControlPanel } from './ControlPanel';
 
 // Mock child components to isolate ControlPanel tests
@@ -20,7 +20,7 @@ vi.mock('./Header', () => ({
 }));
 
 vi.mock('./MessageInput', () => ({
-  MessageInput: ({ onSend, disabled, isComplaintMode, onComplaintInfoChange }: any) => (
+  MessageInput: ({ onSend, disabled, _isComplaintMode, _onComplaintInfoChange }: any) => (
     <div data-testid="message-input-mock">
       <textarea placeholder="Enter message" data-testid="message-textarea" disabled={disabled} />
       <button onClick={() => onSend('test message')} data-testid="send-button" disabled={disabled}>
@@ -31,7 +31,7 @@ vi.mock('./MessageInput', () => ({
 }));
 
 vi.mock('./SpeechControls', () => ({
-  SpeechControls: ({ messages, ttsEnabled }: any) => (
+  SpeechControls: ({ _messages, ttsEnabled }: any) => (
     <div data-testid="speech-controls-mock" data-tts-enabled={ttsEnabled}>
       Speech Controls
     </div>
@@ -226,7 +226,7 @@ describe('ControlPanel Component', () => {
       />
     );
 
-    const clearButton = screen.getByRole('button', { name: /clear_history/ });
+    const clearButton = screen.getByRole('button', { name: /clear_chat/ });
     expect(clearButton).toBeInTheDocument();
   });
 
@@ -245,7 +245,7 @@ describe('ControlPanel Component', () => {
       />
     );
 
-    const clearButton = screen.getByRole('button', { name: /clear_history/ });
+    const clearButton = screen.getByRole('button', { name: /clear_chat/ });
     clearButton.click();
 
     expect(mockOnClearHistory).toHaveBeenCalled();
@@ -266,12 +266,12 @@ describe('ControlPanel Component', () => {
       />
     );
 
-    const clearButton = screen.getByRole('button', { name: /clear_history/ });
+    const clearButton = screen.getByRole('button', { name: /clear_chat/ });
     expect(clearButton).toBeDisabled();
   });
 
   it('should pass isComplaintMode to Header', () => {
-    const { container } = render(
+    const { container: _container } = render(
       <ControlPanel
         messages={defaultMessages}
         isLoading={false}

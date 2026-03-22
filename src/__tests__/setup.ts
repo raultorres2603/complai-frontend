@@ -34,12 +34,13 @@ beforeEach(() => {
 if (typeof BroadcastChannel === 'undefined') {
   const broadcastChannelInstances = new Map<
     string,
-    { onmessage: ((event: any) => void) | null; listeners: Set<BroadcastChannel> }
+    { onmessage: ((event: any) => void) | null; listeners: Set<any> }
   >();
 
   (global as any).BroadcastChannel = class MockBroadcastChannel {
     private name: string;
     public onmessage: ((event: any) => void) | null = null;
+    public onmessageerror: ((event: any) => void) | null = null;
 
     constructor(name: string) {
       this.name = name;
@@ -55,15 +56,51 @@ if (typeof BroadcastChannel === 'undefined') {
     postMessage(message: any) {
       const instances = broadcastChannelInstances.get(this.name);
       if (instances) {
-        instances.listeners.forEach((listener) => {
+        instances.listeners.forEach((listener: any) => {
           if (listener !== this && listener.onmessage) {
             // Broadcast to other instances asynchronously
             setTimeout(() => {
-              listener.onmessage?.({ data: message });
+              const messageEvent = { data: message } as any;
+              listener.onmessage?.(messageEvent);
             }, 0);
           }
         });
       }
+    }
+
+    addEventListener(
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      _options?: boolean | AddEventListenerOptions
+    ): void {
+      if (type === 'message' && typeof listener === 'function') {
+        this.onmessage = listener;
+      } else if (type === 'messageerror' && typeof listener === 'function') {
+        this.onmessageerror = listener;
+      }
+    }
+
+    removeEventListener(
+      type: string,
+      _listener: EventListenerOrEventListenerObject,
+      _options?: boolean | EventListenerOptions
+    ): void {
+      if (type === 'message') {
+        this.onmessage = null;
+      } else if (type === 'messageerror') {
+        this.onmessageerror = null;
+      }
+    }
+
+    dispatchEvent(event: Event): boolean {
+      if (event.type === 'message' && this.onmessage) {
+        this.onmessage(event as any);
+        return true;
+      } else if (event.type === 'messageerror' && this.onmessageerror) {
+        this.onmessageerror(event as any);
+        return true;
+      }
+      return false;
     }
 
     close() {

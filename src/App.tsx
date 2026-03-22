@@ -19,7 +19,7 @@ import './App.css';
 
 function App() {
   const { jwtToken, isInitialized, getCityFromToken } = useAuth();
-  const { settings } = useAccessibility(); // Initialize accessibility hook
+  const { settings: _settings } = useAccessibility(); // Initialize accessibility hook
 
   // Determine city from JWT token
   const cityId = (jwtToken && getCityFromToken(jwtToken)) || 'elprat';
