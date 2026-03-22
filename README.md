@@ -76,7 +76,9 @@ npm install
 
 ### Environment Configuration
 
-Create a `.env.local` file in the frontend directory:
+The frontend uses **GitHub Environment Variables and Secrets** for CI/CD deployments. No local `.env` files are needed or committed to the repository.
+
+**For local development**, create a `.env.local` file (git-ignored):
 
 ```env
 # Backend API URL
@@ -85,10 +87,11 @@ VITE_BACKEND_URL=http://localhost:3000
 # Default city (must match backend city IDs)
 VITE_DEFAULT_CITY=testcity
 
-# Feature flags
-VITE_ENABLE_LANGUAGE_SELECTOR=true
-VITE_ENABLE_COMPLAINT_FEATURE=true
+# JWT token for API auth (optional, can be entered in UI)
+VITE_JWT_TOKEN=your-dev-jwt-token
 ```
+
+**For CI/CD deployments**, configure GitHub Environments (see the [GitHub Environment Configuration](#github-environment-configuration) section below).
 
 ### Development Server
 
@@ -294,6 +297,132 @@ UPSTREAM = 3       // Backend/AI service unavailable
 INTERNAL = 4       // Internal server error
 UNKNOWN = 5        // Unknown error
 ```
+
+## GitHub Environment Configuration
+
+The ComplAI frontend uses **GitHub Environments and Secrets** exclusively for CI/CD deployments. All configuration is managed through GitHub's Environment settings; no local `.env` files are committed to the repository.
+
+### Creating GitHub Environments
+
+Follow these steps to configure the GitHub Environments for automated deployments:
+
+#### Development Environment
+
+1. Go to your GitHub repository → **Settings** → **Environments**
+2. Click **New environment** and name it `development`
+3. Add the following **Environment Variables**:
+   - **`VITE_BACKEND_URL`**: Development API URL
+     - Example: `https://dev-api.complai.com`
+     - This is the backend server your development frontend will connect to
+   - **`VITE_DEFAULT_CITY`**: Default city for development
+     - Example: `testcity`
+     - Must match a valid city ID configured in your backend
+4. Add the following **Secrets**:
+   - **`VITE_JWT_TOKEN`**: Development JWT authentication token
+     - This token is used to authenticate API requests from the frontend
+     - Keep this secure; never commit it to the repository
+5. (Optional) Under **Deployment branches**, restrict to the `develop` branch only
+6. Save the environment
+
+#### Production Environment
+
+1. Go to your GitHub repository → **Settings** → **Environments**
+2. Click **New environment** and name it `production`
+3. Add the following **Environment Variables**:
+   - **`VITE_BACKEND_URL`**: Production API URL
+     - Example: `https://api.complai.com`
+     - This is the production backend server
+   - **`VITE_DEFAULT_CITY`**: Default city for production
+     - Example: `barcelona`
+     - Should match your production city configuration
+4. Add the following **Secrets**:
+   - **`VITE_JWT_TOKEN`**: Production JWT authentication token
+     - This must be a valid production token
+     - Keep this secure; never commit it to the repository
+5. (Optional) Under **Deployment branches**, restrict to the `main` branch only
+6. (**Recommended**) Enable **"Require reviewers"** to enforce manual approval before production deployments
+7. Save the environment
+
+### How It Works
+
+1. When you push to the `develop` branch, the workflow uses the `development` environment variables and secrets
+2. When you push to the `main` branch, the workflow uses the `production` environment variables and secrets
+3. During the build process, these variables are injected into the Vite build, making them available as `process.env.VITE_*` in your code
+4. The compiled application contains these values embedded in the JavaScript bundle
+
+### Security Best Practices
+
+- ✅ **Store secrets in GitHub Secrets only** — Never commit JWT tokens or sensitive values to the repository
+- ✅ **Use strong, unique tokens** — Generate strong JWT tokens for each environment
+- ✅ **Rotate tokens regularly** — Update JWT tokens periodically for security
+- ✅ **Restrict environment access** — Use GitHub's branch deployment restrictions to prevent accidental deployments
+- ✅ **Require approvals for production** — Always require manual review before deploying to production
+- ✅ **Verify token expiry** — Ensure JWT tokens are valid for the deployment duration
+- Check the `.env*` pattern is in `.gitignore` to prevent accidental commits of local files
+
+### Local Testing
+
+To test the build locally with the same configuration:
+
+```bash
+# Development build
+VITE_BACKEND_URL=https://dev-api.complai.com \
+VITE_DEFAULT_CITY=testcity \
+VITE_JWT_TOKEN=your-dev-token \
+VITE_DEPLOYMENT_ENV=development \
+npm run build
+
+# Production build
+VITE_BACKEND_URL=https://api.complai.com \
+VITE_DEFAULT_CITY=barcelona \
+VITE_JWT_TOKEN=your-prod-token \
+VITE_DEPLOYMENT_ENV=production \
+npm run build
+
+# Preview the build
+npm run preview
+```
+
+### Workflow Trigger
+
+The deployment workflow (`.github/workflows/deploy.yml`) automatically:
+1. Triggers on push to `main` (→ production environment) or `develop` (→ development environment)
+2. Checks out your code
+3. Installs dependencies
+4. Runs TypeScript type checking
+5. Runs the test suite
+6. Builds the application with GitHub environment variables
+7. Deploys to GitHub Pages using the appropriate base path:
+   - Development: `/complai-frontend-dev/` subdirectory
+   - Production: `/` (root)
+
+No local `.env` files are required for CI/CD; all configuration comes from GitHub Environments.
+
+**Workflow Failed:**
+1. Check the **Actions** tab for error details
+2. Common issues:
+   - Missing `VITE_BACKEND_URL` environment variable
+   - TypeScript type checking failed (`npm run type-check`)
+   - Tests failed (`npm test -- --run`)
+   - Build failed (`npm run build`)
+
+**Site Not Updating:**
+1. Verify the workflow completed successfully (green checkmark)
+2. Force refresh the GitHub Pages URL (Cmd+Shift+R or Ctrl+Shift+F5)
+3. Check that the `gh-pages` branch was updated in the **Branches** section
+
+**API Calls Failing:**
+1. Ensure `VITE_BACKEND_URL` environment variable is set correctly in GitHub
+2. Verify the backend server is accessible from the client
+3. Check browser console for network errors
+
+### CI/CD Best Practices
+
+- Always push to `develop` first for testing before merging to `main`
+- Use GitHub's branch protection rules to require pull requests before merging to `main`
+- Require approvals for production deployments
+- Monitor workflow execution in the Actions tab
+- Review deployment logs if issues occur
 
 ## Browser Support
 
