@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { usePdfPolling } from './hooks/usePdfPolling';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
+import { useTabDetection } from './hooks/useTabDetection';
 import { complaiService } from './services/apiService';
 import { sessionService } from './services/sessionService';
 import { MainLayout } from './layouts/MainLayout';
 import { ChatWindow } from './components/ChatWindow';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { TabConflictModal } from './components/TabConflictModal';
 import './App.css';
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
   const chatState = useChat(undefined, cityId);
   const [isComplaintMode, setIsComplaintMode] = useState(false);
   const { pollPdfUrl, stopPolling } = usePdfPolling();
+  const tabDetection = useTabDetection();
+  const [tabConflictDismissed, setTabConflictDismissed] = useState(false);
 
   // Initialize or restore conversation
   useEffect(() => {
@@ -111,6 +115,13 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <TabConflictModal
+        isVisible={tabDetection.isMultipleTabsDetected && !tabConflictDismissed}
+        onContinueThisTab={() => {
+          tabDetection.forceTabActive();
+          setTabConflictDismissed(true);
+        }}
+      />
       <MainLayout isComplaintMode={isComplaintMode} onToggleComplaint={() => setIsComplaintMode((v) => !v)}>
         <ChatWindow
           messages={chatState.state.messages}
