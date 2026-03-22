@@ -2,7 +2,7 @@
  * TabConflictModal Component - Displays warning when multiple tabs detected
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './TabConflictModal.module.css';
 
 interface TabConflictModalProps {
@@ -14,6 +14,13 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
   isVisible,
   onContinueThisTab,
 }) => {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleContinue = () => {
+    setIsClosing(true);
+    onContinueThisTab();
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -28,13 +35,17 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
             For security reasons, ComplAI only allows one active session per device.
           </p>
           <p className={styles.submessage}>
-            You have multiple browser tabs open. Please use only one and close the others.
+            Other tabs of this app will be automatically closed.
           </p>
         </div>
 
         <div className={styles.footer}>
-          <button className={styles.primaryButton} onClick={onContinueThisTab}>
-            Continue with this tab
+          <button
+            className={styles.primaryButton}
+            onClick={handleContinue}
+            disabled={isClosing}
+          >
+            {isClosing ? 'Closing other tabs...' : 'Continue with this tab'}
           </button>
         </div>
       </div>

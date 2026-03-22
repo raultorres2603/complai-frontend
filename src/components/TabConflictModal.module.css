@@ -46,6 +46,18 @@
     }
 }
 
+@keyframes buttonPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 2px 16px rgba(59, 130, 246, 0.4);
+    }
+}
+
 .header {
     margin-bottom: 1.5rem;
 }
@@ -93,14 +105,20 @@
     transition: all 0.2s ease;
 }
 
-.primaryButton:hover {
+.primaryButton:hover:not(:disabled) {
     background: var(--color-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
-.primaryButton:active {
+.primaryButton:active:not(:disabled) {
     transform: translateY(0);
+}
+
+.primaryButton:disabled {
+    opacity: 0.7;
+    cursor: progress;
+    animation: buttonPulse 1.5s infinite ease-in-out;
 }
 
 /* Mobile responsive */

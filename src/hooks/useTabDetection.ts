@@ -5,15 +5,21 @@
 
 import { useEffect, useState, useRef } from 'react';
 
-const TAB_ID_KEY = 'complai_tab_id';
-const TAB_ACTIVE_KEY = 'complai_tab_active';
+const TAB_ID_KEY = 'complai_tab_ids'; // localStorage key storing all active tab IDs
 const CHANNEL_NAME = 'complai_tab_channel';
+const HEARTBEAT_INTERVAL = 500; // Check every 500ms for other tabs
+const TAB_EXPIRY_TIME = 2000; // Consider tab dead after 2 seconds without heartbeat
 
 interface TabDetectionState {
   isMultipleTabsDetected: boolean;
   currentTabId: string;
   isCurrentTabActive: boolean;
   error: string | null;
+}
+
+interface TabEntry {
+  id: string;
+  timestamp: number;
 }
 
 /**
@@ -30,15 +36,12 @@ export function useTabDetection() {
 
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
   const tabIdRef = useRef<string>('');
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize tab detection on mount
   useEffect(() => {
-    // Generate unique tab ID if not exists
-    let tabId = sessionStorage.getItem(TAB_ID_KEY);
-    if (!tabId) {
-      tabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem(TAB_ID_KEY, tabId);
-    }
+    // Generate unique tab ID
+    const tabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     tabIdRef.current = tabId;
 
     setState((prev) => ({
@@ -47,13 +50,54 @@ export function useTabDetection() {
       isCurrentTabActive: true,
     }));
 
-    // Try to use BroadcastChannel (preferred modern API)
+    // Register this tab in localStorage
+    const registerTab = () => {
+      try {
+        const tabsData = localStorage.getItem(TAB_ID_KEY);
+        const tabs: Record<string, number> = tabsData ? JSON.parse(tabsData) : {};
+        
+        // Add/update this tab
+        tabs[tabId] = Date.now();
+        
+        // Remove expired tabs (no heartbeat for TAB_EXPIRY_TIME)
+        const now = Date.now();
+        Object.keys(tabs).forEach((id) => {
+          if (now - tabs[id] > TAB_EXPIRY_TIME) {
+            delete tabs[id];
+          }
+        });
+
+        localStorage.setItem(TAB_ID_KEY, JSON.stringify(tabs));
+        
+        // Check if other tabs exist
+        const otherTabs = Object.keys(tabs).filter((id) => id !== tabId);
+        if (otherTabs.length > 0) {
+          setState((prev) => ({
+            ...prev,
+            isMultipleTabsDetected: true,
+          }));
+        } else {
+          setState((prev) => ({
+            ...prev,
+            isMultipleTabsDetected: false,
+          }));
+        }
+      } catch (e) {
+        console.warn('Failed to register tab in localStorage:', e);
+      }
+    };
+
+    // Heartbeat: Register this tab every 500ms
+    heartbeatIntervalRef.current = setInterval(registerTab, HEARTBEAT_INTERVAL);
+    registerTab(); // Initial registration
+
+    // Try to use BroadcastChannel as well (preferred modern API)
     if (typeof BroadcastChannel !== 'undefined') {
       try {
         const channel = new BroadcastChannel(CHANNEL_NAME);
         broadcastChannelRef.current = channel;
 
-        // Announce this tab is active
+        // Announce this tab
         channel.postMessage({
           type: 'TAB_ACTIVE',
           tabId: tabId,
@@ -62,25 +106,21 @@ export function useTabDetection() {
 
         // Listen for messages from other tabs
         channel.onmessage = (event) => {
-          const { type, tabId: otherTabId, timestamp } = event.data;
+          const { type, tabId: otherTabId } = event.data;
 
-          if (type === 'TAB_ACTIVE') {
-            // Another tab is trying to be active
-            if (otherTabId !== tabId) {
-              // Another tab exists - mark as multiple tabs detected
-              setState((prev) => ({
-                ...prev,
-                isMultipleTabsDetected: true,
-              }));
-            }
-          } else if (type === 'TAB_CLOSED') {
-            // Another tab was closed - check if we're the only one left
-            // Re-announce this tab as active
-            channel.postMessage({
-              type: 'TAB_ACTIVE',
-              tabId: tabId,
-              timestamp: Date.now(),
-            });
+          if (type === 'TAB_ACTIVE' && otherTabId !== tabId) {
+            // Another tab announced itself
+            setState((prev) => ({
+              ...prev,
+              isMultipleTabsDetected: true,
+            }));
+          } else if (type === 'TAB_CLOSE_SELF') {
+            // This tab was requested to close itself
+            console.log('Closing tab due to another tab taking over');
+            // Give a brief moment for state updates, then close
+            setTimeout(() => {
+              window.close();
+            }, 100);
           }
         };
 
@@ -95,43 +135,43 @@ export function useTabDetection() {
           broadcastChannelRef.current = null;
         };
       } catch (error) {
-        console.warn('BroadcastChannel not available, falling back to storage events', error);
-        setState((prev) => ({
-          ...prev,
-          error: 'BroadcastChannel initialization warning',
-        }));
+        console.warn('BroadcastChannel not available, using localStorage fallback:', error);
       }
-    } else {
-      // Fallback: use storage events for older browsers
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === TAB_ACTIVE_KEY) {
-          const otherTabId = e.newValue;
-          if (otherTabId && otherTabId !== tabId) {
-            setState((prev) => ({
-              ...prev,
-              isMultipleTabsDetected: true,
-            }));
+    }
+
+    // Cleanup on unmount
+    return () => {
+      // Clear heartbeat interval
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+      }
+
+      // Close BroadcastChannel if open
+      if (broadcastChannelRef.current) {
+        broadcastChannelRef.current.close();
+        broadcastChannelRef.current = null;
+      }
+
+      // Remove this tab from localStorage
+      try {
+        const tabsData = localStorage.getItem(TAB_ID_KEY);
+        if (tabsData) {
+          const tabs: Record<string, number> = JSON.parse(tabsData);
+          delete tabs[tabId];
+          if (Object.keys(tabs).length > 0) {
+            localStorage.setItem(TAB_ID_KEY, JSON.stringify(tabs));
+          } else {
+            localStorage.removeItem(TAB_ID_KEY);
           }
         }
-      };
-
-      // Mark this tab as active periodically
-      const heartbeatInterval = setInterval(() => {
-        sessionStorage.setItem(TAB_ACTIVE_KEY, tabId);
-      }, 1000);
-
-      window.addEventListener('storage', handleStorageChange);
-
-      return () => {
-        clearInterval(heartbeatInterval);
-        window.removeEventListener('storage', handleStorageChange);
-        sessionStorage.removeItem(TAB_ACTIVE_KEY);
-      };
-    }
+      } catch (e) {
+        console.warn('Failed to clean up tab from localStorage:', e);
+      }
+    };
   }, []);
 
   /**
-   * Force this tab to be the active one (requires user interaction)
+   * Force this tab to be the active one and close all other tabs of this app
    */
   const forceTabActive = () => {
     setState((prev) => ({
@@ -140,14 +180,21 @@ export function useTabDetection() {
       isMultipleTabsDetected: false,
     }));
 
+    try {
+      // Clear other tabs' registrations, keep only this one
+      const tabId = tabIdRef.current;
+      localStorage.setItem(TAB_ID_KEY, JSON.stringify({ [tabId]: Date.now() }));
+    } catch (e) {
+      console.warn('Failed to force tab active:', e);
+    }
+
+    // Send close message to all other tabs of the same app
     if (broadcastChannelRef.current) {
       broadcastChannelRef.current.postMessage({
-        type: 'TAB_FORCE_ACTIVE',
+        type: 'TAB_CLOSE_SELF',
         tabId: tabIdRef.current,
         timestamp: Date.now(),
       });
-    } else {
-      sessionStorage.setItem(TAB_ACTIVE_KEY, tabIdRef.current);
     }
   };
 
