@@ -57,7 +57,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          destination_dir: complai-frontend-dev
+          destination_dir: dev
           commit_message: 'Deploy development build to GitHub Pages'
 
   deploy-prod:
