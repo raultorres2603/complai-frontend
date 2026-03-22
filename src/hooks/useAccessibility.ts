@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import type { AccessibilitySettings, ColorBlindnessType } from '../types/accessibility.types';
+import type { AccessibilitySettings, ColorBlindnessType, Language } from '../types/accessibility.types';
 import { DEFAULT_ACCESSIBILITY_SETTINGS } from '../types/accessibility.types';
 
 const STORAGE_KEY = 'complai_accessibility';
@@ -12,6 +12,7 @@ export interface UseAccessibilityReturn {
   settings: AccessibilitySettings;
   updateSettings: (partial: Partial<AccessibilitySettings>) => void;
   applyColorFilter: (type: ColorBlindnessType) => void;
+  setLanguage: (language: Language) => void;
   isLocalStorageAvailable: boolean;
 }
 
@@ -19,8 +20,9 @@ export interface UseAccessibilityReturn {
  * Custom hook for managing accessibility settings
  * Loads settings from localStorage on mount and persists changes
  * Applies color blindness filters to the document
+ * Manages language selection
  *
- * @returns Accessibility settings and update functions
+ * @returns Accessibility settings, update functions, and language setter
  */
 export function useAccessibility(): UseAccessibilityReturn {
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_ACCESSIBILITY_SETTINGS);
@@ -72,6 +74,14 @@ export function useAccessibility(): UseAccessibilityReturn {
   }, [isLocalStorageAvailable]);
 
   /**
+   * Set language and persist to localStorage
+   * Convenience method for changing language
+   */
+  const setLanguage = useCallback((language: Language) => {
+    updateSettings({ language });
+  }, [updateSettings]);
+
+  /**
    * Apply color blindness filter to document
    * Adds CSS class to document.body
    */
@@ -90,6 +100,7 @@ export function useAccessibility(): UseAccessibilityReturn {
     settings,
     updateSettings,
     applyColorFilter,
+    setLanguage,
     isLocalStorageAvailable,
   };
 }

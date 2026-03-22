@@ -1,6 +1,7 @@
 /**
  * SpeechControls Component - Text-to-Speech controls
  * Provides voice playback controls, voice selection, and speed adjustment
+ * Only renders when TTS is enabled
  */
 
 import React from 'react';
@@ -26,8 +27,10 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
   ttsEnabled = true,
 }) => {
   const { settings } = useAccessibility();
-  const { state, readText, stop, setRate, selectVoice } = useTextToSpeech();
+  // Pass enabled parameter to dynamically control TTS initialization
+  const { state, readText, stop, setRate, selectVoice } = useTextToSpeech(settings.ttsEnabled);
 
+  // Early return: don't render if TTS is disabled
   if (!ttsEnabled || !settings.ttsEnabled) {
     return null;
   }

@@ -1,6 +1,9 @@
 /**
  * useTextToSpeech Hook - Text-to-Speech functionality using Web Speech API
  * Provides voice synthesis with voice selection, rate control, and playback management
+ * 
+ * Can be dynamically enabled/disabled via the `enabled` parameter to control
+ * Web Speech API initialization without page refresh
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -16,7 +19,14 @@ export interface UseTextToSpeechReturn {
   selectVoice: (voiceUri: string) => void;
 }
 
-export function useTextToSpeech(): UseTextToSpeechReturn {
+/**
+ * Custom hook for text-to-speech functionality
+ * 
+ * @param enabled - Whether TTS is enabled. When false, Voice API is not initialized
+ *                  and readText will fail gracefully.
+ * @returns TTS state and control methods
+ */
+export function useTextToSpeech(enabled: boolean = true): UseTextToSpeechReturn {
   const [state, setState] = useState<TextToSpeechState>({
     isPlaying: false,
     isPaused: false,
@@ -31,8 +41,25 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
   const synthesisRef = useRef<SpeechSynthesis | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Initialize Speech Synthesis
+  // Initialize Speech Synthesis only when enabled
   useEffect(() => {
+    if (!enabled) {
+      // Cleanup: cancel any ongoing speech and reset refs
+      if (synthesisRef.current) {
+        synthesisRef.current.cancel();
+      }
+      // Reset state when disabled
+      setState((prev) => ({
+        ...prev,
+        isPlaying: false,
+        isPaused: false,
+        currentMessageId: null,
+        currentText: '',
+        availableVoices: [],
+      }));
+      return;
+    }
+
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       synthesisRef.current = window.speechSynthesis;
 
@@ -55,9 +82,17 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
         window.speechSynthesis.onvoiceschanged = null;
       };
     }
-  }, []);
+  }, [enabled]);
 
   const readText = useCallback((text: string, messageId: string) => {
+    if (!enabled) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Text-to-Speech is not enabled. Enable it in accessibility settings.',
+      }));
+      return;
+    }
+
     if (!synthesisRef.current) {
       setState((prev) => ({
         ...prev,
@@ -142,7 +177,7 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
         error: `Error creating utterance: ${err instanceof Error ? err.message : String(err)}`,
       }));
     }
-  }, [state.selectedVoiceUri, state.currentRate, state.availableVoices]);
+  }, [enabled, state.selectedVoiceUri, state.currentRate, state.availableVoices]);
 
   const pause = useCallback(() => {
     if (synthesisRef.current && synthesisRef.current.speaking && !synthesisRef.current.paused) {

@@ -2,6 +2,7 @@
  * API Client - Handles HTTP requests with JWT authentication
  */
 
+import type { Language } from '../types/accessibility.types';
 import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest } from '../types/api.types';
 import { ErrorCode } from '../types/api.types';
 
@@ -154,17 +155,25 @@ export const complaiService = {
   /**
    * Ask a question to the ComplAI chatbot
    * POST /complai/ask
+   * 
+   * @param text - The question text
+   * @param conversationId - Optional conversation ID for multi-turn context
+   * @param jwtToken - JWT authentication token
+   * @param language - Language code (es, en, ca) for API communication
+   * @param timeout - Optional request timeout in milliseconds
    */
   async askQuestion(
     text: string,
     conversationId: string | undefined,
     jwtToken: string,
+    language: Language = 'es',
     timeout?: number
   ): Promise<OpenRouterPublicDto> {
     const client = getApiClient();
 
     const request: AskRequest = {
       text,
+      language, // Include language in request
       ...(conversationId && { conversationId }),
     };
 
@@ -179,6 +188,16 @@ export const complaiService = {
    * Redact a complaint letter
    * POST /complai/redact
    * Returns 200 with response or 202 Accepted with pdfUrl
+   * 
+   * @param text - The complaint text to redact
+   * @param format - Output format (PDF, etc.)
+   * @param conversationId - Optional conversation ID
+   * @param requesterName - Optional requester first name
+   * @param requesterSurname - Optional requester last name
+   * @param requesterIdNumber - Optional requester ID number
+   * @param jwtToken - JWT authentication token
+   * @param language - Language code (es, en, ca) for API communication
+   * @param timeout - Optional request timeout in milliseconds
    */
   async redactComplaint(
     text: string,
@@ -188,6 +207,7 @@ export const complaiService = {
     requesterSurname: string | undefined,
     requesterIdNumber: string | undefined,
     jwtToken: string,
+    language: Language = 'es',
     timeout?: number
   ): Promise<RedactAsyncResponse> {
     const client = getApiClient();
@@ -195,6 +215,7 @@ export const complaiService = {
     const request: RedactRequest = {
       text,
       format: format as any,
+      language, // Include language in request
       ...(conversationId && { conversationId }),
       ...(requesterName && { requesterName }),
       ...(requesterSurname && { requesterSurname }),

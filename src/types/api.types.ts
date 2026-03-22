@@ -3,6 +3,8 @@
  * These types represent the exact structure of backend API responses
  */
 
+import type { Language } from './accessibility.types';
+
 /**
  * Error codes from backend OpenRouterErrorCode enum
  */
@@ -60,6 +62,7 @@ export interface RedactAsyncResponse extends OpenRouterPublicDto {
 export interface AskRequest {
   text: string;
   conversationId?: string;
+  language: Language; // Language code for API communication
 }
 
 /**
@@ -69,6 +72,7 @@ export interface RedactRequest {
   text: string;
   format: OutputFormat;
   conversationId?: string;
+  language: Language; // Language code for API communication
   requesterName?: string;
   requesterSurname?: string;
   requesterIdNumber?: string;

@@ -4,7 +4,9 @@
 
 import React, { useState } from 'react';
 import { useAccessibility } from '../hooks/useAccessibility';
+import { useLanguage } from '../hooks/useLanguage';
 import { COLORBLINDNESS_FILTERS, type ColorBlindnessType } from '../types/accessibility.types';
+import { LanguageSelector } from './LanguageSelector';
 import styles from './AccessibilityPanel.module.css';
 
 export interface AccessibilityPanelProps {
@@ -14,13 +16,14 @@ export interface AccessibilityPanelProps {
 
 /**
  * Accessibility panel for managing user accessibility preferences
- * Allows selection of color blindness filter, TTS, and STT options
+ * Includes color blindness filter, TTS, STT, and language selection
  */
 export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
   isVisible,
   onClose,
 }) => {
   const { settings, updateSettings } = useAccessibility();
+  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['daltonism']));
 
   const toggleSection = (section: string) => {
@@ -55,15 +58,18 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
         </div>
 
         <div className={styles.content}>
-          {/* Daltonism Filter Section */}
-          <div className={styles.section}>
+          {/* Color Blindness Filter Section */}
+          <div className={styles.section} data-section="colorblindness">
             <button
               className={styles.sectionHeader}
               onClick={() => toggleSection('daltonism')}
               aria-expanded={expandedSections.has('daltonism')}
               aria-controls="daltonism-content"
             >
-              <span className={styles.sectionTitle}>Color Blindness Filter</span>
+              <span className={styles.sectionTitle}>
+                <span className={styles.icon}>♿</span>
+                Color Blindness Filter
+              </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('daltonism') ? '▼' : '▶'}
               </span>
@@ -117,14 +123,17 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
           </div>
 
           {/* Text-to-Speech Section */}
-          <div className={styles.section}>
+          <div className={styles.section} data-section="tts">
             <button
               className={styles.sectionHeader}
               onClick={() => toggleSection('tts')}
               aria-expanded={expandedSections.has('tts')}
               aria-controls="tts-content"
             >
-              <span className={styles.sectionTitle}>Text-to-Speech</span>
+              <span className={styles.sectionTitle}>
+                <span className={styles.icon}>🔊</span>
+                Text-to-Speech
+              </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('tts') ? '▼' : '▶'}
               </span>
@@ -165,14 +174,17 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
           </div>
 
           {/* Speech-to-Text Section */}
-          <div className={styles.section}>
+          <div className={styles.section} data-section="stt">
             <button
               className={styles.sectionHeader}
               onClick={() => toggleSection('stt')}
               aria-expanded={expandedSections.has('stt')}
               aria-controls="stt-content"
             >
-              <span className={styles.sectionTitle}>Speech-to-Text</span>
+              <span className={styles.sectionTitle}>
+                <span className={styles.icon}>🎤</span>
+                Speech-to-Text
+              </span>
               <span className={styles.expandIcon}>
                 {expandedSections.has('stt') ? '▼' : '▶'}
               </span>
@@ -213,6 +225,42 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
                     </select>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+
+          {/* Language Selection Section */}
+          <div className={styles.section} data-section="language">
+            <button
+              className={styles.sectionHeader}
+              onClick={() => toggleSection('language')}
+              aria-expanded={expandedSections.has('language')}
+              aria-controls="language-content"
+            >
+              <span className={styles.sectionTitle}>
+                <span className={styles.icon}>🌐</span>
+                Language
+              </span>
+              <span className={styles.expandIcon}>
+                {expandedSections.has('language') ? '▼' : '▶'}
+              </span>
+            </button>
+
+            {expandedSections.has('language') && (
+              <div id="language-content" className={styles.sectionContent}>
+                <label htmlFor="language-selector" className={styles.label}>
+                  Interface Language:
+                </label>
+                <div className={styles.languageSelectorWrapper}>
+                  <LanguageSelector
+                    currentLanguage={currentLanguage}
+                    onSelectLanguage={setLanguage}
+                    availableLanguages={availableLanguages}
+                  />
+                </div>
+                <p className={styles.description}>
+                  Changes the language of the interface and API requests.
+                </p>
               </div>
             )}
           </div>

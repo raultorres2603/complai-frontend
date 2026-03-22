@@ -6,6 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { ChatMessage, ChatState, ComplaintRedactContext } from '../types/domain.types';
 import { complaiService, ApiError } from '../services/apiService';
 import { sessionService } from '../services/sessionService';
+import { useLanguage } from './useLanguage';
 
 function generateMessageId(): string {
   return 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
@@ -15,6 +16,7 @@ export function useChat(
   initialConversationId?: string,
   cityId?: string
 ) {
+  const { currentLanguage } = useLanguage(); // Get current language for API calls
   const [state, setState] = useState<ChatState>({
     conversationId: initialConversationId || '',
     messages: [],
@@ -74,11 +76,12 @@ export function useChat(
       sessionService.addMessage(state.conversationId, userMessage);
 
       try {
-        // Call API
+        // Call API with current language
         const response = await complaiService.askQuestion(
           text,
           state.conversationId,
           jwtToken,
+          currentLanguage,
           60000
         );
 
@@ -189,6 +192,7 @@ export function useChat(
           requesterSurname,
           requesterIdNumber,
           jwtToken,
+          currentLanguage,
           90000
         );
 

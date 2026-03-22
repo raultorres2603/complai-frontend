@@ -1,9 +1,11 @@
 /**
- * Header Component - Minimal brand header
+ * Header Component - Minimal brand header with accessibility and language controls
  */
 
 import React, { useState } from 'react';
 import AccessibilityPanel from './AccessibilityPanel';
+import { LanguageSelector } from './LanguageSelector';
+import { useLanguage } from '../hooks/useLanguage';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -13,6 +15,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
 
   return (
     <>
@@ -24,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
             <p className={styles.subtitle}>Citizen Support Chatbot</p>
           </div>
 
-          {/* Right controls - toggle complaint mode and accessibility */}
+          {/* Right controls - accessibility, language, and complaint mode */}
           <div className={styles.controls}>
             <button
               className={styles.accessibilityButton}
@@ -34,6 +37,13 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
             >
               ♿
             </button>
+
+            <LanguageSelector
+              currentLanguage={currentLanguage}
+              onSelectLanguage={setLanguage}
+              availableLanguages={availableLanguages}
+            />
+
             <button
               className={`${styles.modeButton} ${isComplaintMode ? styles.on : ''}`}
               onClick={() => onToggleComplaint?.()}
