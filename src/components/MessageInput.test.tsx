@@ -137,7 +137,7 @@ describe('MessageInput Component Translation', () => {
   });
 
   it('should call onSend when message is submitted', async () => {
-    const { container } = render(
+    const { container, user } = render(
       <MessageInput
         onSend={mockOnSend}
         disabled={false}
@@ -149,12 +149,11 @@ describe('MessageInput Component Translation', () => {
     const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question/i);
     const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
 
-    // Type message
-    textarea.textContent = 'Test message';
-    textarea.value = 'Test message';
+    // Type message using user event
+    await user.type(textarea, 'Test message');
 
     // Click send
-    sendButton.click();
+    await user.click(sendButton);
 
     // onSend should be called
     expect(mockOnSend).toHaveBeenCalled();

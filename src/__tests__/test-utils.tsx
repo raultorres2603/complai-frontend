@@ -10,6 +10,7 @@ import {
   renderHook as rtlRenderHook,
   RenderHookOptions,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Custom render function that ensures DOM container is available
@@ -27,7 +28,13 @@ export function render(
     document.body.appendChild(container);
   }
 
-  return rtlRender(ui, { ...options });
+  const renderResult = rtlRender(ui, { ...options });
+  const user = userEvent.setup({ delay: null });
+
+  return {
+    ...renderResult,
+    user,
+  };
 }
 
 /**
@@ -62,4 +69,5 @@ export function renderHook<TProps, TResult>(
 
 // Re-export common testing utilities
 export { screen, waitFor, act } from '@testing-library/react';
+export { userEvent };
 export type { RenderResult } from '@testing-library/react';
