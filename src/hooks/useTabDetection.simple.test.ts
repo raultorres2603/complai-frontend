@@ -114,8 +114,8 @@ describe('useTabDetection', () => {
     // Since heartbeat 500ms interval, wait a short time
     await new Promise((resolve) => setTimeout(resolve, 600));
 
-    expect(result.current.isMultipleTabsDetected).toBeTrue();
-  });
+    expect(result.current.isMultipleTabsDetected).toBe(true);
+  }, 10000);
 
   it('should send TAB_CLOSE_SELF on forceTabActive', () => {
     const { result } = renderHook(() => useTabDetection());

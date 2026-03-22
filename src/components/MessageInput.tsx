@@ -6,6 +6,7 @@ import { useState, useRef } from 'react';
 import type { OutputFormat } from '../types/api.types';
 import { OutputFormat as OutputFormatEnum } from '../types/api.types';
 import { useAccessibility } from '../hooks/useAccessibility';
+import { useTranslation } from '../hooks/useTranslation';
 import { MicrophoneButton } from './MicrophoneButton';
 import styles from './MessageInput.module.css';
 
@@ -29,6 +30,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onComplaintInfoChange,
 }) => {
   const { settings } = useAccessibility();
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   const [format, setFormat] = useState<OutputFormat>(OutputFormatEnum.AUTO);
   const [complaintInfo, setComplaintInfo] = useState({
@@ -82,11 +84,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={`${styles.complaintSection} ${isComplaintMode ? styles.visible : styles.hidden}`}>
-        <h3 className={styles.sectionTitle}>Requester Information (Optional)</h3>
+        <h3 className={styles.sectionTitle}>{t('requester_information')} {t('optional')}</h3>
         <div className={styles.complaintFields}>
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t('name_field')}
             value={complaintInfo.name}
             onChange={(e) => handleComplaintInfoChange('name', e.target.value)}
             disabled={disabled}
@@ -94,7 +96,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           />
           <input
             type="text"
-            placeholder="Surname"
+            placeholder={t('surname_field')}
             value={complaintInfo.surname}
             onChange={(e) => handleComplaintInfoChange('surname', e.target.value)}
             disabled={disabled}
@@ -102,7 +104,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           />
           <input
             type="text"
-            placeholder="ID Number (DNI/NIF)"
+            placeholder={t('id_number_field')}
             value={complaintInfo.idNumber}
             onChange={(e) => handleComplaintInfoChange('idNumber', e.target.value)}
             disabled={disabled}
@@ -111,7 +113,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </div>
 
         <div className={styles.formatSection}>
-          <label className={styles.label}>Output Format:</label>
+          <label className={styles.label}>{t('output_format_label')}</label>
           <div className={styles.formatButtons}>
             {Object.values(OutputFormatEnum).map((fmt) => (
               <button
@@ -134,7 +136,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             ref={textareaRef}
             value={text}
             onChange={handleTextChange}
-            placeholder={isComplaintMode ? 'Describe your complaint...' : 'Ask a question...'}
+            placeholder={isComplaintMode ? t('describe_complaint_placeholder') : t('ask_question_placeholder')}
             disabled={disabled}
             className={styles.textarea}
             rows={3}
@@ -153,9 +155,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             type="submit"
             disabled={isSubmitDisabled}
             className={styles.sendButton}
-            title="Send message (Ctrl+Enter)"
+            title={t('send_message_tooltip')}
           >
-            Send
+            {t('send_message')}
           </button>
         </div>
       </div>

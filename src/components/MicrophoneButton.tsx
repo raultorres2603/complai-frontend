@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { useSpeechToText } from '../hooks/useSpeechToText';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from './MicrophoneButton.module.css';
 
 interface MicrophoneButtonProps {
@@ -20,6 +21,7 @@ export const MicrophoneButton: React.FC<MicrophoneButtonProps> = ({
 }) => {
   const { state, startListening, stopListening, cancelListening, resetTranscript } =
     useSpeechToText();
+  const { t } = useTranslation();
 
   // Auto-send transcript when complete
   useEffect(() => {
@@ -59,8 +61,8 @@ export const MicrophoneButton: React.FC<MicrophoneButtonProps> = ({
         className={`${styles.button} ${state.isListening ? styles.listening : ''}`}
         onClick={handleClick}
         disabled={disabled}
-        title={state.isListening ? 'Stop listening' : 'Start listening'}
-        aria-label={state.isListening ? 'Stop listening' : 'Start listening'}
+        title={state.isListening ? t('stop_listening') : t('start_listening')}
+        aria-label={state.isListening ? t('stop_listening') : t('start_listening')}
       >
         <span className={styles.icon}>🎤</span>
       </button>
@@ -87,7 +89,7 @@ export const MicrophoneButton: React.FC<MicrophoneButtonProps> = ({
             <p className={styles.final}>{state.transcript}</p>
           )}
           {!state.transcript && !state.interimTranscript && (
-            <p className={styles.listening}>Listening...</p>
+            <p className={styles.listening}>{t('listening_status')}</p>
           )}
         </div>
       )}

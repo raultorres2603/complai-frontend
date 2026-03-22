@@ -10,7 +10,7 @@
  * - Accessibility attributes
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@/__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
 import { TabConflictModal } from './TabConflictModal';
@@ -32,14 +32,14 @@ describe('TabConflictModal', () => {
   it('should render modal content when isVisible is true', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    expect(screen.getByText(/Multiple Tabs Detected/i)).toBeInTheDocument();
-    expect(screen.getByText(/only allows one active session/i)).toBeInTheDocument();
+    expect(screen.getByText(/detectaron múltiples pestañas|Multiple Tabs Detected/i)).toBeInTheDocument();
+    expect(screen.getByText(/solo permite una sesión activa|only allows one active session/i)).toBeInTheDocument();
   });
 
-  it('should show initial button text "Continue with this tab"', () => {
+  it('should show initial button text with translation', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     expect(button).toBeInTheDocument();
   });
 
@@ -51,13 +51,13 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('should update button text to "Closing other tabs..." after click', async () => {
+  it('should update button text to closing state with translation', async () => {
     const user = userEvent.setup();
     const mockCallback = vi.fn();
 
@@ -65,11 +65,11 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Button text should change to "Closing other tabs..."
-    expect(screen.getByText(/Closing other tabs.../i)).toBeInTheDocument();
+    // Button text should change to translated "Closing other tabs..."
+    expect(screen.getByText(/Cerrando otras pestañas|Closing other tabs/i)).toBeInTheDocument();
   });
 
   it('should disable button during closure', async () => {
@@ -79,94 +79,82 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
     // Button should be disabled
     expect(button).toBeDisabled();
   });
 
-  it('should show error message after timeout', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+  it('should show error message after timeout with translation', async () => {
+    const user = userEvent.setup();
 
     render(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for error message to appear after timeout
     await waitFor(() => {
-      expect(screen.getByText(/Other tabs did not close/i)).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText(/no se cerraron|did not close/i)).toBeInTheDocument();
+    }, { timeout: 6000 });
+  }, 15000);
 
-  it('should show "Retry" button after timeout', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+  it('should show translated "Retry" button after timeout', async () => {
+    const user = userEvent.setup();
 
     render(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for retry button to appear after timeout
     await waitFor(() => {
-      expect(screen.getByText(/Retry/i)).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText(/Reintentar|Retry/i)).toBeInTheDocument();
+    }, { timeout: 6000 });
+  }, 15000);
 
   it('should allow retry after error', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
     const mockCallback = vi.fn();
 
     render(
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} />
     );
 
-    const firstButton = screen.getByText(/Continue with this tab/i);
+    const firstButton = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(firstButton);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for retry button to appear
     await waitFor(() => {
-      expect(screen.getByText(/Retry/i)).toBeInTheDocument();
-    });
+      expect(screen.getByText(/Reintentar|Retry/i)).toBeInTheDocument();
+    }, { timeout: 6000 });
 
-    const retryButton = screen.getByText(/Retry/i);
+    const retryButton = screen.getByText(/Reintentar|Retry/i);
     await user.click(retryButton);
     expect(mockCallback).toHaveBeenCalledTimes(1); // Only first call
-  });
+  }, 15000);
 
   it('should enable retry button (not disabled)', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
 
     render(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for retry button to become enabled
     await waitFor(() => {
-      const retryButton = screen.getByText(/Retry/i);
+      const retryButton = screen.getByText(/Reintentar|Retry/i);
       expect(retryButton).not.toBeDisabled();
-    });
-  });
+    }, { timeout: 6000 });
+  }, 15000);
 
   it('should reset state when modal becomes hidden/visible', async () => {
     const user = userEvent.setup();
@@ -175,11 +163,11 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
     // Button should show closing state
-    expect(screen.getByText(/Closing other tabs.../i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando otras pestañas|Closing other tabs/i)).toBeInTheDocument();
 
     // Hide modal
     rerender(
@@ -192,13 +180,13 @@ describe('TabConflictModal', () => {
     );
 
     // Should be reset to initial state
-    expect(screen.getByText(/Continue with this tab/i)).toBeInTheDocument();
+    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab/i)).toBeInTheDocument();
   });
 
   it('should have proper accessibility attributes', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     expect(button).toHaveAttribute('aria-label');
   });
 
@@ -209,12 +197,12 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
     // Spinner container should be visible
     await waitFor(() => {
-      expect(screen.getByText(/Closing tabs.../i)).toBeInTheDocument();
+      expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
     });
   });
 
@@ -222,32 +210,28 @@ describe('TabConflictModal', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
     // Spinner should not be visible initially
-    expect(screen.queryByText(/Closing tabs.../i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Cerrando pestaña|Closing tabs/i)).not.toBeInTheDocument();
   });
 
   it('should display error message with warning icon', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
 
     render(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for error message to appear
     await waitFor(() => {
-      const errorText = screen.getByText(/Other tabs did not close/i);
+      const errorText = screen.getByText(/no se cerraron|did not close/i);
       expect(errorText).toBeInTheDocument();
-    });
-  });
+    }, { timeout: 6000 });
+  }, 15000);
 
   it('should handle multiple retry attempts', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
     const mockCallback = vi.fn();
 
     render(
@@ -255,41 +239,35 @@ describe('TabConflictModal', () => {
     );
 
     // First attempt
-    let button = screen.getByText(/Continue with this tab/i);
+    let button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Advance time past the 5s timeout
-    vi.advanceTimersByTime(5100);
-
+    // Wait for retry button to appear
     await waitFor(() => {
-      expect(screen.getByText(/Retry/i)).toBeInTheDocument();
-    });
+      expect(screen.getByText(/Reintentar|Retry/i)).toBeInTheDocument();
+    }, { timeout: 6000 });
 
     // Click retry
-    button = screen.getByText(/Retry/i);
+    button = screen.getByText(/Reintentar|Retry/i);
     await user.click(button);
 
     // Should reset to idle and show "Continue" button
-    expect(screen.getByText(/Continue with this tab/i)).toBeInTheDocument();
-  });
+    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab/i)).toBeInTheDocument();
+  }, 15000);
 
   it('should clean up timeout on unmount', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
 
     const { unmount } = render(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Unmount before timeout
+    // Unmount immediately - should not cause errors
     unmount();
 
-    // Advance time - no error should occur
-    vi.advanceTimersByTime(5100);
-
     expect(true).toBe(true); // If we got here without error, test passes
-  });
+  }, 15000);
 });

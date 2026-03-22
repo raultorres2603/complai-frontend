@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
               onClick={() => onToggleComplaint?.()}
               aria-pressed={isComplaintMode}
             >
-              {isComplaintMode ? 'Complaint mode' : 'Ask a question'}
+              {isComplaintMode ? t('complaint_mode') : t('ask_question')}
             </button>
           </div>
         </div>

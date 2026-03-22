@@ -11,6 +11,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TabConflictModal.module.css';
 import { LoadingSpinner } from './LoadingSpinner';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface TabConflictModalProps {
   isVisible: boolean;
@@ -23,6 +24,7 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
   isVisible,
   onContinueThisTab,
 }) => {
+  const { t } = useTranslation();
   const [closureState, setClosureState] = useState<ClosureState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [closureTimeoutReached, setClosureTimeoutReached] = useState(false);
@@ -43,14 +45,14 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
         console.warn('Tab closure timeout - other tabs did not close within 5 seconds');
         setClosureTimeoutReached(true);
         setClosureState('error');
-        setErrorMessage('Other tabs did not close. Retrying...');
+        setErrorMessage(t('other_tabs_close_failed'));
       }, 5000); // 5 second timeout
 
       return () => {
         clearTimeout(timeoutId);
       };
     }
-  }, [closureState]);
+  }, [closureState, t]);
 
   const handleContinue = () => {
     setClosureState('closing');
@@ -71,13 +73,13 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
   const getButtonText = () => {
     switch (closureState) {
       case 'closing':
-        return 'Closing other tabs...';
+        return t('closing_other_tabs');
       case 'closed':
-        return 'Other tabs closed';
+        return t('other_tabs_closed');
       case 'error':
-        return 'Retry';
+        return t('retry_button');
       default:
-        return 'Continue with this tab';
+        return t('continue_this_tab');
     }
   };
 
@@ -87,21 +89,21 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>⚠️ Multiple Tabs Detected</h2>
+          <h2 className={styles.title}>{t('multiple_tabs_detected_title')}</h2>
         </div>
 
         <div className={styles.content}>
           <p className={styles.message}>
-            For security reasons, ComplAI only allows one active session per device.
+            {t('multiple_tabs_security_message')}
           </p>
           <p className={styles.submessage}>
-            Other tabs of this app will be automatically closed.
+            {t('multiple_tabs_auto_close_message')}
           </p>
 
           {closureState === 'closing' && (
             <div className={styles.spinnerContainer}>
               <LoadingSpinner />
-              <p className={styles.closingText}>Closing tabs...</p>
+              <p className={styles.closingText}>{t('closing_tabs_status')}</p>
             </div>
           )}
 

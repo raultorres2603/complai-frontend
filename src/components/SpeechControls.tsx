@@ -7,6 +7,7 @@
 import React from 'react';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAccessibility } from '../hooks/useAccessibility';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from './SpeechControls.module.css';
 
 interface ChatMessage {
@@ -27,6 +28,7 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
   ttsEnabled = true,
 }) => {
   const { settings } = useAccessibility();
+  const { t } = useTranslation();
   // Pass enabled parameter to dynamically control TTS initialization
   const { state, readText, stop, setRate, selectVoice } = useTextToSpeech(settings.ttsEnabled);
 
@@ -52,9 +54,9 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
           <button
             className={styles.stopBtn}
             onClick={stop}
-            title="Stop speaking"
+            title={t('stop_speaking')}
           >
-            Stop
+            {t('stop_speaking')}
           </button>
         )}
       </div>
@@ -62,7 +64,7 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
       <div className={styles.controls}>
         {/* Speed Control */}
         <div className={styles.controlGroup}>
-          <label className={styles.label}>Speed:</label>
+          <label className={styles.label}>{t('speed_label')}</label>
           <div className={styles.speedControl}>
             <input
               type="range"
@@ -80,7 +82,7 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
         {/* Voice Selection */}
         {state.availableVoices.length > 0 && (
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Voice:</label>
+            <label className={styles.label}>{t('voice_label')}</label>
             <select
               value={state.selectedVoiceUri || ''}
               onChange={(e) => selectVoice(e.target.value)}
