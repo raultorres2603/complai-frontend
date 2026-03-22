@@ -2,9 +2,12 @@
  * SpeechControls Component - Text-to-Speech controls
  * Provides voice playback controls, voice selection, and speed adjustment
  * Only renders when TTS is enabled
+ * 
+ * NOTE: Fully reactive - TTS widget appears/disappears instantly when toggled
+ * No page reload needed
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { useAccessibility } from '../hooks/useAccessibility';
 import { useTranslation } from '../hooks/useTranslation';
@@ -29,15 +32,25 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
 }) => {
   const { settings } = useAccessibility();
   const { t } = useTranslation();
+  
+  // Determine if TTS is actually enabled
+  const isEnabled = useMemo(() => ttsEnabled && settings.ttsEnabled, [ttsEnabled, settings.ttsEnabled]);
+  
   // Pass enabled parameter to dynamically control TTS initialization
-  const { state, readText, stop, setRate, selectVoice } = useTextToSpeech(settings.ttsEnabled);
+  // This hook properly handles the dynamic enable/disable without page reload
+  const { state, readText, stop, setRate, selectVoice } = useTextToSpeech(isEnabled);
+
+  // Memoize filtered messages to prevent unnecessary recalculations
+  // NOTE: Must be called before early return to maintain consistent hook count
+  const assistantMessages = useMemo(
+    () => messages.filter((msg) => msg.role === 'assistant'),
+    [messages]
+  );
 
   // Early return: don't render if TTS is disabled
-  if (!ttsEnabled || !settings.ttsEnabled) {
+  if (!isEnabled) {
     return null;
   }
-
-  const assistantMessages = messages.filter((msg) => msg.role === 'assistant');
 
   const handleReadMessage = (messageId: string) => {
     const message = assistantMessages.find((m) => m.id === messageId);
