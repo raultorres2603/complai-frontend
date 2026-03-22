@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - develop
+      - development
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/development'
     runs-on: ubuntu-latest
     environment: development
     permissions:
