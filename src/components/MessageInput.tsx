@@ -5,6 +5,8 @@
 import { useState, useRef } from 'react';
 import type { OutputFormat } from '../types/api.types';
 import { OutputFormat as OutputFormatEnum } from '../types/api.types';
+import { useAccessibility } from '../hooks/useAccessibility';
+import { MicrophoneButton } from './MicrophoneButton';
 import styles from './MessageInput.module.css';
 
 interface MessageInputProps {
@@ -26,6 +28,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   isComplaintMode = false,
   onComplaintInfoChange,
 }) => {
+  const { settings } = useAccessibility();
   const [text, setText] = useState('');
   const [format, setFormat] = useState<OutputFormat>(OutputFormatEnum.AUTO);
   const [complaintInfo, setComplaintInfo] = useState({
@@ -62,6 +65,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     const updated = { ...complaintInfo, [field]: value };
     setComplaintInfo(updated);
     onComplaintInfoChange?.(updated);
+  };
+
+  const handleTranscript = (transcript: string) => {
+    if (textareaRef.current) {
+      const newText = text ? `${text} ${transcript}` : transcript;
+      if (newText.length <= MAX_MESSAGE_LENGTH) {
+        setText(newText);
+        textareaRef.current.focus();
+      }
+    }
   };
 
   const isSubmitDisabled = disabled || !text.trim();
@@ -116,15 +129,22 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       </div>
 
       <div className={styles.inputContainer}>
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={handleTextChange}
-          placeholder={isComplaintMode ? 'Describe your complaint...' : 'Ask a question...'}
-          disabled={disabled}
-          className={styles.textarea}
-          rows={3}
-        />
+        <div className={styles.inputWrapper}>
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={handleTextChange}
+            placeholder={isComplaintMode ? 'Describe your complaint...' : 'Ask a question...'}
+            disabled={disabled}
+            className={styles.textarea}
+            rows={3}
+          />
+          <MicrophoneButton
+            onTranscript={handleTranscript}
+            disabled={disabled}
+            sttEnabled={settings.sttEnabled}
+          />
+        </div>
         <div className={styles.footer}>
           <span className={styles.charCount}>
             {text.length}/{MAX_MESSAGE_LENGTH}

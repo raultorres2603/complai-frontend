@@ -166,6 +166,21 @@
     opacity: 0.6;
 }
 
+/* Input wrapper for textarea + microphone button */
+.inputWrapper {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    align-items: flex-end;
+}
+
+.inputWrapper .textarea {
+    flex: 1;
+    padding: 0;
+    border: none;
+    min-height: 80px;
+}
+
 /* Footer with char count and send button */
 .footer {
     display: flex;

@@ -1,6 +1,33 @@
 /**
- * Accessibility Feature Types - Daltonism, Text-to-Speech, Speech-to-Text
+ * Accessibility Feature Types - Daltonism, Text-to-Speech, Speech-to-Text, Language
  */
+
+/**
+ * Language type for UI and API communication
+ * - es: Spanish (Español)
+ * - en: English
+ * - ca: Catalan (Català)
+ */
+export type Language = 'es' | 'en' | 'ca';
+
+/**
+ * Language option with metadata (label, flag icon, locale)
+ */
+export interface LanguageOption {
+  code: Language;
+  label: string;
+  flag: string; // Flag emoji: 🇪🇸, 🇬🇧, 🇪🇸
+  locale: string; // BCP 47 locale: es-ES, en-US, ca-ES
+}
+
+/**
+ * Available language options
+ */
+export const AVAILABLE_LANGUAGES: Record<Language, LanguageOption> = {
+  es: { code: 'es', label: 'Español', flag: '🇪🇸', locale: 'es-ES' },
+  en: { code: 'en', label: 'English', flag: '🇬🇧', locale: 'en-US' },
+  ca: { code: 'ca', label: 'Català', flag: '🇪🇸', locale: 'ca-ES' },
+};
 
 /**
  * Color blindness type for Daltonism support
@@ -63,6 +90,7 @@ export interface SpeechToTextState {
  */
 export interface AccessibilitySettings {
   colorBlindnessType: ColorBlindnessType;
+  language: Language; // Current language selection
   ttsEnabled: boolean;
   ttsRate: number;           // 0.5 to 2.0
   ttsVoiceUri?: string;
@@ -77,6 +105,7 @@ export interface AccessibilitySettings {
  */
 export const DEFAULT_ACCESSIBILITY_SETTINGS: AccessibilitySettings = {
   colorBlindnessType: 'normal',
+  language: 'es', // Default to Spanish
   ttsEnabled: false,
   ttsRate: 1.0,
   ttsPitch: 1.0,

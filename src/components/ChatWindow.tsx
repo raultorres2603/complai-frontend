@@ -6,6 +6,8 @@ import { useState } from 'react';
 import type { OutputFormat } from '../types/api.types';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
+import { SpeechControls } from './SpeechControls';
+import { useAccessibility } from '../hooks/useAccessibility';
 import styles from './ChatWindow.module.css';
 
 interface ChatWindowProps {
@@ -38,6 +40,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   isComplaintMode = false,
   onToggleComplaint,
 }) => {
+  const { settings } = useAccessibility();
   const [complaintInfo, setComplaintInfo] = useState<{
     name?: string;
     surname?: string;
@@ -84,6 +87,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
       {/* Message List */}
       <MessageList messages={messages} loading={isLoading} />
+
+      {/* Text-to-Speech Controls */}
+      {settings.ttsEnabled && <SpeechControls messages={messages} ttsEnabled={settings.ttsEnabled} />}
 
       {/* Message Input */}
       <MessageInput
