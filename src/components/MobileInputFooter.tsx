@@ -74,6 +74,7 @@ export const MobileInputFooter: React.FC<MobileInputFooterProps> = ({
           disabled={disabled}
           isComplaintMode={isComplaintMode}
           onComplaintInfoChange={onComplaintInfoChange}
+          isCompact={true}
         />
       </div>
     </footer>
