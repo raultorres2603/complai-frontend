@@ -177,6 +177,11 @@ function App() {
         error={chatState.state.currentError}
         messages={chatState.state.messages}
         onDismissError={chatState.clearCurrentError}
+        handleSendQuestion={handleSendQuestion}
+        handleSendComplaint={handleSendComplaint}
+        isLoading={chatState.state.isLoading}
+        jwtToken={jwtToken}
+        cityId={cityId}
       />
     </ErrorBoundary>
   );

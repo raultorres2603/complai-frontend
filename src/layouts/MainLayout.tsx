@@ -20,6 +20,7 @@ import { MobileInputFooter } from '../components/MobileInputFooter';
 import { ControlDrawer } from '../components/ControlDrawer';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslation } from '../hooks/useTranslation';
+import type { MainLayoutHandlers } from '../types/layout.types';
 import styles from './MainLayout.module.css';
 
 interface MainLayoutProps {
@@ -37,6 +38,18 @@ interface MainLayoutProps {
   messages?: any[];
   jwtToken?: string | null;
   onDismissError?: () => void;
+  // New props for mobile message sending
+  handleSendQuestion?: (text: string, jwtToken: string) => void;
+  handleSendComplaint?: (
+    text: string,
+    format: string,
+    name: string | undefined,
+    surname: string | undefined,
+    idNumber: string | undefined,
+    jwtToken: string
+  ) => void;
+  isLoading?: boolean;
+  cityId?: string;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -51,6 +64,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   error,
   messages = [],
   onDismissError,
+  handleSendQuestion,
+  handleSendComplaint,
+  isLoading = false,
+  jwtToken,
 }) => {
   const { currentLanguage, availableLanguages, setLanguage } = useLanguage();
   const { t } = useTranslation();
@@ -70,13 +87,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {/* Chat area - fills space between header and footer */}
         <main className={styles.mobileMain}>{chatWindow}</main>
 
-        {/* Fixed input footer - extracts props from controlPanel context */}
+        {/* Fixed input footer - pass handlers and state */}
         <MobileInputFooter
-          onSend={() => {}}
-          disabled={false}
+          onSend={(text, format) => {
+            if (handleSendQuestion && jwtToken) {
+              handleSendQuestion(text, jwtToken);
+            }
+          }}
+          onSendComplaint={(text, format, name, surname, idNumber) => {
+            if (handleSendComplaint && jwtToken) {
+              handleSendComplaint(text, format, name, surname, idNumber, jwtToken);
+            }
+          }}
+          disabled={isLoading}
           isComplaintMode={isComplaintMode}
           messages={messages}
           ttsEnabled={true}
+          jwtToken={jwtToken || null}
         />
 
         {/* Drawer with secondary controls */}

@@ -38,14 +38,17 @@ vi.mock('./SpeechControls', () => ({
 }));
 
 describe('MobileInputFooter Component', () => {
-  const defaultProps = {
-    onSend: vi.fn(),
-    disabled: false,
-    messages: [],
-  };
+  let defaultProps: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    defaultProps = {
+      onSend: vi.fn(),
+      onSendComplaint: vi.fn(),
+      disabled: false,
+      messages: [],
+      jwtToken: 'test-token',
+    };
   });
 
   it('should render footer container', () => {
