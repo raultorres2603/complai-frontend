@@ -269,3 +269,47 @@
         font-size: 0.875rem;
     }
 }
+
+/**
+ * Compact mode styles for mobile input
+ * Reduces padding, single-line textarea, hides complaint section
+ */
+.form.compact {
+    gap: 0;
+    padding: 0.5rem;
+}
+
+.form.compact .complaintSection {
+    display: none;
+}
+
+.form.compact .inputContainer {
+    border-radius: 8px;
+}
+
+.form.compact .inputWrapper {
+    padding: 0;
+    gap: 0.25rem;
+}
+
+.form.compact .inputWrapper .textarea {
+    padding: 0.5rem;
+    min-height: 40px;
+    max-height: 40px;
+    font-size: 0.9375rem;
+}
+
+.form.compact .footer {
+    padding: 0;
+    border-top: none;
+}
+
+.form.compact .charCount {
+    display: none;
+}
+
+.form.compact .sendButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    min-height: 40px;
+}

@@ -8,6 +8,7 @@ import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
 import { useTabDetection } from './hooks/useTabDetection';
 import { useAccessibility } from './hooks/useAccessibility';
+import { useMobileLayout } from './hooks/useMobileLayout';
 import { complaiService } from './services/apiService';
 import { sessionService } from './services/sessionService';
 import { MainLayout } from './layouts/MainLayout';
@@ -20,6 +21,9 @@ import './App.css';
 function App() {
   const { jwtToken, isInitialized, getCityFromToken } = useAuth();
   const { settings: _settings } = useAccessibility(); // Initialize accessibility hook
+
+  // Mobile layout state
+  const { isMobile, isDrawerOpen, toggleDrawer, closeDrawer } = useMobileLayout();
 
   // Determine city from JWT token
   const cityId = (jwtToken && getCityFromToken(jwtToken)) || 'elprat';
@@ -131,11 +135,18 @@ function App() {
       isLoading={chatState.state.isLoading}
       error={chatState.state.currentError}
       isComplaintMode={isComplaintMode}
-      onToggleComplaint={() => setIsComplaintMode((v) => !v)}
+      onToggleComplaint={() => {
+        setIsComplaintMode((v) => !v);
+        // Close drawer when toggling complaint mode
+        if (isMobile && isDrawerOpen) {
+          closeDrawer();
+        }
+      }}
       onSendQuestion={handleSendQuestion}
       onSendComplaint={handleSendComplaint}
       jwtToken={jwtToken}
       onClearHistory={chatState.clearMessages}
+      isMobile={isMobile}
     />
   );
 
@@ -148,7 +159,25 @@ function App() {
           setTabConflictDismissed(true);
         }}
       />
-      <MainLayout chatWindow={chatWindowComponent} controlPanel={controlPanelComponent} />
+      <MainLayout
+        chatWindow={chatWindowComponent}
+        controlPanel={controlPanelComponent}
+        isMobile={isMobile}
+        isDrawerOpen={isDrawerOpen}
+        onToggleDrawer={toggleDrawer}
+        isComplaintMode={isComplaintMode}
+        onToggleComplaint={() => {
+          setIsComplaintMode((v) => !v);
+          if (isMobile && isDrawerOpen) {
+            closeDrawer();
+          }
+        }}
+        onClearHistory={chatState.clearMessages}
+        disabled={chatState.state.isLoading}
+        error={chatState.state.currentError}
+        messages={chatState.state.messages}
+        onDismissError={chatState.clearCurrentError}
+      />
     </ErrorBoundary>
   );
 }

@@ -24,11 +24,13 @@ interface ChatMessage {
 interface SpeechControlsProps {
   messages: ChatMessage[];
   ttsEnabled?: boolean;
+  isCompact?: boolean;
 }
 
 export const SpeechControls: React.FC<SpeechControlsProps> = ({
   messages,
   ttsEnabled = true,
+  isCompact = false,
 }) => {
   const { settings } = useAccessibility();
   const { t } = useTranslation();
@@ -58,7 +60,54 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
       readText(message.content, messageId);
     }
   };
+  // Compact mode: horizontal layout with play/stop/voice select only
+  if (isCompact) {
+    return (
+      <div className={`${styles.container} ${styles.compact}`}>
+        <div className={styles.compactControls}>
+          {state.isPlaying && (
+            <button
+              className={styles.stopBtn}
+              onClick={stop}
+              title={t('stop')}
+              aria-label={t('stop')}
+            >
+              ⏹️
+            </button>
+          )}
 
+          {assistantMessages.length > 0 && !state.isPlaying && (
+            <button
+              className={styles.playBtn}
+              onClick={() => handleReadMessage(assistantMessages[assistantMessages.length - 1].id)}
+              title={t('listen')}
+              aria-label={t('listen')}
+            >
+              ▶️
+            </button>
+          )}
+
+          {state.availableVoices.length > 0 && (
+            <select
+              value={state.selectedVoiceUri || ''}
+              onChange={(e) => selectVoice(e.target.value)}
+              className={styles.voiceSelect}
+              title={t('voice_label')}
+              aria-label={t('voice_label')}
+            >
+              {state.availableVoices.map((voice) => (
+                <option key={voice.voiceURI} value={voice.voiceURI}>
+                  {voice.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop mode: full layout
   return (
     <div className={styles.container}>
       <div className={styles.header}>

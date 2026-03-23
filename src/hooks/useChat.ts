@@ -312,6 +312,16 @@ export function useChat(
     }
   }, [state.conversationId]);
 
+  /**
+   * Clear the current error state
+   */
+  const clearCurrentError = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      currentError: null,
+    }));
+  }, []);
+
   return {
     state,
     redactContext,
@@ -321,5 +331,6 @@ export function useChat(
     clearMessages,
     setConversationId,
     addMessage,
+    clearCurrentError,
   };
 }

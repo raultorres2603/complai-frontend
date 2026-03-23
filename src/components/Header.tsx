@@ -1,5 +1,6 @@
 /**
  * Header Component - Minimal brand header with accessibility and language controls
+ * Desktop-only component; returns null on mobile (MobileHeader handles mobile)
  */
 
 import React, { useState } from 'react';
@@ -12,13 +13,19 @@ import styles from './Header.module.css';
 interface HeaderProps {
   isComplaintMode?: boolean;
   onToggleComplaint?: () => void;
+  isMobile?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint }) => {
+export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const { t } = useTranslation();
   const appName = import.meta.env.VITE_APP_NAME || 'ComplAI';
+
+  // Return null on mobile; MobileHeader handles mobile header
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <>

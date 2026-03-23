@@ -1,5 +1,6 @@
 /**
  * MessageInput Component - User input form
+ * Supports both desktop and compact mobile mode
  */
 
 import { useState, useRef } from 'react';
@@ -19,6 +20,7 @@ interface MessageInputProps {
     surname?: string;
     idNumber?: string;
   }) => void;
+  isCompact?: boolean;
 }
 
 const MAX_MESSAGE_LENGTH = 5000;
@@ -28,6 +30,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   disabled,
   isComplaintMode = false,
   onComplaintInfoChange,
+  isCompact = false,
 }) => {
   const { settings } = useAccessibility();
   const { t } = useTranslation();
@@ -82,7 +85,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const isSubmitDisabled = disabled || !text.trim();
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={`${styles.form} ${isCompact ? styles.compact : ''}`} onSubmit={handleSubmit}>
+      {/* Complaint section - hidden in compact mode */}
       <div className={`${styles.complaintSection} ${isComplaintMode ? styles.visible : styles.hidden}`}>
         <h3 className={styles.sectionTitle}>{t('requester_information')} {t('optional')}</h3>
         <div className={styles.complaintFields}>
@@ -139,7 +143,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             placeholder={isComplaintMode ? t('describe_complaint_placeholder') : t('ask_question_placeholder')}
             disabled={disabled}
             className={styles.textarea}
-            rows={3}
+            rows={isCompact ? 1 : 3}
           />
           <MicrophoneButton
             onTranscript={handleTranscript}
@@ -148,9 +152,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           />
         </div>
         <div className={styles.footer}>
-          <span className={styles.charCount}>
-            {text.length}/{MAX_MESSAGE_LENGTH}
-          </span>
+          {!isCompact && (
+            <span className={styles.charCount}>
+              {text.length}/{MAX_MESSAGE_LENGTH}
+            </span>
+          )}
           <button
             type="submit"
             disabled={isSubmitDisabled}
