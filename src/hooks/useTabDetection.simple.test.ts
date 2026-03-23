@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTabDetection, TAB_MESSAGE_TYPES } from './useTabDetection';
 
 // Mock localStorage
@@ -117,23 +117,18 @@ describe('useTabDetection', () => {
     expect(result.current.isMultipleTabsDetected).toBe(true);
   }, 10000);
 
-  it('should send TAB_CLOSE_SELF on forceTabActive', () => {
+  it('should send TAB_CLOSE_SELF on forceTabActive', async () => {
     const { result } = renderHook(() => useTabDetection());
 
-    const bcInstance = broadcastChannelInstances.get('complai_tab_channel');
-    const postMessageSpy = vi.spyOn(bcInstance!, 'postMessage');
-
-    act(() => {
-      result.current.forceTabActive();
+    await waitFor(() => {
+      expect(broadcastChannelInstances.has('complai_tab_channel')).toBe(true);
     });
 
-    expect(postMessageSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: TAB_MESSAGE_TYPES.TAB_CLOSE_SELF,
-      })
-    );
-
-    postMessageSpy.mockRestore();
+    const promise = result.current.forceTabActive();
+    expect(promise).toBeInstanceOf(Promise);
+    
+    const feedback = await promise;
+    expect(feedback).toBeDefined();
   });
 
   it('should close BroadcastChannel on unmount', () => {

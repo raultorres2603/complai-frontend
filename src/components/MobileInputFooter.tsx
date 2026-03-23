@@ -121,7 +121,7 @@ export const MobileInputFooter: React.FC<MobileInputFooterProps> = ({
   };
 
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-testid="mobile-input-footer">
       {/* Compact SpeechControls - only show play/stop/voice select */}
       {ttsEnabled && (
         <div className={styles.speechControls}>

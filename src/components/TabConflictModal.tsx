@@ -44,22 +44,29 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
 
   // Track real closure progress from hook props
   useEffect(() => {
-    if (closureState !== 'idle' && closureState !== 'requesting') {
-      if (closingTabCount > 0) {
-        // We're in a closure operation
-        if (closedTabCount === closingTabCount) {
-          // All tabs closed
-          setClosureState('complete_success');
-        } else if (closedTabCount > 0) {
-          // Some but not all closed
-          setClosureState('partial_success');
-        } else if (closureState === 'closing' || closureState === 'closing_timeout') {
-          // Keep in same state
-        } else {
-          // Just started
+    // Handle state transitions based on closure progress
+    if (closingTabCount > 0) {
+      // We're in a closure operation
+      if (closedTabCount === closingTabCount) {
+        // All tabs closed
+        setClosureState('complete_success');
+      } else if (closedTabCount > 0) {
+        // Some but not all closed
+        setClosureState('partial_success');
+      } else if (closureState === 'idle') {
+        // Do nothing - waiting for user action
+      } else if (closureState === 'requesting' || closureState === 'closing' || closureState === 'closing_timeout') {
+        // Continue in current state or transition to closing
+        if (closureState === 'requesting') {
           setClosureState('closing');
         }
+      } else {
+        // Other states - just started
+        setClosureState('closing');
       }
+    } else if (closingTabCount === 0 && closureState !== 'idle' && closureState !== 'requesting') {
+      // Reset if closingTabCount becomes 0
+      setClosureState('idle');
     }
   }, [closingTabCount, closedTabCount, closureState]);
 
@@ -118,7 +125,7 @@ export const TabConflictModal: React.FC<TabConflictModalProps> = ({
   // Get progress text for closing state
   const getProgressText = (): string => {
     if (closingTabCount > 0 && (closureState === 'closing' || closureState === 'partial_success')) {
-      return `Cerrando pestañas: ${closedTabCount} de ${closingTabCount} cerradas`;
+      // Use the closing_tabs_progress template from translations  return t('closing_tabs_progress').replace('{{closed}}', String(closedTabCount)).replace('{{total}}', String(closingTabCount));
     }
     return '';
   };

@@ -50,7 +50,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       return;
     }
 
-    onSend(text.trim(), isComplaintMode ? format : undefined);
+    onSend(text.trim(), format);
     setText('');
     setComplaintInfo({ name: '', surname: '', idNumber: '' });
 
@@ -137,8 +137,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       <div className={styles.inputContainer}>
         <div className={styles.inputWrapper}>
           <textarea
-            ref={textareaRef}
-            value={text}
+            ref={textareaRef}            data-testid="message-input-textarea"            value={text}
             onChange={handleTextChange}
             placeholder={isComplaintMode ? t('describe_complaint_placeholder') : t('ask_question_placeholder')}
             disabled={disabled}

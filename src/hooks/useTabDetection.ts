@@ -264,28 +264,30 @@ export function useTabDetection() {
           // Send closure acknowledgment back to the requesting tab
           if (broadcastChannelRef.current) {
             try {
-              const ackMessage: TabClosureAckMessage = {
-                type: TAB_MESSAGE_TYPES.TAB_CLOSURE_ACK,
+              const ackMessage = {
+                type: TAB_MESSAGE_TYPES.TAB_CLOSED,
                 tabId: tabIdRef.current,
                 timestamp: Date.now(),
                 messageId: message.messageId,
-                closureSuccess: success, // Report actual closure status
-                error: !success ? 'window.close() failed, page hidden' : undefined,
               };
               broadcastChannelRef.current.postMessage(ackMessage);
-              log('Sent TAB_CLOSURE_ACK', { closureSuccess: success });
+              log('Sent TAB_CLOSED', { closureSuccess: success });
             } catch (e) {
-              logError('Failed to send TAB_CLOSURE_ACK', e);
+              logError('Failed to send TAB_CLOSED', e);
             }
           }
         });
-      } else if (type === TAB_MESSAGE_TYPES.TAB_CLOSURE_ACK) {
-        // NEW: Tab acknowledged its closure attempt
-        handleClosureAck(message as TabClosureAckMessage);
       } else if (type === TAB_MESSAGE_TYPES.TAB_CLOSED) {
-        // Legacy: Tab acknowledged closure (older message type)
+        // Tab acknowledged closure
         log('Received TAB_CLOSED acknowledgment', { fromTabId: otherTabId.substring(0, 8) });
         closingTabsRef.current.delete(otherTabId);
+        handleClosureAck({
+          type: TAB_MESSAGE_TYPES.TAB_CLOSED,
+          tabId: otherTabId,
+          timestamp: message.timestamp,
+          messageId: message.messageId,
+          closureSuccess: true,
+        } as TabClosureAckMessage);
       }
     },
     [log, logError, attemptWindowClose, setForceClosure, handleClosureAck]

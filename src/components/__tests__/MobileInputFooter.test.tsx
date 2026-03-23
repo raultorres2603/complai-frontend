@@ -56,23 +56,20 @@ describe('MobileInputFooter', () => {
       />
     );
 
-    // Find the textarea (can use role or find by input type)
-    const textareas = screen.queryAllByRole('textbox');
-    const textarea = textareas.length > 0 ? textareas[0] : document.querySelector('textarea');
+    // Find the textarea using test id
+    const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
     
-    if (textarea) {
-      await user.type(textarea, 'Test message');
+    await user.type(textarea, 'Test message');
 
-      // Submit the form
-      const form = textarea.closest('form');
-      if (form) {
-        fireEvent.submit(form);
-      }
-
-      await waitFor(() => {
-        expect(mockOnSend).toHaveBeenCalledWith('Test message', expect.any(Object));
-      });
+    // Submit the form
+    const form = textarea.closest('form');
+    if (form) {
+      fireEvent.submit(form);
     }
+
+    await waitFor(() => {
+      expect(mockOnSend).toHaveBeenCalledWith('Test message', expect.any(String));
+    });
   });
 
   it('should call onSendComplaint when complaint submitted in complaint mode', async () => {
@@ -93,22 +90,20 @@ describe('MobileInputFooter', () => {
       />
     );
 
-    // Find the textarea using query selector
-    const textarea = document.querySelector('textarea');
+    // Find the textarea using test id
+    const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
     
-    if (textarea) {
-      await user.type(textarea, 'Complaint message');
+    await user.type(textarea, 'Complaint message');
 
-      // Submit the form
-      const form = textarea.closest('form');
-      if (form) {
-        fireEvent.submit(form);
-      }
-
-      await waitFor(() => {
-        expect(mockOnSendComplaint).toHaveBeenCalled();
-      });
+    // Submit the form
+    const form = textarea.closest('form');
+    if (form) {
+      fireEvent.submit(form);
     }
+
+    await waitFor(() => {
+      expect(mockOnSendComplaint).toHaveBeenCalled();
+    });
   });
 
   it('should not call onSend or onSendComplaint when disabled', async () => {
@@ -123,18 +118,16 @@ describe('MobileInputFooter', () => {
     );
 
     // Find the textarea
-    const textarea = document.querySelector('textarea');
-    if (textarea) {
-      expect(textarea).toBeDisabled();
+    const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+    expect(textarea).toBeDisabled();
 
-      // Verify that when we try to type, it's still disabled
-      await user.type(textarea, 'Test message', { skipClick: true });
+    // Verify that when we try to type, it's still disabled
+    await user.type(textarea, 'Test message', { skipClick: true });
 
-      // The submit button should also be disabled
-      const form = textarea.closest('form');
-      if (form) {
-        fireEvent.submit(form);
-      }
+    // The submit button should also be disabled
+    const form = textarea.closest('form');
+    if (form) {
+      fireEvent.submit(form);
     }
 
     // Neither handler should be called

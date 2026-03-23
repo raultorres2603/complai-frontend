@@ -33,19 +33,17 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector('textarea');
-      if (textarea) {
-        await user.type(textarea, 'How can I help?');
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'How can I help?');
 
-        const form = textarea.closest('form');
-        if (form) {
-          fireEvent.submit(form);
-        }
-
-        await waitFor(() => {
-          expect(mockOnSend).toHaveBeenCalledWith('How can I help?', expect.any(Object));
-        });
+      const form = textarea.closest('form');
+      if (form) {
+        fireEvent.submit(form);
       }
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('How can I help?', expect.any(String));
+      });
     });
 
     it('should clear input after sending normal message', async () => {
@@ -63,19 +61,17 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-      if (textarea) {
-        await user.type(textarea, 'Test message');
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'Test message');
 
-        const form = textarea.closest('form');
-        if (form) {
-          fireEvent.submit(form);
-        }
-
-        await waitFor(() => {
-          expect(textarea.value).toBe('');
-        });
+      const form = textarea.closest('form');
+      if (form) {
+        fireEvent.submit(form);
       }
+
+      await waitFor(() => {
+        expect(textarea.value).toBe('');
+      });
     });
 
     it('should send multiple messages in sequence', async () => {
@@ -93,27 +89,25 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-      if (textarea) {
-        // Send first message
-        await user.type(textarea, 'First message');
-        let form = textarea.closest('form');
-        if (form) fireEvent.submit(form);
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      // Send first message
+      await user.type(textarea, 'First message');
+      let form = textarea.closest('form');
+      if (form) fireEvent.submit(form);
 
-        await waitFor(() => {
-          expect(mockOnSend).toHaveBeenCalledWith('First message', expect.any(Object));
-        });
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('First message', expect.any(String));
+      });
 
-        // Send second message
-        await user.type(textarea, 'Second message');
-        form = textarea.closest('form');
-        if (form) fireEvent.submit(form);
+      // Send second message
+      await user.type(textarea, 'Second message');
+      form = textarea.closest('form');
+      if (form) fireEvent.submit(form);
 
-        await waitFor(() => {
-          expect(mockOnSend).toHaveBeenCalledTimes(2);
-          expect(mockOnSend).toHaveBeenLastCalledWith('Second message', expect.any(Object));
-        });
-      }
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledTimes(2);
+        expect(mockOnSend).toHaveBeenLastCalledWith('Second message', expect.any(String));
+      });
     });
   });
 
@@ -133,21 +127,19 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector('textarea');
-      if (textarea) {
-        await user.type(textarea, 'Complaint message');
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'Complaint message');
 
-        const form = textarea.closest('form');
-        if (form) {
-          fireEvent.submit(form);
-        }
-
-        await waitFor(() => {
-          expect(mockOnSendComplaint).toHaveBeenCalled();
-          const callArgs = mockOnSendComplaint.mock.calls[0];
-          expect(callArgs[0]).toBe('Complaint message');
-        });
+      const form = textarea.closest('form');
+      if (form) {
+        fireEvent.submit(form);
       }
+
+      await waitFor(() => {
+        expect(mockOnSendComplaint).toHaveBeenCalled();
+        const callArgs = mockOnSendComplaint.mock.calls[0];
+        expect(callArgs[0]).toBe('Complaint message');
+      });
     });
 
     it('should toggle complaint mode and send accordingly', async () => {
@@ -166,13 +158,13 @@ describe('MobileInputFooter Integration', () => {
       );
 
       // Send in normal mode
-      let textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      let textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       await user.type(textarea, 'Normal message');
       let form = textarea.closest('form');
       if (form) fireEvent.submit(form);
 
       await waitFor(() => {
-        expect(mockOnSend).toHaveBeenCalledWith('Normal message', expect.any(Object));
+        expect(mockOnSend).toHaveBeenCalledWith('Normal message', expect.any(String));
       });
 
       // Switch to complaint mode
@@ -189,7 +181,7 @@ describe('MobileInputFooter Integration', () => {
       );
 
       // Send in complaint mode
-      textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       await user.type(textarea, 'Complaint message');
       form = textarea.closest('form');
       if (form) fireEvent.submit(form);
@@ -220,7 +212,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       await user.type(textarea, 'Complaint message');
 
       const form = textarea.closest('form');
@@ -247,7 +239,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      let textarea = document.querySelector("textarea");
+      let textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       expect(textarea).not.toBeDisabled();
 
       // Switch to loading state
@@ -263,7 +255,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      textarea = document.querySelector("textarea");
+      textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       expect(textarea).toBeDisabled();
     });
 
@@ -282,7 +274,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
 
       // Type message
       await user.type(textarea, 'Message while loading');
@@ -322,7 +314,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      let textarea = document.querySelector("textarea");
+      let textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       expect(textarea).toBeDisabled();
 
       // Loading completes
@@ -338,7 +330,7 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      textarea = document.querySelector("textarea");
+      textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
       expect(textarea).not.toBeDisabled();
     });
   });
@@ -357,7 +349,10 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const speechControls = container.querySelector('.speechControls');
+      const footer = screen.getByTestId('mobile-input-footer');
+      expect(footer).toBeInTheDocument();
+      
+      const speechControls = footer.querySelector('[class*="speechControls"]');
       expect(speechControls).toBeInTheDocument();
     });
 
@@ -393,11 +388,11 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const footer = container.querySelector('footer');
+      const footer = screen.getByTestId('mobile-input-footer');
       expect(footer).toBeInTheDocument();
-
-      const input = container.querySelector('.input');
-      expect(input).toBeInTheDocument();
+      
+      const inputDiv = footer.querySelector('[class*="input"]');
+      expect(inputDiv).toBeInTheDocument();
     });
 
     it('should have footer positioned fixed at bottom', () => {
@@ -413,11 +408,13 @@ describe('MobileInputFooter Integration', () => {
         />
       );
 
-      const footer = container.querySelector('footer');
-      const styles = window.getComputedStyle(footer!);
-
-      expect(footer).toHaveClass('footer');
-      // Position fixed is set in CSS
+      const footer = screen.getByTestId('mobile-input-footer');
+      expect(footer).toBeInTheDocument();
+      
+      // Verify it's a footer element (semantic HTML)
+      expect(footer.tagName).toBe('FOOTER');
+      // The position: fixed CSS is defined in MobileInputFooter.module.css
+      // which we can't reliably check in test environment without actual CSS rendering
     });
   });
 

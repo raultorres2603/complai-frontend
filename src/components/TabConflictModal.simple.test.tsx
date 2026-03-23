@@ -46,15 +46,22 @@ describe('TabConflictModal', () => {
 
   it('should update button text after click', async () => {
     const user = userEvent.setup();
+    const mockCallback = vi.fn();
 
-    render(
-      <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
+    const { rerender } = render(
+      <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
     const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    expect(screen.getByText(/Cerrando otras pestañas|Closing other tabs/i)).toBeInTheDocument();
+    rerender(
+      <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={1} closedTabCount={0} />
+    );
+
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+    // When closingTabCount > 0, button shows "Cerrando pestañas..." (without "otras")
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
   });
 
   it('should disable button during closure', async () => {
@@ -79,26 +86,23 @@ describe('TabConflictModal', () => {
 
   it('should reset state when visibility toggles', async () => {
     const user = userEvent.setup();
+    const mockCallback = vi.fn();
 
     const { rerender } = render(
-      <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
+      <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
     const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
     await user.click(button);
 
-    // Should show closing state
-    expect(screen.getByText(/Cerrando otras pestañas|Closing other tabs/i)).toBeInTheDocument();
-
-    // Hide and show
     rerender(
-      <TabConflictModal isVisible={false} onContinueThisTab={() => {}} />
-    );
-    rerender(
-      <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
+      <TabConflictModal isVisible={false} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    // Should be reset
+    rerender(
+      <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
+    );
+
     expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab/i)).toBeInTheDocument();
   });
 });
