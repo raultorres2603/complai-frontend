@@ -155,9 +155,18 @@ function App() {
       <TabConflictModal
         isVisible={tabDetection.isMultipleTabsDetected && !tabConflictDismissed}
         onContinueThisTab={() => {
-          tabDetection.forceTabActive();
-          setTabConflictDismissed(true);
+          tabDetection.forceTabActive().then(() => {
+            // Closure completed (either success or timeout), dismiss modal
+            setTabConflictDismissed(true);
+          }).catch((err) => {
+            console.error('Closure error:', err);
+            // Even on error, allow dismissal after a moment
+            setTimeout(() => setTabConflictDismissed(true), 2000);
+          });
         }}
+        closingTabCount={tabDetection.closingTabCount}
+        closedTabCount={tabDetection.closedTabCount}
+        closureFailureMessage={tabDetection.closureFailureMessage}
       />
       <MainLayout
         chatWindow={chatWindowComponent}

@@ -12,12 +12,14 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import type { TabClosureAckMessage, ClosureFeedback } from '../types/tabDetection.types';
 
 // Message types for tab communication
 export const TAB_MESSAGE_TYPES = {
   TAB_ACTIVE: 'TAB_ACTIVE',
   TAB_CLOSE_SELF: 'TAB_CLOSE_SELF',
   TAB_CLOSED: 'TAB_CLOSED',
+  TAB_CLOSURE_ACK: 'TAB_CLOSURE_ACK',
   TAB_CLOSE_REQUEST: 'TAB_CLOSE_REQUEST',
 } as const;
 
@@ -42,6 +44,9 @@ interface TabDetectionState {
   isCurrentTabActive: boolean;
   error: string | null;
   isClosing: boolean;
+  closingTabCount: number; // Number of tabs attempting to close
+  closedTabCount: number; // Number that confirmed closure
+  closureFailureMessage: string | null; // Details on remaining open tabs
 }
 
 interface TabMessage {
@@ -62,6 +67,9 @@ export function useTabDetection() {
     isCurrentTabActive: true,
     error: null,
     isClosing: false,
+    closingTabCount: 0,
+    closedTabCount: 0,
+    closureFailureMessage: null,
   });
 
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
@@ -71,9 +79,14 @@ export function useTabDetection() {
   const messageQueueRef = useRef<TabMessage[]>([]);
   const messageListenerReadyRef = useRef<boolean>(false);
   const closingTabsRef = useRef<Set<string>>(new Set());
+  // NEW: Track closure progress
+  const pendingClosureTabsRef = useRef<Set<string>>(new Set());
+  const closureStartTimeRef = useRef<number | null>(null);
+  const closureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
-   * Log function with conditional debug output
+   * [REVISED] Log function with conditional debug output
+   * DECLARED EARLY: Must be before any useCallback that references it
    */
   const log = useCallback((message: string, data?: unknown) => {
     const prefix = `[TabDetection:${tabIdRef.current.substring(0, 8)}]`;
@@ -83,12 +96,63 @@ export function useTabDetection() {
   }, []);
 
   /**
-   * Error logging function
+   * [REVISED] Error logging function
+   * DECLARED EARLY: Must be before any useCallback that references it
    */
   const logError = useCallback((operation: string, error: unknown) => {
     const prefix = `[TabDetection:${tabIdRef.current.substring(0, 8)}]`;
     console.error(`${prefix} ${operation}:`, error);
   }, []);
+
+  /**
+   * Set localStorage flag to trigger fallback closure path in receiving tab
+   * Called when TAB_CLOSE_SELF is received
+   */
+  const setForceClosure = useCallback((requestingTabId: string) => {
+    try {
+      localStorage.setItem(FORCE_CLOSE_KEY, requestingTabId);
+      log('Set FORCE_CLOSE_KEY in localStorage', { requestingTabId: requestingTabId.substring(0, 8) });
+    } catch (e) {
+      logError('setForceClosure', e);
+    }
+  }, [log, logError]);
+
+  /**
+   * Handle TAB_CLOSURE_ACK message from a tab acknowledging closure attempt
+   * Updates closure progress tracking in state
+   */
+  const handleClosureAck = useCallback((message: TabClosureAckMessage) => {
+    const { tabId: closingTabId, closureSuccess } = message;
+    
+    log('Processing TAB_CLOSURE_ACK', { 
+      fromTabId: closingTabId.substring(0, 8),
+      closureSuccess 
+    });
+
+    // Remove from pending set
+    pendingClosureTabsRef.current.delete(closingTabId);
+
+    // Update state to reflect progress
+    setState((prev) => {
+      const newClosedCount = prev.closedTabCount + 1;
+      const stillPending = prev.closingTabCount - newClosedCount;
+      
+      let failureMsg = prev.closureFailureMessage;
+      if (stillPending === 0) {
+        // All tabs have responded
+        failureMsg = null;
+      } else if (!closureSuccess && stillPending > 0) {
+        // Tab didn't close, might need to track it for failure message
+        failureMsg = `${stillPending} tab(s) remain open`;
+      }
+
+      return {
+        ...prev,
+        closedTabCount: newClosedCount,
+        closureFailureMessage: failureMsg,
+      };
+    });
+  }, [log]);
 
   /**
    * Attempt to close the window with fallback chain
@@ -186,6 +250,9 @@ export function useTabDetection() {
           isClosing: true,
         }));
 
+        // Set FORCE_CLOSE_KEY to trigger storage listener fallback
+        setForceClosure(otherTabId);
+
         // Try to close the window
         attemptWindowClose().then((success) => {
           if (success) {
@@ -193,29 +260,35 @@ export function useTabDetection() {
           } else {
             logError('attemptWindowClose', 'All fallbacks exhausted, tab still open');
           }
-        });
 
-        // Send acknowledgment back to the requesting tab
-        if (broadcastChannelRef.current) {
-          try {
-            broadcastChannelRef.current.postMessage({
-              type: TAB_MESSAGE_TYPES.TAB_CLOSED,
-              tabId: tabIdRef.current,
-              timestamp: Date.now(),
-              messageId: message.messageId,
-            });
-            log('Sent TAB_CLOSED acknowledgment');
-          } catch (e) {
-            logError('Failed to send TAB_CLOSED acknowledgment', e);
+          // Send closure acknowledgment back to the requesting tab
+          if (broadcastChannelRef.current) {
+            try {
+              const ackMessage: TabClosureAckMessage = {
+                type: TAB_MESSAGE_TYPES.TAB_CLOSURE_ACK,
+                tabId: tabIdRef.current,
+                timestamp: Date.now(),
+                messageId: message.messageId,
+                closureSuccess: success, // Report actual closure status
+                error: !success ? 'window.close() failed, page hidden' : undefined,
+              };
+              broadcastChannelRef.current.postMessage(ackMessage);
+              log('Sent TAB_CLOSURE_ACK', { closureSuccess: success });
+            } catch (e) {
+              logError('Failed to send TAB_CLOSURE_ACK', e);
+            }
           }
-        }
+        });
+      } else if (type === TAB_MESSAGE_TYPES.TAB_CLOSURE_ACK) {
+        // NEW: Tab acknowledged its closure attempt
+        handleClosureAck(message as TabClosureAckMessage);
       } else if (type === TAB_MESSAGE_TYPES.TAB_CLOSED) {
-        // Tab acknowledged closure
+        // Legacy: Tab acknowledged closure (older message type)
         log('Received TAB_CLOSED acknowledgment', { fromTabId: otherTabId.substring(0, 8) });
         closingTabsRef.current.delete(otherTabId);
       }
     },
-    [log, logError, attemptWindowClose]
+    [log, logError, attemptWindowClose, setForceClosure, handleClosureAck]
   );
 
   /**
@@ -419,6 +492,11 @@ export function useTabDetection() {
         clearTimeout(closeTimeoutRef.current);
       }
 
+      // Clear closure timeout if pending
+      if (closureTimeoutRef.current) {
+        clearTimeout(closureTimeoutRef.current);
+      }
+
       // Clear heartbeat interval
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current);
@@ -460,8 +538,9 @@ export function useTabDetection() {
 
   /**
    * Force this tab to be the active one and close all other tabs of this app
+   * Returns Promise with closure feedback
    */
-  const forceTabActive = useCallback(() => {
+  const forceTabActive = useCallback(async (): Promise<ClosureFeedback> => {
     const tabId = tabIdRef.current;
     log('forceTabActive called');
 
@@ -473,36 +552,98 @@ export function useTabDetection() {
 
     try {
       // Clear other tabs' registrations, keep only this one
-      localStorage.setItem(TAB_ID_KEY, JSON.stringify({ [tabId]: Date.now() }));
-      log('Cleared other tabs from localStorage');
-    } catch (e) {
-      logError('localStorage update in forceTabActive', e);
-    }
-
-    // Send close message to all other tabs of the same app
-    if (broadcastChannelRef.current) {
-      const messageId = `msg_${Date.now()}`;
-      try {
-        broadcastChannelRef.current.postMessage({
-          type: TAB_MESSAGE_TYPES.TAB_CLOSE_SELF,
-          tabId: tabId,
-          timestamp: Date.now(),
-          messageId: messageId,
-        });
-        log('Sent TAB_CLOSE_SELF message', { messageId });
-        closingTabsRef.current.add(messageId);
-
-        // Set timeout to forcefully clean up if acknowledgments don't arrive
-        if (closeTimeoutRef.current) {
-          clearTimeout(closeTimeoutRef.current);
-        }
-        closeTimeoutRef.current = setTimeout(() => {
-          log('Message acknowledgment timeout, clearing closing tabs');
-          closingTabsRef.current.clear();
-        }, MESSAGE_ACK_TIMEOUT);
-      } catch (e) {
-        logError('Failed to send TAB_CLOSE_SELF message', e);
+      const tabsData = localStorage.getItem(TAB_ID_KEY);
+      let otherTabIds: string[] = [];
+      
+      if (tabsData) {
+        const tabs: Record<string, number> = JSON.parse(tabsData);
+        otherTabIds = Object.keys(tabs).filter(id => id !== tabId);
       }
+      
+      localStorage.setItem(TAB_ID_KEY, JSON.stringify({ [tabId]: Date.now() }));
+      log('Cleared other tabs from localStorage', { count: otherTabIds.length });
+
+      // Initialize closure tracking
+      const closingCount = otherTabIds.length;
+      pendingClosureTabsRef.current = new Set(otherTabIds);
+      closureStartTimeRef.current = Date.now();
+
+      // Update state with closure progress
+      setState((prev) => ({
+        ...prev,
+        closingTabCount: closingCount,
+        closedTabCount: 0,
+        closureFailureMessage: null,
+      }));
+
+      if (closingCount === 0) {
+        // No other tabs to close
+        log('No other tabs to close');
+        return {
+          success: true,
+          closedCount: 0,
+          pendingCount: 0,
+          timedOut: false,
+        };
+      }
+
+      // Send close message to all other tabs
+      if (broadcastChannelRef.current) {
+        const messageId = `msg_${Date.now()}`;
+        try {
+          broadcastChannelRef.current.postMessage({
+            type: TAB_MESSAGE_TYPES.TAB_CLOSE_SELF,
+            tabId: tabId,
+            timestamp: Date.now(),
+            messageId: messageId,
+          });
+          log('Sent TAB_CLOSE_SELF message', { messageId, targetCount: closingCount });
+        } catch (e) {
+          logError('Failed to send TAB_CLOSE_SELF message', e);
+        }
+      }
+
+      // Return a promise that resolves when closure times out
+      // Components can await this to know when to proceed
+      return new Promise<ClosureFeedback>((resolve) => {
+        // Set 3-second timeout for closure completion
+        if (closureTimeoutRef.current) {
+          clearTimeout(closureTimeoutRef.current);
+        }
+        
+        closureTimeoutRef.current = setTimeout(() => {
+          log('Closure timeout reached', { 
+            pending: pendingClosureTabsRef.current.size,
+            closed: closingCount - pendingClosureTabsRef.current.size 
+          });
+
+          // Update state to show timeout was reached
+          setState((prev) => {
+            const failureMsg = pendingClosureTabsRef.current.size > 0 
+              ? `${pendingClosureTabsRef.current.size} tab(s) did not close`
+              : null;
+            return {
+              ...prev,
+              closureFailureMessage: failureMsg,
+            };
+          });
+
+          resolve({
+            success: false,
+            closedCount: closingCount - pendingClosureTabsRef.current.size,
+            pendingCount: pendingClosureTabsRef.current.size,
+            timedOut: true,
+          });
+        }, 3000);
+      });
+    } catch (e) {
+      logError('forceTabActive', e);
+      return {
+        success: false,
+        closedCount: 0,
+        pendingCount: 0,
+        timedOut: false,
+      };
     }
   }, [log, logError]);
 

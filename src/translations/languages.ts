@@ -55,6 +55,9 @@ export const translations = {
     retry_button: 'Reintentar',
     continue_this_tab: 'Continuar con esta pestaña',
     closing_tabs_status: 'Cerrando pestañas...',
+    preparing_to_close: 'Preparando para cerrar otras pestañas...',
+    closing_tabs_progress: 'Cerrando pestañas: {{closed}} de {{total}} cerradas',
+    manual_closure_guidance: 'Por favor, cierra las otras pestañas manualmente o se volverán inactivas.',
   },
   en: {
     accessibility_settings: 'Accessibility Settings',
@@ -105,6 +108,9 @@ export const translations = {
     retry_button: 'Retry',
     continue_this_tab: 'Continue with this tab',
     closing_tabs_status: 'Closing tabs...',
+    preparing_to_close: 'Preparing to close other tabs...',
+    closing_tabs_progress: 'Closing tabs: {{closed}} of {{total}} closed',
+    manual_closure_guidance: 'Please close the other tabs manually or they will become inactive.',
   },
   ca: {
     accessibility_settings: 'Configuració d\'Accessibilitat',
@@ -155,6 +161,9 @@ export const translations = {
     retry_button: 'Reintentar',
     continue_this_tab: 'Continuar amb aquesta pestanya',
     closing_tabs_status: 'Tancant pestanyes...',
+    preparing_to_close: 'Preparant per tancar altres pestanyes...',
+    closing_tabs_progress: 'Tancant pestanyes: {{closed}} de {{total}} tancades',
+    manual_closure_guidance: 'Si us plau, tanca les altres pestanyes manualment o es tornaran inactives.',
   },
 } as const;
 
