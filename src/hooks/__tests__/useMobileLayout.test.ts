@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useMobileLayout } from './useMobileLayout';
+import { useMobileLayout } from '../useMobileLayout';
 
 describe('useMobileLayout Hook', () => {
   beforeEach(() => {

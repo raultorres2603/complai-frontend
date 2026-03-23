@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MobileHeader } from './MobileHeader';
+import { MobileHeader } from '../MobileHeader';
 
 describe('MobileHeader Component', () => {
   it('should render app name', () => {

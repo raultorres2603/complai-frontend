@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MobileInputFooter } from './MobileInputFooter';
+import { MobileInputFooter } from '../MobileInputFooter';
 import type { OutputFormat } from '../types/api.types';
 
 // Mock MessageInput

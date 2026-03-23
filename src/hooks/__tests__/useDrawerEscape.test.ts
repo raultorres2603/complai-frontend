@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useDrawerEscape } from './useDrawerEscape';
+import { useDrawerEscape } from '../useDrawerEscape';
 
 describe('useDrawerEscape Hook', () => {
   let onCloseMock: ReturnType<typeof vi.fn>;
