@@ -6,7 +6,7 @@ export default defineConfig({
   base: process.env.VITE_DEPLOYMENT_ENV === 'production' 
     ? '/complai-frontend/' 
     : process.env.VITE_DEPLOYMENT_ENV === 'development'
-    ? '/complai-frontend/complai-frontend-dev/'
+    ? '/complai-frontend/dev/'
     : '/', // Local development
   plugins: [react()],
   server: {
