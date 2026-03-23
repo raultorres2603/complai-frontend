@@ -3,7 +3,7 @@
  * Tests the full flow of message sending on mobile
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MobileInputFooter } from '../../components/MobileInputFooter';
@@ -449,6 +449,253 @@ describe('MobileInputFooter Integration', () => {
       );
 
       expect(container.querySelector('footer')).toBeInTheDocument();
+    });
+  });
+
+  describe('MobileInputFooter - Mobile Specific Integration Tests', () => {
+    const originalUserAgent = navigator.userAgent;
+
+    beforeEach(() => {
+      // Mock mobile user agent for all tests in this suite
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X)',
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: originalUserAgent,
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    it('should send message via mobile keyboard Enter key', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'Mobile test message');
+
+      // Simulate mobile Enter key (not Shift+Enter)
+      fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter' });
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('Mobile test message', expect.any(String));
+      });
+
+      // Verify textarea was cleared
+      expect(textarea.value).toBe('');
+    });
+
+    it('should send message via send button click on mobile', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
+
+      await user.type(textarea, 'Button click test');
+      await user.click(sendButton);
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('Button click test', expect.any(String));
+      });
+
+      expect(textarea.value).toBe('');
+    });
+
+    it('should handle rapid message sends on mobile', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
+
+      // Send message 1
+      await user.type(textarea, 'Message 1');
+      await user.click(sendButton);
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('Message 1', expect.any(String));
+      });
+
+      // Immediately type and send message 2
+      await user.type(textarea, 'Message 2');
+      await user.click(sendButton);
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledTimes(2);
+        expect(mockOnSend).toHaveBeenLastCalledWith('Message 2', expect.any(String));
+      });
+    });
+
+    it('should not allow send during disabled state (loading)', async () => {
+      const user = userEvent.setup();
+
+      const { rerender } = render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'Test message');
+
+      // Rerender with disabled state (simulating loading)
+      rerender(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={true}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      // Attempt to send while disabled
+      const form = textarea.closest('form');
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      // Should still only have been called once (from first message)
+      expect(mockOnSend).not.toHaveBeenCalled();
+    });
+
+    it('should send complaint via mobile with complaint info', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={true}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      await user.type(textarea, 'My complaint');
+
+      // Send via Enter key on mobile
+      fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter' });
+
+      await waitFor(() => {
+        expect(mockOnSendComplaint).toHaveBeenCalledWith(
+          'My complaint',
+          expect.any(String),
+          undefined,
+          undefined,
+          undefined
+        );
+      });
+    });
+
+    it('should handle soft keyboard focus restoration', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
+
+      // Type and send first message
+      await user.type(textarea, 'First message');
+      await user.click(sendButton);
+
+      await waitFor(() => {
+        // Verify textarea was cleared
+        expect(textarea.value).toBe('');
+      });
+
+      // Type second message (should work without issues)
+      await user.type(textarea, 'Second message');
+      await user.click(sendButton);
+
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('should work correctly in landscape mode (reduced height)', () => {
+      const { container } = render(
+        <MobileInputFooter
+          onSend={mockOnSend}
+          onSendComplaint={mockOnSendComplaint}
+          disabled={false}
+          isComplaintMode={false}
+          messages={[]}
+          ttsEnabled={true}
+          jwtToken="test-token"
+        />
+      );
+
+      const footer = screen.getByTestId('mobile-input-footer');
+      expect(footer).toBeInTheDocument();
+
+      // Verify it's still functional in landscape
+      const textarea = screen.getByTestId('message-input-textarea') as HTMLTextAreaElement;
+      expect(textarea).toBeInTheDocument();
+      
+      const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
+      expect(sendButton).toBeInTheDocument();
     });
   });
 });

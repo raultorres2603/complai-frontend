@@ -43,6 +43,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Detect mobile device based on user agent
+  const [isMobileDevice] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return /iPhone|iPad|Android/i.test(navigator.userAgent);
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -55,7 +61,31 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     setComplaintInfo({ name: '', surname: '', idNumber: '' });
 
     if (textareaRef.current) {
-      textareaRef.current.focus();
+      if (isMobileDevice) {
+        // Delay focus on mobile for soft keyboard to close properly
+        requestAnimationFrame(() => {
+          textareaRef.current?.focus();
+        });
+      } else {
+        textareaRef.current.focus();
+      }
+    }
+  };
+
+  // Handle keyboard events for form submission
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Mobile: Enter submits (but not Shift+Enter)
+    if (isMobileDevice && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+      return;
+    }
+
+    // Desktop: Ctrl+Enter or Cmd+Enter submits
+    if (!isMobileDevice && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleSubmit(e as any);
+      return;
     }
   };
 
@@ -137,8 +167,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       <div className={styles.inputContainer}>
         <div className={styles.inputWrapper}>
           <textarea
-            ref={textareaRef}            data-testid="message-input-textarea"            value={text}
+            ref={textareaRef}
+            data-testid="message-input-textarea"
+            value={text}
             onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
             placeholder={isComplaintMode ? t('describe_complaint_placeholder') : t('ask_question_placeholder')}
             disabled={disabled}
             className={styles.textarea}

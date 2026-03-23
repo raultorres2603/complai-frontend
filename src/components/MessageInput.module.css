@@ -217,6 +217,18 @@
     letter-spacing: 0.3px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Mobile touch support */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+
+    /* Ensure minimum touch target */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sendButton:hover:not(:disabled) {
@@ -226,8 +238,8 @@
 }
 
 .sendButton:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: var(--shadow-focus-ring);
+    transform: scale(0.98);
+    box-shadow: var(--shadow-focus-ring), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .sendButton:disabled {
@@ -297,6 +309,12 @@
     min-height: 40px;
     max-height: 40px;
     font-size: 0.9375rem;
+}
+
+.form.compact .sendButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    min-height: 44px;
 }
 
 .form.compact .footer {
