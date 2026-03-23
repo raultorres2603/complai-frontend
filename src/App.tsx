@@ -55,6 +55,12 @@ function App() {
     complaiService.setBackendUrl(backendUrl);
   }, []);
 
+  // Set browser tab title from environment variable
+  useEffect(() => {
+    const appName = import.meta.env.VITE_APP_NAME || 'ComplAI';
+    document.title = appName;
+  }, []);
+
   const handleSendQuestion = (text: string, token: string) => {
     chatState.sendQuestion(text, token);
   };
