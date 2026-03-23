@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { LanguageSelector } from '../LanguageSelector';
-import { AVAILABLE_LANGUAGES } from '../types/accessibility.types';
+import { AVAILABLE_LANGUAGES } from '../../types/accessibility.types';
 
 describe('LanguageSelector', () => {
   it('renders with current language flag and label', () => {

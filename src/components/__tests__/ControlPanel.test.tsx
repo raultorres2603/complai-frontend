@@ -8,7 +8,7 @@ import { render, screen } from '@/__tests__/test-utils';
 import { ControlPanel } from '../ControlPanel';
 
 // Mock child components to isolate ControlPanel tests
-vi.mock('./Header', () => ({
+vi.mock('../Header', () => ({
   Header: ({ isComplaintMode, onToggleComplaint }: any) => (
     <div data-testid="header-mock" data-testid-complaint-mode={isComplaintMode ? 'true' : 'false'}>
       <button onClick={onToggleComplaint} data-testid="complaint-toggle">
@@ -19,7 +19,7 @@ vi.mock('./Header', () => ({
   ),
 }));
 
-vi.mock('./MessageInput', () => ({
+vi.mock('../MessageInput', () => ({
   MessageInput: ({ onSend, disabled, _isComplaintMode, _onComplaintInfoChange }: any) => (
     <div data-testid="message-input-mock">
       <textarea placeholder="Enter message" data-testid="message-textarea" disabled={disabled} />
@@ -30,7 +30,7 @@ vi.mock('./MessageInput', () => ({
   ),
 }));
 
-vi.mock('./SpeechControls', () => ({
+vi.mock('../SpeechControls', () => ({
   SpeechControls: ({ _messages, ttsEnabled }: any) => (
     <div data-testid="speech-controls-mock" data-tts-enabled={ttsEnabled}>
       Speech Controls
@@ -38,7 +38,7 @@ vi.mock('./SpeechControls', () => ({
   ),
 }));
 
-vi.mock('../hooks/useAccessibility', () => ({
+vi.mock('../../hooks/useAccessibility', () => ({
   useAccessibility: () => ({
     settings: {
       ttsEnabled: true,
@@ -49,7 +49,7 @@ vi.mock('../hooks/useAccessibility', () => ({
   }),
 }));
 
-vi.mock('../hooks/useTranslation', () => ({
+vi.mock('../../hooks/useTranslation', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

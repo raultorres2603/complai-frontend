@@ -8,7 +8,7 @@ import { renderHook, act } from '@/__tests__/test-utils';
 import { useTranslation } from '../useTranslation';
 import { useLanguage } from '../useLanguage';
 import * as useAccessibilityModule from '../useAccessibility';
-import type { Language } from '../types/accessibility.types';
+import type { Language } from '../../types/accessibility.types';
 
 describe('Dynamic Language Switching', () => {
   const baseMockSettings = (language: Language = 'es') => ({

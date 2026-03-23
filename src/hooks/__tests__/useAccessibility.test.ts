@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@/__tests__/test-utils';
 import { useAccessibility } from '../useAccessibility';
-import { DEFAULT_ACCESSIBILITY_SETTINGS } from '../types/accessibility.types';
+import { DEFAULT_ACCESSIBILITY_SETTINGS } from '../../types/accessibility.types';
 
 describe('useAccessibility', () => {
   beforeEach(() => {

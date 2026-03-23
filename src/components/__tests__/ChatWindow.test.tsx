@@ -8,7 +8,7 @@ import { render, screen } from '@/__tests__/test-utils';
 import { ChatWindow } from '../ChatWindow';
 
 // Mock MessageList component
-vi.mock('./MessageList', () => ({
+vi.mock('../MessageList', () => ({
   MessageList: ({ messages, loading }: any) => (
     <div data-testid="message-list-mock" data-message-count={messages.length} data-loading={loading}>
       {messages.map((msg: any) => (

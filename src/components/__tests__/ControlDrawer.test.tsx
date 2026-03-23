@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ControlDrawer } from '../ControlDrawer';
-import type { LanguageOption } from '../types/accessibility.types';
+import type { LanguageOption } from '../../types/accessibility.types';
 
 // Mock AccessibilityPanel
-vi.mock('./AccessibilityPanel', () => ({
+vi.mock('../AccessibilityPanel', () => ({
   default: ({ isVisible, onClose }: any) =>
     isVisible ? (
       <div data-testid="accessibility-panel">
@@ -19,7 +19,7 @@ vi.mock('./AccessibilityPanel', () => ({
 }));
 
 // Mock LanguageSelector
-vi.mock('./LanguageSelector', () => ({
+vi.mock('../LanguageSelector', () => ({
   LanguageSelector: ({ currentLanguage, onSelectLanguage }: any) => (
     <div data-testid="language-selector">
       <button onClick={() => onSelectLanguage('es')}>Select Spanish</button>
@@ -29,14 +29,14 @@ vi.mock('./LanguageSelector', () => ({
 }));
 
 // Mock useTranslation
-vi.mock('../hooks/useTranslation', () => ({
+vi.mock('../../hooks/useTranslation', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock useDrawerEscape
-vi.mock('../hooks/useDrawerEscape', () => ({
+vi.mock('../../hooks/useDrawerEscape', () => ({
   useDrawerEscape: vi.fn(),
 }));
 

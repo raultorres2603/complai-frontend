@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MobileInputFooter } from '../MobileInputFooter';
-import type { OutputFormat } from '../types/api.types';
+import type { OutputFormat } from '../../types/api.types';
 
 // Mock MessageInput
-vi.mock('./MessageInput', () => ({
+vi.mock('../MessageInput', () => ({
   MessageInput: ({ onSend, disabled }: any) => (
     <form data-testid="message-input-form" onSubmit={(e) => {
       e.preventDefault();
@@ -28,7 +28,7 @@ vi.mock('./MessageInput', () => ({
 }));
 
 // Mock SpeechControls
-vi.mock('./SpeechControls', () => ({
+vi.mock('../SpeechControls', () => ({
   SpeechControls: ({ messages, ttsEnabled }: any) =>
     ttsEnabled ? (
       <div data-testid="speech-controls">

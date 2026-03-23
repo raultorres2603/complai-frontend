@@ -5,8 +5,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@/__tests__/test-utils';
 import { SpeechControls } from '../SpeechControls';
-import * as useAccessibilityModule from '../hooks/useAccessibility';
-import * as useTextToSpeechModule from '../hooks/useTextToSpeech';
+import * as useAccessibilityModule from '../../hooks/useAccessibility';
+import * as useTextToSpeechModule from '../../hooks/useTextToSpeech';
 
 describe('SpeechControls Component Translation', () => {
   const mockMessages = [
