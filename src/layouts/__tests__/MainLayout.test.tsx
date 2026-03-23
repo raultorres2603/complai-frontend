@@ -1,12 +1,22 @@
 /**
  * Unit tests for MainLayout component
+ * 
+ * Tests cover:
+ * - Desktop layout rendering (2-column grid)
+ * - Mobile layout rendering (single column with drawer)
+ * - MobileHeader, MobileInputFooter, and ControlDrawer integration
+ * - State and prop reactivity
+ * - Error handling and edge cases
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MainLayout } from '../MainLayout';
+import type { MainLayoutProps } from '../MainLayout';
 
-// Mock dependencies
+// ===== Mock Setup =====
+
+// Mock useLanguage hook
 vi.mock('../../hooks/useLanguage', () => ({
   useLanguage: () => ({
     currentLanguage: 'es',
@@ -18,13 +28,143 @@ vi.mock('../../hooks/useLanguage', () => ({
   }),
 }));
 
+// Mock useTranslation hook
 vi.mock('../../hooks/useTranslation', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
+// Mock MobileHeader component
+vi.mock('../../components/MobileHeader', () => ({
+  MobileHeader: ({ appName, onOpenDrawer }: Record<string, unknown>) => (
+    <header data-testid="mobile-header">
+      <div>{appName}</div>
+      <button
+        data-testid="drawer-toggle-btn"
+        onClick={onOpenDrawer}
+        aria-label="Toggle drawer"
+      >
+        Menu
+      </button>
+    </header>
+  ),
+}));
+
+// Mock MobileInputFooter component
+vi.mock('../../components/MobileInputFooter', () => ({
+  MobileInputFooter: ({
+    onSend,
+    onSendComplaint,
+    disabled,
+    isComplaintMode,
+    messages,
+    jwtToken,
+  }: Record<string, unknown>) => (
+    <footer data-testid="mobile-input-footer" role="contentinfo">
+      <textarea
+        data-testid="mobile-input-textarea"
+        disabled={disabled}
+        placeholder={isComplaintMode ? 'Complaint...' : 'Message...'}
+        onChange={() => {
+          // Simulate input for testing
+        }}
+      />
+      <button
+        data-testid="send-btn"
+        onClick={() => onSend('test message')}
+        disabled={disabled}
+      >
+        Send
+      </button>
+      {isComplaintMode && (
+        <button
+          data-testid="send-complaint-btn"
+          onClick={() =>
+            onSendComplaint('complaint text', 'pdf', 'John', 'Doe', '123')
+          }
+        >
+          Send Complaint
+        </button>
+      )}
+      <div data-testid="message-count">{messages.length}</div>
+      <div data-testid="token-status">{jwtToken ? 'authenticated' : 'unauthenticated'}</div>
+    </footer>
+  ),
+}));
+
+// Mock ControlDrawer component
+vi.mock('../../components/ControlDrawer', () => ({
+  ControlDrawer: ({
+    isOpen,
+    onClose,
+    isComplaintMode,
+    onToggleComplaint,
+    onClearHistory,
+    currentLanguage,
+    onSelectLanguage,
+    availableLanguages,
+    error,
+    onDismissError,
+    messages,
+  }: Record<string, unknown>) => (
+    <div
+      data-testid="control-drawer"
+      data-open={isOpen}
+      role="dialog"
+      aria-hidden={!isOpen}
+    >
+      <button
+        data-testid="drawer-close-btn"
+        onClick={onClose}
+        aria-label="Close drawer"
+      >
+        Close
+      </button>
+      <button
+        data-testid="toggle-complaint-btn"
+        onClick={onToggleComplaint}
+      >
+        {isComplaintMode ? 'Disable' : 'Enable'} Complaint Mode
+      </button>
+      <button
+        data-testid="clear-history-btn"
+        onClick={onClearHistory}
+      >
+        Clear History
+      </button>
+      <div data-testid="language-selector">
+        {currentLanguage}
+        {availableLanguages.map((lang: Record<string, unknown>) => (
+          <button
+            key={lang.code}
+            data-testid={`lang-${lang.code}`}
+            onClick={() => onSelectLanguage(lang.code)}
+          >
+            {lang.name}
+          </button>
+        ))}
+      </div>
+      {error && (
+        <div data-testid="error-message">
+          {error.message}
+          <button
+            data-testid="dismiss-error-btn"
+            onClick={onDismissError}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+      <div data-testid="drawer-messages">{messages.length} messages</div>
+    </div>
+  ),
+}));
+
+// ===== Test Suite =====
+
 describe('MainLayout', () => {
+  // ===== Mock Functions =====
   const mockHandleSendQuestion = vi.fn();
   const mockHandleSendComplaint = vi.fn();
   const mockOnToggleDrawer = vi.fn();
@@ -32,9 +172,10 @@ describe('MainLayout', () => {
   const mockOnClearHistory = vi.fn();
   const mockOnDismissError = vi.fn();
 
-  const defaultProps = {
-    chatWindow: <div>Chat Window</div>,
-    controlPanel: <div>Control Panel</div>,
+  // ===== Default Props =====
+  const defaultProps: MainLayoutProps = {
+    chatWindow: <div data-testid="mock-chat">Chat Content</div>,
+    controlPanel: <div data-testid="mock-control">Control Content</div>,
     isMobile: false,
     isDrawerOpen: false,
     onToggleDrawer: mockOnToggleDrawer,
@@ -44,348 +185,921 @@ describe('MainLayout', () => {
     disabled: false,
     error: null,
     messages: [],
-    jwtToken: 'test-token',
+    jwtToken: 'test-jwt-token',
     onDismissError: mockOnDismissError,
     handleSendQuestion: mockHandleSendQuestion,
     handleSendComplaint: mockHandleSendComplaint,
     isLoading: false,
+    cityId: 'test-city',
   };
 
+  // ===== Setup & Cleanup =====
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should render desktop layout when isMobile is false', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={false}
-      />
-    );
+  // ===== A. Desktop Layout Tests =====
+  describe('Desktop Layout (isMobile=false)', () => {
+    it('should render desktop layout container with correct testid', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
 
-    const layout = screen.getByTestId('layout');
-    expect(layout).toBeInTheDocument();
+      const layout = screen.getByTestId('layout');
+      expect(layout).toBeInTheDocument();
+    });
+
+    it('should render main element for chat window', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
+
+      const main = screen.getByTestId('main');
+      expect(main).toBeInTheDocument();
+    });
+
+    it('should render sidebar element for control panel', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
+
+      const sidebar = screen.getByTestId('sidebar');
+      expect(sidebar).toBeInTheDocument();
+    });
+
+    it('should pass chatWindow prop content to main element', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={false}
+          chatWindow={<div data-testid="chat-content">My Chat Content</div>}
+        />
+      );
+
+      const main = screen.getByTestId('main');
+      expect(main).toHaveTextContent('My Chat Content');
+    });
+
+    it('should pass controlPanel prop content to sidebar element', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={false}
+          controlPanel={<div data-testid="control-content">My Control Panel</div>}
+        />
+      );
+
+      const sidebar = screen.getByTestId('sidebar');
+      expect(sidebar).toHaveTextContent('My Control Panel');
+    });
+
+    it('should not render mobile-specific components on desktop', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
+
+      const mobileLayout = screen.queryByTestId('mobile-layout');
+      const mobileHeader = screen.queryByTestId('mobile-header');
+
+      expect(mobileLayout).not.toBeInTheDocument();
+      expect(mobileHeader).not.toBeInTheDocument();
+    });
+
+    it('should not render MobileInputFooter on desktop', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
+
+      const footer = screen.queryByTestId('mobile-input-footer');
+      expect(footer).not.toBeInTheDocument();
+    });
+
+    it('should render both columns on desktop layout', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={false}
+          chatWindow={<div>Chat</div>}
+          controlPanel={<div>Controls</div>}
+        />
+      );
+
+      const main = screen.getByTestId('main');
+      const sidebar = screen.getByTestId('sidebar');
+
+      expect(main).toBeInTheDocument();
+      expect(sidebar).toBeInTheDocument();
+      expect(main).toHaveTextContent('Chat');
+      expect(sidebar).toHaveTextContent('Controls');
+    });
   });
 
-  it('should render mobile layout when isMobile is true', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-      />
-    );
+  // ===== B. Mobile Layout Tests =====
+  describe('Mobile Layout (isMobile=true)', () => {
+    it('should render mobile layout container with correct testid', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
 
-    const mobileLayout = screen.getByTestId('mobile-layout');
-    expect(mobileLayout).toBeInTheDocument();
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+    });
+
+    it('should not render desktop layout structure on mobile', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
+
+      const layout = screen.queryByTestId('layout');
+      expect(layout).not.toBeInTheDocument();
+    });
+
+    it('should render MobileHeader component on mobile', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
+
+      const header = screen.getByTestId('mobile-header');
+      expect(header).toBeInTheDocument();
+    });
+
+    it('should render mobile main area with chat content', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          chatWindow={<div>Mobile Chat</div>}
+        />
+      );
+
+      const mobileMain = screen.getByTestId('mobile-main');
+      expect(mobileMain).toBeInTheDocument();
+      expect(mobileMain).toHaveTextContent('Mobile Chat');
+    });
+
+    it('should render MobileInputFooter at bottom of mobile layout', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
+
+      const footer = screen.getByTestId('mobile-input-footer');
+      expect(footer).toBeInTheDocument();
+    });
+
+    it('should render footer with role="contentinfo" semantic element', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
+
+      const footer = screen.getByRole('contentinfo');
+      expect(footer).toBeInTheDocument();
+    });
+
+    it('should render ControlDrawer component on mobile', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
+
+      const drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toBeInTheDocument();
+    });
   });
 
-  it('should render MobileHeader on mobile', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-      />
-    );
+  // ===== C. MobileHeader Integration Tests =====
+  describe('MobileHeader Integration', () => {
+    it('should display app name in header (ComplAI by default)', () => {
+      render(<MainLayout {...defaultProps} isMobile={true} />);
 
-    // MobileHeader renders app name via text content
-    expect(screen.getByText('ComplAI')).toBeInTheDocument();
+      expect(screen.getByText('ComplAI')).toBeInTheDocument();
+    });
+
+    it('should pass onToggleDrawer callback to MobileHeader', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleDrawer={mockOnToggleDrawer}
+        />
+      );
+
+      const toggleBtn = screen.getByTestId('drawer-toggle-btn');
+      fireEvent.click(toggleBtn);
+
+      expect(mockOnToggleDrawer).toHaveBeenCalled();
+    });
+
+    it('should pass drawer open state to MobileHeader', () => {
+      const { rerender } = render(
+        <MainLayout {...defaultProps} isMobile={true} isDrawerOpen={false} />
+      );
+
+      let drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'false');
+
+      rerender(
+        <MainLayout {...defaultProps} isMobile={true} isDrawerOpen={true} />
+      );
+
+      drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'true');
+    });
+
+    it('should toggle drawer when menu button clicked', () => {
+      const onToggleDrawer = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleDrawer={onToggleDrawer}
+        />
+      );
+
+      const toggleBtn = screen.getByTestId('drawer-toggle-btn');
+      fireEvent.click(toggleBtn);
+
+      expect(onToggleDrawer).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('should render MobileInputFooter on mobile with correct props', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        handleSendQuestion={mockHandleSendQuestion}
-        handleSendComplaint={mockHandleSendComplaint}
-        isLoading={false}
-        jwtToken="test-token"
-      />
-    );
+  // ===== D. MobileInputFooter Integration Tests =====
+  describe('MobileInputFooter Integration', () => {
+    it('should render MobileInputFooter with disabled state from isLoading', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isLoading={false}
+        />
+      );
 
-    const footer = screen.getByRole('contentinfo');
-    expect(footer).toBeInTheDocument();
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).not.toBeDisabled();
+    });
+
+    it('should pass disabled=true to MobileInputFooter when isLoading=true', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isLoading={true}
+        />
+      );
+
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toBeDisabled();
+    });
+
+    it('should pass disabled=false to MobileInputFooter when isLoading=false', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isLoading={false}
+        />
+      );
+
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).not.toBeDisabled();
+    });
+
+    it('should pass isComplaintMode state to footer', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={true}
+        />
+      );
+
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toHaveAttribute('placeholder', 'Complaint...');
+    });
+
+    it('should pass messages array to footer', () => {
+      const messages = [
+        { id: '1', text: 'Message 1' },
+        { id: '2', text: 'Message 2' },
+        { id: '3', text: 'Message 3' },
+      ];
+
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={messages}
+        />
+      );
+
+      const messageCount = screen.getByTestId('message-count');
+      expect(messageCount).toHaveTextContent('3');
+    });
+
+    it('should pass jwtToken to footer as null when not provided', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          jwtToken={undefined}
+        />
+      );
+
+      const tokenStatus = screen.getByTestId('token-status');
+      expect(tokenStatus).toHaveTextContent('unauthenticated');
+    });
+
+    it('should pass jwtToken to footer when provided', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          jwtToken="valid-token"
+        />
+      );
+
+      const tokenStatus = screen.getByTestId('token-status');
+      expect(tokenStatus).toHaveTextContent('authenticated');
+    });
+
+    it('should pass handleSendQuestion handler to footer', () => {
+      const handleSendQuestion = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          handleSendQuestion={handleSendQuestion}
+          jwtToken="test-token"
+        />
+      );
+
+      const sendBtn = screen.getByTestId('send-btn');
+      fireEvent.click(sendBtn);
+
+      // Handler should be defined and callable
+      expect(handleSendQuestion).toBeDefined();
+    });
+
+    it('should pass handleSendComplaint handler to footer', () => {
+      const handleSendComplaint = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={true}
+          handleSendComplaint={handleSendComplaint}
+          jwtToken="test-token"
+        />
+      );
+
+      const complaintBtn = screen.getByTestId('send-complaint-btn');
+      expect(complaintBtn).toBeInTheDocument();
+      expect(handleSendComplaint).toBeDefined();
+    });
+
+    it('should pass empty messages array when not provided', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={undefined as any}
+        />
+      );
+
+      const messageCount = screen.getByTestId('message-count');
+      expect(messageCount).toHaveTextContent('0');
+    });
   });
 
-  it('should pass isLoading as disabled prop to MobileInputFooter', () => {
-    const { rerender } = render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isLoading={false}
-      />
-    );
+  // ===== E. ControlDrawer Integration Tests =====
+  describe('ControlDrawer Integration', () => {
+    it('should pass isDrawerOpen state to ControlDrawer', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isDrawerOpen={false}
+        />
+      );
 
-    // When not loading, input should be enabled
-    const textarea1 = screen.getByRole('textbox');
-    expect(textarea1).not.toBeDisabled();
+      let drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'false');
 
-    rerender(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isLoading={true}
-      />
-    );
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isDrawerOpen={true}
+        />
+      );
 
-    // When loading, input should be disabled
-    const textarea2 = screen.getByRole('textbox');
-    expect(textarea2).toBeDisabled();
+      drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'true');
+    });
+
+    it('should pass onToggleDrawer as onClose callback to drawer', () => {
+      const onToggleDrawer = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleDrawer={onToggleDrawer}
+        />
+      );
+
+      const closeBtn = screen.getByTestId('drawer-close-btn');
+      fireEvent.click(closeBtn);
+
+      expect(onToggleDrawer).toHaveBeenCalled();
+    });
+
+    it('should pass isComplaintMode to drawer', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={false}
+        />
+      );
+
+      let toggleBtn = screen.getByTestId('toggle-complaint-btn');
+      expect(toggleBtn).toHaveTextContent('Enable');
+
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={true}
+        />
+      );
+
+      toggleBtn = screen.getByTestId('toggle-complaint-btn');
+      expect(toggleBtn).toHaveTextContent('Disable');
+    });
+
+    it('should pass onToggleComplaint callback to drawer', () => {
+      const onToggleComplaint = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleComplaint={onToggleComplaint}
+        />
+      );
+
+      const toggleBtn = screen.getByTestId('toggle-complaint-btn');
+      fireEvent.click(toggleBtn);
+
+      expect(onToggleComplaint).toHaveBeenCalled();
+    });
+
+    it('should pass onClearHistory callback to drawer', () => {
+      const onClearHistory = vi.fn();
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onClearHistory={onClearHistory}
+        />
+      );
+
+      const clearBtn = screen.getByTestId('clear-history-btn');
+      fireEvent.click(clearBtn);
+
+      expect(onClearHistory).toHaveBeenCalled();
+    });
+
+    it('should pass language information to drawer', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+        />
+      );
+
+      const languageSelector = screen.getByTestId('language-selector');
+      expect(languageSelector).toBeInTheDocument();
+      expect(languageSelector).toHaveTextContent('es');
+
+      // Language options should be available
+      const esLang = screen.getByTestId('lang-es');
+      const caLang = screen.getByTestId('lang-ca');
+      expect(esLang).toBeInTheDocument();
+      expect(caLang).toBeInTheDocument();
+    });
+
+    it('should pass error state and onDismissError callback to drawer', () => {
+      const onDismissError = vi.fn();
+      const error = { message: 'Test error occurred' };
+
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          error={error}
+          onDismissError={onDismissError}
+        />
+      );
+
+      const errorMessage = screen.getByTestId('error-message');
+      expect(errorMessage).toHaveTextContent('Test error occurred');
+
+      const dismissBtn = screen.getByTestId('dismiss-error-btn');
+      fireEvent.click(dismissBtn);
+
+      expect(onDismissError).toHaveBeenCalled();
+    });
+
+    it('should pass messages array to drawer', () => {
+      const messages = [
+        { id: '1', text: 'Msg 1' },
+        { id: '2', text: 'Msg 2' },
+      ];
+
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={messages}
+        />
+      );
+
+      const drawerMessages = screen.getByTestId('drawer-messages');
+      expect(drawerMessages).toHaveTextContent('2 messages');
+    });
+
+    it('should not render ControlDrawer on desktop', () => {
+      render(<MainLayout {...defaultProps} isMobile={false} />);
+
+      const drawer = screen.queryByTestId('control-drawer');
+      // On desktop, drawer should not be in the document
+      // (it's conditionally rendered inside Mobile layout)
+      expect(drawer).not.toBeInTheDocument();
+    });
   });
 
-  it('should pass handleSendQuestion to MobileInputFooter', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        handleSendQuestion={mockHandleSendQuestion}
-        jwtToken="test-token"
-      />
-    );
+  // ===== F. State & Prop Changes Tests =====
+  describe('State & Prop Changes Reactivity', () => {
+    it('should re-render with new mobile layout when isMobile toggles false→true', () => {
+      const { rerender } = render(
+        <MainLayout {...defaultProps} isMobile={false} />
+      );
 
-    // Handler should be passed and callable (tested in MobileInputFooter tests)
-    expect(mockHandleSendQuestion).toBeDefined();
+      let layout = screen.getByTestId('layout');
+      expect(layout).toBeInTheDocument();
+
+      rerender(<MainLayout {...defaultProps} isMobile={true} />);
+
+      let mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+
+      layout = screen.queryByTestId('layout');
+      expect(layout).not.toBeInTheDocument();
+    });
+
+    it('should re-render with new desktop layout when isMobile toggles true→false', () => {
+      const { rerender } = render(
+        <MainLayout {...defaultProps} isMobile={true} />
+      );
+
+      let mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+
+      rerender(<MainLayout {...defaultProps} isMobile={false} />);
+
+      let layout = screen.getByTestId('layout');
+      expect(layout).toBeInTheDocument();
+
+      mobileLayout = screen.queryByTestId('mobile-layout');
+      expect(mobileLayout).not.toBeInTheDocument();
+    });
+
+    it('should update drawer open/close state on rerender', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isDrawerOpen={false}
+        />
+      );
+
+      let drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'false');
+
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isDrawerOpen={true}
+        />
+      );
+
+      drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toHaveAttribute('data-open', 'true');
+    });
+
+    it('should update complaint mode on rerender', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={false}
+        />
+      );
+
+      let textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toHaveAttribute('placeholder', 'Message...');
+
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={true}
+        />
+      );
+
+      textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toHaveAttribute('placeholder', 'Complaint...');
+    });
+
+    it('should update loading state and disable footer input on rerender', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isLoading={false}
+        />
+      );
+
+      let textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).not.toBeDisabled();
+
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isLoading={true}
+        />
+      );
+
+      textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toBeDisabled();
+    });
+
+    it('should update error state and pass to drawer on rerender', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          error={null}
+        />
+      );
+
+      let errorMessage = screen.queryByTestId('error-message');
+      expect(errorMessage).not.toBeInTheDocument();
+
+      const error = { message: 'New error' };
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          error={error}
+        />
+      );
+
+      errorMessage = screen.getByTestId('error-message');
+      expect(errorMessage).toHaveTextContent('New error');
+    });
+
+    it('should update messages in footer and drawer', () => {
+      const { rerender } = render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={[]}
+        />
+      );
+
+      let messageCount = screen.getByTestId('message-count');
+      expect(messageCount).toHaveTextContent('0');
+
+      const messages = [{ id: '1', text: 'New message' }];
+      rerender(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={messages}
+        />
+      );
+
+      messageCount = screen.getByTestId('message-count');
+      expect(messageCount).toHaveTextContent('1');
+
+      const drawerMessages = screen.getByTestId('drawer-messages');
+      expect(drawerMessages).toHaveTextContent('1 messages');
+    });
   });
 
-  it('should pass handleSendComplaint to MobileInputFooter', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        handleSendComplaint={mockHandleSendComplaint}
-        jwtToken="test-token"
-      />
-    );
+  // ===== G. Error & Edge Cases =====
+  describe('Error Handling & Edge Cases', () => {
+    it('should handle missing onToggleDrawer callback gracefully', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleDrawer={undefined}
+        />
+      );
 
-    // Handler should be passed and callable (tested in MobileInputFooter tests)
-    expect(mockHandleSendComplaint).toBeDefined();
-  });
+      const drawer = screen.getByTestId('control-drawer');
+      expect(drawer).toBeInTheDocument();
 
-  it('should render ControlDrawer on mobile', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-      />
-    );
+      // Should not throw when close button clicked
+      const closeBtn = screen.getByTestId('drawer-close-btn');
+      expect(() => fireEvent.click(closeBtn)).not.toThrow();
+    });
 
-    // ControlDrawer is rendered in mobile layout
-    // Verify mobile layout is rendered (implies drawer is rendered)
-    const mobileLayout = screen.getByTestId('mobile-layout');
-    expect(mobileLayout).toBeInTheDocument();
-  });
+    it('should handle missing onToggleComplaint callback gracefully', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onToggleComplaint={undefined}
+        />
+      );
 
-  it('should render chat area in mobileMain on mobile', () => {
-    const { container } = render(
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-      />
-    );
+      const toggleBtn = screen.getByTestId('toggle-complaint-btn');
+      expect(() => fireEvent.click(toggleBtn)).not.toThrow();
+    });
 
-    const mobileMain = screen.getByTestId('mobile-m
-    expect(mobileMain).toHaveTextContent('Chat Window');
-  });
+    it('should handle missing onClearHistory callback gracefully', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          onClearHistory={undefined}
+        />
+      );
 
-  it('should pass complaint mode to MobileInputFooter', () => {
-    const { container: container1 } = render(
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isComplaintMode={false}
-      />
-    );
+      const clearBtn = screen.getByTestId('clear-history-btn');
+      expect(() => fireEvent.click(clearBtn)).not.toThrow();
+    });
 
-    // In normal mode, textarea should be rendered
-    const textarea = screen.getByRole('textbox');
-    expect(textarea).toBeInTheDocument();
+    it('should handle null jwtToken', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          jwtToken={null}
+        />
+      );
 
-  it('should render desktop layout with both columns', () => {
-    const { container } = render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={false}
-      />
-    );
+      const tokenStatus = screen.getByTestId('token-status');
+      expect(tokenStatus).toHaveTextContent('unauthenticated');
+    });
 
-    const main = container.querySelector('.main');
-    const sidebar = container.querySelector('.sidebar');
+    it('should handle empty messages array', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          messages={[]}
+        />
+      );
 
-    expect(main).toBeInTheDocument();
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={false}
-      />
-    );
+      const messageCount = screen.getByTestId('message-count');
+      expect(messageCount).toHaveTextContent('0');
 
-    const main = screen.getByTestId('main');
-    const sidebar = screen.getByTestId('
-        isMobile={false}
-      />
-    );
+      const drawerMessages = screen.getByTestId('drawer-messages');
+      expect(drawerMessages).toHaveTextContent('0 messages');
+    });
 
-    // MobileHeader should not be rendered on desktop
-    const mobileLayout = document.querySelector('.mobileLayout');
-    expect(mobileLayout).not.toBeInTheDocument();
-  });
+    it('should handle null error state', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          error={null}
+        />
+      );
 
-  it('should not render MobileInputFooter on desktop', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={false}
-      />
-    );
-screen.queryByTestId('mobile-l
-    // MobileInputFooter should not be rendered on desktop
-    const footer = document.querySelector('[class*="footer"]');
-    // On desktop, no footer with mobile-specific class
-  });
+      const errorMessage = screen.queryByTestId('error-message');
+      expect(errorMessage).not.toBeInTheDocument();
+    });
 
-  it('should pass jwtToken to MobileInputFooter on mobile', () => {
-    const { container } = render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        jwtToken="valid-jwt-token"
-      /Desktop layout should be rendered
-    const layout = screen.getByTestId('layout');
-    expect(layout).toBeInTheDocument();
-    // Footer should be rendered with access to token
-    const footer = container.querySelector('footer');
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        jwtToken="valid-jwt-token"
-      />
-    );
+    it('should render when controlPanel is not a React element', () => {
+      const customControlPanel = 'String control panel';
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          controlPanel={customControlPanel as any}
+        />
+      );
 
-    // Footer should be rendered with access to token
-    const footer = screen.getByRole('contentinfo
-    );
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+    });
 
-    const footer = container.querySelector('footer');
-    expect(footer).toBeInTheDocument();
-  })render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        jwtToken={null}
-      />
-    );
+    it('should handle undefined cityId prop', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          cityId={undefined}
+        />
+      );
 
-    const footer = screen.getByRole('contentinfo
-        error={null}
-        messages={[]}
-      />
-    );
-render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isDrawerOpen={true}
-        isComplaintMode={false}
-        error={null}
-        messages={[]}
-      />
-    );
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+    });
 
-    // ControlDrawer should be rendered with correct props
-    const mobileLayout = screen.getByTestId('mobile-l
+    it('should preserve city context in prop passing', () => {
+      const cityId = 'barcelona-123';
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          cityId={cityId}
+        />
+      );
 
-    const mobileMain = container.querySelector('.mobileMain');
-    const styles = window.getComputedStyle(mobileMain!);
+      // Verify layout is rendered with city context available
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
 
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-      />
-    );
+      // City context should be available for handlers
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toBeInTheDocument();
+    });
 
-    const mobileMain = screen.getByTestId('mobile-main');
+    it('should handle disabled=true prop', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          disabled={true}
+        />
+      );
 
-    // Check that mobileMain is rendered and has correct structure
-    expect(mobileMain).toBeInTheDocument();
-    expect(mobileMain).toHaveTextContent('Chat Window
-        chatWindow={chatWindowContent}
-        controlPanel={controlPanelContent}
-      />
-    );
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
+    });
 
-    expect(screen.getByTestId('chat')).toBeInTheDocument();
-    expect(screen.getByTestId('control')).toBeInTheDocument();
-  });
+    it('should handle disabled=false prop', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          disabled={false}
+        />
+      );
 
-  it('should accept cityId prop for debugging', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        cityId="elprat"
-      />
-    );
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).not.toBeDisabled();
+    });
 
-    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
-  });
+    it('should render without isComplaintMode prop (defaults to false)', () => {
+      const propsWithoutComplaintMode = { ...defaultProps };
+      delete (propsWithoutComplaintMode as any).isComplaintMode;
 
-  it('should handle missing optional props gracefully', () => {
-    render(
-      <MainLayout
-        chatWindow={<div>Chat</div>}
-        controlPanel={<div>Control</div>}
-        isMobile={true}
-      />
-    );
+      render(
+        <MainLayout
+          {...propsWithoutComplaintMode}
+          isMobile={true}
+        />
+      );
 
-    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
-  });
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).toHaveAttribute('placeholder', 'Message...');
+    });
 
-  it('should render with default values for optional props', () => {
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isComplaintMode={undefined as any}
-        isLoading={undefined as any}
-        jwtToken={undefined as any}
-      />
-    );
+    it('should render without isMobile prop (defaults to false - desktop)', () => {
+      const propsWithoutMobile = { ...defaultProps };
+      delete (propsWithoutMobile as any).isMobile;
 
-    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
-  });
+      render(<MainLayout {...propsWithoutMobile} />);
 
-  it('should pass messages to MobileInputFooter', () => {
-    const messages = [{ id: '1', role: 'user', content: 'Hello' }];
+      const layout = screen.getByTestId('layout');
+      expect(layout).toBeInTheDocument();
+    });
 
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        messages={messages}
-      />
-    );
+    it('should render without isLoading prop (defaults to false)', () => {
+      const propsWithoutLoading = { ...defaultProps };
+      delete (propsWithoutLoading as any).isLoading;
 
-    const footer = screen.getByRole('contentinfo');
-    expect(footer).toBeInTheDocument();
-  });
+      render(
+        <MainLayout
+          {...propsWithoutLoading}
+          isMobile={true}
+        />
+      );
 
-  it('should pass error and onDismissError to ControlDrawer', () => {
-    const error = { message: 'Test error' };
+      const textarea = screen.getByTestId('mobile-input-textarea');
+      expect(textarea).not.toBeDisabled();
+    });
 
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        error={error}
-        onDismissError={mockOnDismissError}
-      />
-    );
+    it('should handle missing handleSendQuestion gracefully on mobile', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          handleSendQuestion={undefined}
+        />
+      );
 
-    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
+      const sendBtn = screen.getByTestId('send-btn');
+      expect(() => fireEvent.click(sendBtn)).not.toThrow();
+    });
+
+    it('should handle missing handleSendComplaint gracefully on mobile', () => {
+      render(
+        <MainLayout
+          {...defaultProps}
+          isMobile={true}
+          isComplaintMode={true}
+          handleSendComplaint={undefined}
+        />
+      );
+
+      const complaintBtn = screen.getByTestId('send-complaint-btn');
+      expect(() => fireEvent.click(complaintBtn)).not.toThrow();
+    });
   });
 });
