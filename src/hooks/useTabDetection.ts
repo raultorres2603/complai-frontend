@@ -282,7 +282,7 @@ export function useTabDetection() {
         log('Received TAB_CLOSED acknowledgment', { fromTabId: otherTabId.substring(0, 8) });
         closingTabsRef.current.delete(otherTabId);
         handleClosureAck({
-          type: TAB_MESSAGE_TYPES.TAB_CLOSED,
+          type: TAB_MESSAGE_TYPES.TAB_CLOSURE_ACK,
           tabId: otherTabId,
           timestamp: message.timestamp,
           messageId: message.messageId,
