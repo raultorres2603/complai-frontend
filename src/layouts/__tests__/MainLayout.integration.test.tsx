@@ -56,7 +56,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Test question');
 
       const form = textarea.closest('form');
@@ -86,7 +86,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Test complaint');
 
       const form = textarea.closest('form');
@@ -117,7 +117,7 @@ describe('MainLayout Integration', () => {
       );
 
       // Send in normal mode
-      let textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      let textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Normal message');
       let form = textarea.closest('form');
       if (form) fireEvent.submit(form);
@@ -142,7 +142,7 @@ describe('MainLayout Integration', () => {
       );
 
       // Send in complaint mode
-      textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Test complaint');
       form = textarea.closest('form');
       if (form) fireEvent.submit(form);
@@ -155,7 +155,7 @@ describe('MainLayout Integration', () => {
 
   describe('Desktop layout remains unchanged', () => {
     it('should render desktop layout with two columns', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -168,18 +168,18 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const layout = container.querySelector('.layout');
+      const layout = screen.getByTestId('layout');
       expect(layout).toBeInTheDocument();
 
-      const main = container.querySelector('.main');
-      const sidebar = container.querySelector('.sidebar');
+      const main = screen.getByTestId('main');
+      const sidebar = screen.getByTestId('sidebar');
 
       expect(main).toBeInTheDocument();
       expect(sidebar).toBeInTheDocument();
     });
 
     it('should not show mobile header on desktop', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -192,12 +192,12 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const mobileLayout = container.querySelector('.mobileLayout');
+      const mobileLayout = screen.queryByTestId('mobile-layout');
       expect(mobileLayout).not.toBeInTheDocument();
     });
 
     it('should not show mobile input footer on desktop', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -210,8 +210,8 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const mobileFooter = container.querySelector('[class*="footer"]');
-      expect(container.querySelector('.layout')).toBeInTheDocument();
+      // Desktop layout should be rendered
+      expect(screen.getByTestId('layout')).toBeInTheDocument();
     });
   });
 
@@ -230,7 +230,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea).toBeDisabled();
     });
 
@@ -248,7 +248,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       expect(textarea).not.toBeDisabled();
     });
 
@@ -266,7 +266,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      let textarea = document.querySelector("textarea");
+      let textarea = screen.getByRole('textbox');
       expect(textarea).not.toBeDisabled();
 
       // Start loading
@@ -283,7 +283,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      textarea = document.querySelector("textarea");
+      textarea = screen.getByRole('textbox');
       expect(textarea).toBeDisabled();
 
       // Stop loading
@@ -300,7 +300,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      textarea = document.querySelector("textarea");
+      textarea = screen.getByRole('textbox');
       expect(textarea).not.toBeDisabled();
     });
 
@@ -320,7 +320,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Message while loading');
 
       // Switch to loading state
@@ -364,7 +364,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Test');
 
       const form = textarea.closest('form');
@@ -393,7 +393,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Test');
 
       const form = textarea.closest('form');
@@ -412,7 +412,7 @@ describe('MainLayout Integration', () => {
 
   describe('Mobile layout structure', () => {
     it('should render mobile header, chat area, and footer', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -425,18 +425,18 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const mobileLayout = container.querySelector('.mobileLayout');
+      const mobileLayout = screen.getByTestId('mobile-layout');
       expect(mobileLayout).toBeInTheDocument();
 
-      const mobileMain = container.querySelector('.mobileMain');
+      const mobileMain = screen.getByTestId('mobile-main');
       expect(mobileMain).toBeInTheDocument();
 
-      const footer = container.querySelector('footer');
+      const footer = screen.getByRole('contentinfo');
       expect(footer).toBeInTheDocument();
     });
 
     it('should have proper flex layout for mobile', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -449,8 +449,8 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const mobileLayout = container.querySelector('.mobileLayout');
-      expect(mobileLayout).toHaveClass('mobileLayout');
+      const mobileLayout = screen.getByTestId('mobile-layout');
+      expect(mobileLayout).toBeInTheDocument();
     });
   });
 
@@ -498,7 +498,7 @@ describe('MainLayout Integration', () => {
         { id: '2', role: 'assistant', content: 'Hi there' },
       ];
 
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -511,7 +511,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const footer = container.querySelector('footer');
+      const footer = screen.getByRole('contentinfo');
       expect(footer).toBeInTheDocument();
     });
   });
@@ -533,7 +533,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Question');
 
       const form = textarea.closest('form');
@@ -563,7 +563,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+      const textarea = screen.getByRole('textbox');
       await user.type(textarea, 'Complaint');
 
       const form = textarea.closest('form');
@@ -579,7 +579,7 @@ describe('MainLayout Integration', () => {
 
   describe('CityId prop handling', () => {
     it('should accept cityId prop for debugging', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -593,13 +593,13 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+      expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
     });
   });
 
   describe('Error state handling', () => {
     it('should pass error state to ControlDrawer on mobile', () => {
-      const { container } = render(
+      render(
         <MainLayout
           chatWindow={<div>Chat</div>}
           controlPanel={<div>Control</div>}
@@ -613,7 +613,7 @@ describe('MainLayout Integration', () => {
         />
       );
 
-      expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+      expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
     });
   });
 });

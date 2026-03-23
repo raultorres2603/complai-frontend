@@ -76,7 +76,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   // Mobile layout
   if (isMobile) {
     return (
-      <div className={styles.mobileLayout}>
+      <div className={styles.mobileLayout} data-testid="mobile-layout">
         {/* Fixed header */}
         <MobileHeader
           appName={appName}
@@ -85,7 +85,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         />
 
         {/* Chat area - fills space between header and footer */}
-        <main className={styles.mobileMain}>{chatWindow}</main>
+        <main className={styles.mobileMain} data-testid="mobile-main">{chatWindow}</main>
 
         {/* Fixed input footer - pass handlers and state */}
         <MobileInputFooter
@@ -128,12 +128,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
   // Desktop layout (unchanged)
   return (
-    <div className={styles.layout}>
+    <div className={styles.layout} data-testid="layout">
       {/* Left column: Chat area with message list */}
-      <main className={styles.main}>{chatWindow}</main>
+      <main className={styles.main} data-testid="main">{chatWindow}</main>
 
       {/* Right column: Control panel with header, input, and controls */}
-      <aside className={styles.sidebar}>{controlPanel}</aside>
+      <aside className={styles.sidebar} data-testid="sidebar">{controlPanel}</aside>
     </div>
   );
 };

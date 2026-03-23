@@ -56,26 +56,26 @@ describe('MainLayout', () => {
   });
 
   it('should render desktop layout when isMobile is false', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={false}
       />
     );
 
-    const layout = container.querySelector('.layout');
+    const layout = screen.getByTestId('layout');
     expect(layout).toBeInTheDocument();
   });
 
   it('should render mobile layout when isMobile is true', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
       />
     );
 
-    const mobileLayout = container.querySelector('.mobileLayout');
+    const mobileLayout = screen.getByTestId('mobile-layout');
     expect(mobileLayout).toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe('MainLayout', () => {
   });
 
   it('should render MobileInputFooter on mobile with correct props', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -103,12 +103,12 @@ describe('MainLayout', () => {
       />
     );
 
-    const footer = container.querySelector('footer');
+    const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
   });
 
   it('should pass isLoading as disabled prop to MobileInputFooter', () => {
-    const { container: container1 } = render(
+    const { rerender } = render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -117,10 +117,10 @@ describe('MainLayout', () => {
     );
 
     // When not loading, input should be enabled
-    const textarea1 = container1.querySelector('textarea');
+    const textarea1 = screen.getByRole('textbox');
     expect(textarea1).not.toBeDisabled();
 
-    const { container: container2 } = render(
+    rerender(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -129,7 +129,7 @@ describe('MainLayout', () => {
     );
 
     // When loading, input should be disabled
-    const textarea2 = container2.querySelector('textarea');
+    const textarea2 = screen.getByRole('textbox');
     expect(textarea2).toBeDisabled();
   });
 
@@ -162,7 +162,7 @@ describe('MainLayout', () => {
   });
 
   it('should render ControlDrawer on mobile', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -170,27 +170,27 @@ describe('MainLayout', () => {
     );
 
     // ControlDrawer is rendered in mobile layout
-    // Check for drawer container
-    const drawer = container.querySelector('[class*="drawer"]') || 
-                  container.querySelector('[class*="Drawer"]');
-    // Note: actual drawer test would check for visible content
+    // Verify mobile layout is rendered (implies drawer is rendered)
+    const mobileLayout = screen.getByTestId('mobile-layout');
+    expect(mobileLayout).toBeInTheDocument();
   });
 
   it('should render chat area in mobileMain on mobile', () => {
     const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
       />
     );
 
-    const mobileMain = container.querySelector('.mobileMain');
-    expect(mobileMain).toBeInTheDocument();
+    const mobileMain = screen.getByTestId('mobile-m
     expect(mobileMain).toHaveTextContent('Chat Window');
   });
 
   it('should pass complaint mode to MobileInputFooter', () => {
     const { container: container1 } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -198,20 +198,9 @@ describe('MainLayout', () => {
       />
     );
 
-    // In normal mode, complaint fields should not be visible
-    // This is controlled by MessageInput component
-
-    const { container: container2 } = render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={true}
-        isComplaintMode={true}
-      />
-    );
-
-    // In complaint mode, complaint fields should be visible
-    // This is controlled by MessageInput component
-  });
+    // In normal mode, textarea should be rendered
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toBeInTheDocument();
 
   it('should render desktop layout with both columns', () => {
     const { container } = render(
@@ -225,15 +214,15 @@ describe('MainLayout', () => {
     const sidebar = container.querySelector('.sidebar');
 
     expect(main).toBeInTheDocument();
-    expect(sidebar).toBeInTheDocument();
-    expect(main).toHaveTextContent('Chat Window');
-    expect(sidebar).toHaveTextContent('Control Panel');
-  });
-
-  it('should not render MobileHeader on desktop', () => {
     render(
       <MainLayout
         {...defaultProps}
+        isMobile={false}
+      />
+    );
+
+    const main = screen.getByTestId('main');
+    const sidebar = screen.getByTestId('
         isMobile={false}
       />
     );
@@ -250,7 +239,7 @@ describe('MainLayout', () => {
         isMobile={false}
       />
     );
-
+screen.queryByTestId('mobile-l
     // MobileInputFooter should not be rendered on desktop
     const footer = document.querySelector('[class*="footer"]');
     // On desktop, no footer with mobile-specific class
@@ -262,16 +251,26 @@ describe('MainLayout', () => {
         {...defaultProps}
         isMobile={true}
         jwtToken="valid-jwt-token"
+      /Desktop layout should be rendered
+    const layout = screen.getByTestId('layout');
+    expect(layout).toBeInTheDocument();
+    // Footer should be rendered with access to token
+    const footer = container.querySelector('footer');
+    render(
+      <MainLayout
+        {...defaultProps}
+        isMobile={true}
+        jwtToken="valid-jwt-token"
       />
     );
 
     // Footer should be rendered with access to token
+    const footer = screen.getByRole('contentinfo
+    );
+
     const footer = container.querySelector('footer');
     expect(footer).toBeInTheDocument();
-  });
-
-  it('should handle null jwtToken gracefully', () => {
-    const { container } = render(
+  })render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -279,12 +278,12 @@ describe('MainLayout', () => {
       />
     );
 
-    const footer = container.querySelector('footer');
-    expect(footer).toBeInTheDocument();
-  });
-
-  it('should pass all required props to ControlDrawer', () => {
-    const { container } = render(
+    const footer = screen.getByRole('contentinfo
+        error={null}
+        messages={[]}
+      />
+    );
+render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -296,33 +295,23 @@ describe('MainLayout', () => {
     );
 
     // ControlDrawer should be rendered with correct props
-    const mobileLayout = container.querySelector('.mobileLayout');
-    expect(mobileLayout).toBeInTheDocument();
-  });
+    const mobileLayout = screen.getByTestId('mobile-l
 
-  it('should have proper margin spacing on mobileMain', () => {
-    const { container } = render(
+    const mobileMain = container.querySelector('.mobileMain');
+    const styles = window.getComputedStyle(mobileMain!);
+
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
       />
     );
 
-    const mobileMain = container.querySelector('.mobileMain');
-    const styles = window.getComputedStyle(mobileMain!);
+    const mobileMain = screen.getByTestId('mobile-main');
 
-    // Check that margins are set (actual values depend on CSS)
-    expect(mobileMain).toHaveClass('mobileMain');
-  });
-
-  it('should wrap chat window and control panel correctly on desktop', () => {
-    const chatWindowContent = <div data-testid="chat">Chat Content</div>;
-    const controlPanelContent = <div data-testid="control">Control Content</div>;
-
-    render(
-      <MainLayout
-        {...defaultProps}
-        isMobile={false}
+    // Check that mobileMain is rendered and has correct structure
+    expect(mobileMain).toBeInTheDocument();
+    expect(mobileMain).toHaveTextContent('Chat Window
         chatWindow={chatWindowContent}
         controlPanel={controlPanelContent}
       />
@@ -333,7 +322,7 @@ describe('MainLayout', () => {
   });
 
   it('should accept cityId prop for debugging', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -341,11 +330,11 @@ describe('MainLayout', () => {
       />
     );
 
-    expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
   });
 
   it('should handle missing optional props gracefully', () => {
-    const { container } = render(
+    render(
       <MainLayout
         chatWindow={<div>Chat</div>}
         controlPanel={<div>Control</div>}
@@ -353,11 +342,11 @@ describe('MainLayout', () => {
       />
     );
 
-    expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
   });
 
   it('should render with default values for optional props', () => {
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -367,13 +356,13 @@ describe('MainLayout', () => {
       />
     );
 
-    expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
   });
 
   it('should pass messages to MobileInputFooter', () => {
     const messages = [{ id: '1', role: 'user', content: 'Hello' }];
 
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -381,14 +370,14 @@ describe('MainLayout', () => {
       />
     );
 
-    const footer = container.querySelector('footer');
+    const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
   });
 
   it('should pass error and onDismissError to ControlDrawer', () => {
     const error = { message: 'Test error' };
 
-    const { container } = render(
+    render(
       <MainLayout
         {...defaultProps}
         isMobile={true}
@@ -397,6 +386,6 @@ describe('MainLayout', () => {
       />
     );
 
-    expect(container.querySelector('.mobileLayout')).toBeInTheDocument();
+    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
   });
 });
