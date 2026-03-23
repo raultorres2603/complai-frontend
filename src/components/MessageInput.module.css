@@ -57,18 +57,18 @@
     font-size: 0.875rem;
     background: var(--color-surface);
     color: var(--color-text);
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .complaintInput::placeholder {
-    color: var(--color-text-secondary);
+    color: var(--color-text-muted);
     font-weight: 400;
 }
 
 .complaintInput:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    box-shadow: var(--shadow-focus-ring);
 }
 
 .complaintInput:disabled {
@@ -104,14 +104,14 @@
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .formatButton:hover:not(:disabled) {
     border-color: var(--color-primary);
     color: var(--color-primary);
     transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    box-shadow: var(--shadow-glow-primary);
 }
 
 .formatButton.active {
@@ -139,7 +139,7 @@
 
 .inputContainer:focus-within {
     border-color: var(--color-primary);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    box-shadow: var(--shadow-focus-ring), var(--shadow-glow-primary);
 }
 
 .textarea {
@@ -222,12 +222,12 @@
 .sendButton:hover:not(:disabled) {
     background: var(--color-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+    box-shadow: var(--shadow-glow-primary);
 }
 
 .sendButton:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    box-shadow: var(--shadow-focus-ring);
 }
 
 .sendButton:disabled {

@@ -43,12 +43,12 @@
     border-radius: var(--border-radius);
     word-wrap: break-word;
     overflow-wrap: break-word;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .content:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .userMessage .content {
@@ -57,11 +57,19 @@
     border-bottom-right-radius: 4px;
 }
 
+.userMessage .content:hover {
+    box-shadow: var(--shadow-glow-primary);
+}
+
 .assistantMessage .content {
-    background: var(--color-surface);
+    background: var(--color-surface-light);
     border: 1px solid var(--color-border);
     color: var(--color-text);
     border-bottom-left-radius: 4px;
+}
+
+.assistantMessage .content:hover {
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
 }
 
 .text {
@@ -86,7 +94,7 @@
 .sources {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--color-border);
 }
 
 .sourcesLabel {
@@ -122,10 +130,17 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-surface);
     padding: 0.5rem;
     border-radius: 4px;
     cursor: pointer;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+}
+
+.file:hover {
+    background: var(--color-surface-light);
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
 }
 
 .fileIcon {
@@ -174,15 +189,15 @@
 .error {
     margin-top: 0.75rem;
     padding: 0.5rem;
-    background: rgba(239, 68, 68, 0.1);
-    border-left: 3px solid #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid var(--color-danger);
     border-radius: 4px;
 }
 
 .errorMessage {
     margin: 0;
     font-size: 0.875rem;
-    color: #dc2626;
+    color: #fca5a5;
 }
 
 /* Mobile responsive */

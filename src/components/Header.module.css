@@ -62,7 +62,7 @@
 
 .accessibilityButton:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    box-shadow: var(--shadow-glow-primary);
 }
 
 .accessibilityButton:active {
@@ -90,7 +90,7 @@
 
 .modeButton:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    box-shadow: var(--shadow-glow-secondary);
 }
 
 .modeButton:active {
@@ -103,9 +103,10 @@
 }
 
 .modeButton.on {
-    background: linear-gradient(90deg, #f97316, #ef4444);
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-secondary-dark));
     color: white;
     border-color: transparent;
+    box-shadow: var(--shadow-glow-secondary);
 }
 
 /* Mobile responsive - revert to horizontal layout */
