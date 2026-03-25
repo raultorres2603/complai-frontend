@@ -7,6 +7,7 @@ import DOMPurify from 'dompurify';
 import type { ChatMessage, ChatFile } from '../types/domain.types';
 import styles from './Message.module.css';
 import { SourceLink } from './SourceLink';
+import { normalizeText } from '../utils/textFormatter';
 
 interface MessageProps {
   message: ChatMessage;
@@ -29,7 +30,7 @@ export const Message: React.FC<MessageProps> = ({ message }) => {
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content) }}
           />
         ) : (
-          <p className={styles.text}>{message.content}</p>
+          <p className={styles.text}>{normalizeText(message.content)}</p>
         )}
 
         {/* Render sources if available */}
