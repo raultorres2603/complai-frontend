@@ -67,6 +67,36 @@ export const translations = {
     feedback_error_validation: 'Todos los campos son obligatorios. Por favor, inténtalo de nuevo.',
     feedback_error_unauthorized: 'Tu sesión ha expirado. Por favor, recarga la página.',
     feedback_error_server: 'No se pudo enviar el comentario en este momento. Por favor, inténtalo más tarde.',
+    // Error messages - Rate Limiting & Quotas
+    error_rate_limit_title: 'Límite de solicitudes excedido',
+    error_rate_limit_message: 'Has enviado demasiadas solicitudes. Por favor, espera {seconds} segundos antes de intentar de nuevo.',
+    error_quota_exceeded_title: 'Cuota de uso excedida',
+    error_quota_exceeded_message: 'Tu cuota de API se ha agotado. Por favor, contacta con soporte o inténtalo mañana.',
+    // Error messages - Authentication & Authorization
+    error_auth_invalid_token: 'Tu token de sesión no es válido. Por favor, inicia sesión de nuevo.',
+    error_auth_expired_token: 'Tu sesión ha expirado. Por favor, inicia sesión de nuevo.',
+    error_auth_missing_token: 'Autenticación requerida. Por favor, inicia sesión.',
+    error_forbidden: 'No tienes permiso para realizar esta acción.',
+    // Error messages - Request Validation
+    error_invalid_request_title: 'Solicitud inválida',
+    error_invalid_request_message: 'Tu solicitud no pudo ser procesada. Por favor, verifica tu entrada e inténtalo de nuevo.',
+    error_missing_fields_message: 'Campos requeridos faltantes: {fields}',
+    error_invalid_field_message: 'Valor inválido para el campo \'{field}\': {reason}',
+    error_context_length_exceeded: 'Tu solicitud es demasiado larga. Por favor, acorta tu mensaje e inténtalo de nuevo.',
+    // Error messages - Service & Model Availability
+    error_upstream_service_unavailable_title: 'Servicio temporalmente no disponible',
+    error_upstream_service_unavailable_message: 'El servicio de OpenRouter no está disponible en este momento. Por favor, inténtalo de nuevo en unos minutos.',
+    error_model_unavailable: 'El modelo de IA no está disponible en este momento. Por favor, inténtalo más tarde.',
+    error_model_overloaded: 'El modelo de IA está sobrecargado. Por favor, inténtalo en un momento.',
+    error_bad_gateway: 'Error de comunicación con el servicio. Por favor, inténtalo de nuevo.',
+    // Error messages - Timeouts & Processing
+    error_request_timeout: 'Tu solicitud tardó demasiado. Por favor, inténtalo de nuevo con un mensaje más corto.',
+    error_processing_timeout: 'El servicio está tardando más de lo esperado. Por favor, inténtalo de nuevo.',
+    // Error messages - Generic & Fallback
+    error_unknown_title: 'Algo salió mal',
+    error_unknown_message: 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.',
+    error_network_error: 'Error de conexión de red. Por favor, comprueba tu internet e inténtalo de nuevo.',
+    error_server_error_generic: 'Error del servidor. Por favor, inténtalo más tarde.',
   },
   en: {
     accessibility_settings: 'Accessibility Settings',
@@ -129,6 +159,36 @@ export const translations = {
     feedback_error_validation: 'All fields are required. Please try again.',
     feedback_error_unauthorized: 'Your session has expired. Please reload the page.',
     feedback_error_server: 'Could not send feedback at this time. Please try again later.',
+    // Error messages - Rate Limiting & Quotas
+    error_rate_limit_title: 'Rate limit exceeded',
+    error_rate_limit_message: 'You\'ve sent too many requests. Please wait {seconds} seconds before trying again.',
+    error_quota_exceeded_title: 'Usage quota exceeded',
+    error_quota_exceeded_message: 'Your API quota has been exhausted. Please contact support or try again tomorrow.',
+    // Error messages - Authentication & Authorization
+    error_auth_invalid_token: 'Your session token is invalid. Please log in again.',
+    error_auth_expired_token: 'Your session has expired. Please log in again.',
+    error_auth_missing_token: 'Authentication required. Please log in.',
+    error_forbidden: 'You do not have permission to perform this action.',
+    // Error messages - Request Validation
+    error_invalid_request_title: 'Invalid request',
+    error_invalid_request_message: 'Your request could not be processed. Please check your input and try again.',
+    error_missing_fields_message: 'Missing required fields: {fields}',
+    error_invalid_field_message: 'Invalid value for field \'{field}\': {reason}',
+    error_context_length_exceeded: 'Your request is too long. Please shorten your message and try again.',
+    // Error messages - Service & Model Availability
+    error_upstream_service_unavailable_title: 'Service temporarily unavailable',
+    error_upstream_service_unavailable_message: 'OpenRouter service is currently unavailable. Please try again in a few minutes.',
+    error_model_unavailable: 'The AI model is currently unavailable. Please try again later.',
+    error_model_overloaded: 'The AI model is overloaded. Please try again in a moment.',
+    error_bad_gateway: 'Communication error with the service. Please try again.',
+    // Error messages - Timeouts & Processing
+    error_request_timeout: 'Your request took too long. Please try again with a shorter message.',
+    error_processing_timeout: 'The service is taking longer than expected. Please try again.',
+    // Error messages - Generic & Fallback
+    error_unknown_title: 'Something went wrong',
+    error_unknown_message: 'An unexpected error occurred. Please try again.',
+    error_network_error: 'Network connection error. Please check your internet and try again.',
+    error_server_error_generic: 'Server error. Please try again later.',
   },
   ca: {
     accessibility_settings: 'Configuració d\'Accessibilitat',
@@ -191,6 +251,36 @@ export const translations = {
     feedback_error_validation: 'Tots els camps són obligatoris. Si us plau, torna-ho a intentar.',
     feedback_error_unauthorized: 'La teva sessió ha expirat. Si us plau, torna a carregar la pàgina.',
     feedback_error_server: "No s'ha pogut enviar el comentari en aquest moment. Si us plau, torna-ho a intentar més tard.",
+    // Error messages - Rate Limiting & Quotas
+    error_rate_limit_title: 'Límit de sol·licituds excedit',
+    error_rate_limit_message: 'Has enviat massa sol·licituds. Si us plau, espera {seconds} segons abans de reintentar-ho.',
+    error_quota_exceeded_title: 'Quota d\'ús superada',
+    error_quota_exceeded_message: 'La teva quota d\'API s\'ha esgotat. Si us plau, contacta amb suport o intenta-ho demà.',
+    // Error messages - Authentication & Authorization
+    error_auth_invalid_token: 'El teu token de sessió no és vàlid. Si us plau, inicia sessió de nou.',
+    error_auth_expired_token: 'La teva sessió ha expirat. Si us plau, inicia sessió de nou.',
+    error_auth_missing_token: 'Autenticació requerida. Si us plau, inicia sessió.',
+    error_forbidden: 'No tens permís per realitzar aquesta acció.',
+    // Error messages - Request Validation
+    error_invalid_request_title: 'Sol·licitud inválida',
+    error_invalid_request_message: 'La teva sol·licitud no ha pogut ser processada. Si us plau, verifica la teva entrada i torna-ho a intentar.',
+    error_missing_fields_message: 'Camps obligatoris que falten: {fields}',
+    error_invalid_field_message: 'Valor inválid per al camp \'{field}\': {reason}',
+    error_context_length_exceeded: 'La teva sol·licitud és massa llarga. Si us plau, escurça el teu missatge i torna-ho a intentar.',
+    // Error messages - Service & Model Availability
+    error_upstream_service_unavailable_title: 'Servei temporalment no disponible',
+    error_upstream_service_unavailable_message: 'El servei OpenRouter no està disponible en aquest moment. Si us plau, torna-ho a intentar en uns minuts.',
+    error_model_unavailable: 'El model d\'IA no està disponible en aquest moment. Si us plau, intenta-ho més tard.',
+    error_model_overloaded: 'El model d\'IA està sobrecarregat. Si us plau, intenta-ho en un moment.',
+    error_bad_gateway: 'Error de comunicació amb el servei. Si us plau, torna-ho a intentar.',
+    // Error messages - Timeouts & Processing
+    error_request_timeout: 'La teva sol·licitud ha trigat massa de temps. Si us plau, torna-ho a intentar amb un missatge més curt.',
+    error_processing_timeout: 'El servei està tardant més de l\'esperat. Si us plau, torna-ho a intentar.',
+    // Error messages - Generic & Fallback
+    error_unknown_title: 'Alguna cosa ha sortit malament',
+    error_unknown_message: 'Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar.',
+    error_network_error: 'Error de connexió de xarxa. Si us plau, verifica la teva connexió a internet i torna-ho a intentar.',
+    error_server_error_generic: 'Error del servidor. Si us plau, intenta-ho més tard.',
   },
 } as const;
 

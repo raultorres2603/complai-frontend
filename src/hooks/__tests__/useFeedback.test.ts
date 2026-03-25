@@ -32,8 +32,18 @@ vi.mock('../useTranslation', () => ({
   }),
 }));
 
+vi.mock('../../services/errorService', () => ({
+  parseOpenRouterError: vi.fn((error) => ({
+    code: (error as any).errorCode || 5,
+    message: (error as any).message || 'An error occurred',
+    isRetryable: true,
+    originalError: error,
+  })),
+}));
+
 // Import mocked modules for assertions
 import { complaiService, ApiError } from '../../services/apiService';
+import { parseOpenRouterError } from '../../services/errorService';
 
 describe('useFeedback', () => {
   beforeEach(() => {
@@ -78,10 +88,9 @@ describe('useFeedback', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('maps status 400 to feedback_error_validation message', async () => {
-    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(
-      new ApiError(400, 2, 'Bad Request')
-    );
+  it('uses parseOpenRouterError to parse errors', async () => {
+    const mockError = new ApiError(400, 2, 'Bad Request');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useFeedback('test-token'));
 
@@ -89,14 +98,18 @@ describe('useFeedback', () => {
       await result.current.submitFeedback('hello');
     });
 
-    expect(result.current.error).toBe('feedback_error_validation');
-    expect(result.current.success).toBe(false);
+    expect(parseOpenRouterError).toHaveBeenCalledWith(mockError);
   });
 
-  it('maps status 401 to feedback_error_unauthorized message', async () => {
-    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(
-      new ApiError(401, 4, 'Unauthorized')
-    );
+  it('sets error message from parseOpenRouterError result', async () => {
+    const mockError = new ApiError(400, 2, 'Bad Request');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
+    vi.mocked(parseOpenRouterError).mockReturnValueOnce({
+      code: 2,
+      message: 'Your request could not be processed. Please check your input and try again.',
+      isRetryable: true,
+      originalError: mockError,
+    });
 
     const { result } = renderHook(() => useFeedback('test-token'));
 
@@ -104,14 +117,19 @@ describe('useFeedback', () => {
       await result.current.submitFeedback('hello');
     });
 
-    expect(result.current.error).toBe('feedback_error_unauthorized');
+    expect(result.current.error).toBe('Your request could not be processed. Please check your input and try again.');
     expect(result.current.success).toBe(false);
   });
 
-  it('maps status 500 to feedback_error_server message', async () => {
-    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(
-      new ApiError(500, 4, 'Server Error')
-    );
+  it('handles rate limit errors via error service', async () => {
+    const mockError = new ApiError(429, 6, 'Rate limit exceeded');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
+    vi.mocked(parseOpenRouterError).mockReturnValueOnce({
+      code: 6,
+      message: 'You\'ve sent too many requests. Please wait a moment before trying again.',
+      isRetryable: true,
+      originalError: mockError,
+    });
 
     const { result } = renderHook(() => useFeedback('test-token'));
 
@@ -119,11 +137,48 @@ describe('useFeedback', () => {
       await result.current.submitFeedback('hello');
     });
 
-    expect(result.current.error).toBe('feedback_error_server');
-    expect(result.current.success).toBe(false);
+    expect(result.current.error).toBe('You\'ve sent too many requests. Please wait a moment before trying again.');
   });
 
-  it('returns feedback_error_unauthorized when jwtToken is null', async () => {
+  it('handles authentication errors via error service', async () => {
+    const mockError = new ApiError(401, 8, 'Unauthorized');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
+    vi.mocked(parseOpenRouterError).mockReturnValueOnce({
+      code: 8,
+      message: 'Authentication required. Please log in.',
+      isRetryable: false,
+      originalError: mockError,
+    });
+
+    const { result } = renderHook(() => useFeedback('test-token'));
+
+    await act(async () => {
+      await result.current.submitFeedback('hello');
+    });
+
+    expect(result.current.error).toBe('Authentication required. Please log in.');
+  });
+
+  it('handles service unavailable errors via error service', async () => {
+    const mockError = new ApiError(503, 10, 'Service Unavailable');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
+    vi.mocked(parseOpenRouterError).mockReturnValueOnce({
+      code: 10,
+      message: 'The service is temporarily unavailable. Please try again in a few moments.',
+      isRetryable: true,
+      originalError: mockError,
+    });
+
+    const { result } = renderHook(() => useFeedback('test-token'));
+
+    await act(async () => {
+      await result.current.submitFeedback('hello');
+    });
+
+    expect(result.current.error).toBe('The service is temporarily unavailable. Please try again in a few moments.');
+  });
+
+  it('returns error when jwtToken is null', async () => {
     const { result } = renderHook(() => useFeedback(null));
 
     await act(async () => {
@@ -135,9 +190,14 @@ describe('useFeedback', () => {
   });
 
   it('resetState clears all state', async () => {
-    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(
-      new ApiError(500, 4, 'Server Error')
-    );
+    const mockError = new ApiError(500, 4, 'Server Error');
+    vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
+    vi.mocked(parseOpenRouterError).mockReturnValueOnce({
+      code: 4,
+      message: 'An unexpected error occurred.',
+      isRetryable: true,
+      originalError: mockError,
+    });
 
     const { result } = renderHook(() => useFeedback('test-token'));
 
@@ -145,7 +205,7 @@ describe('useFeedback', () => {
       await result.current.submitFeedback('hello');
     });
 
-    expect(result.current.error).toBe('feedback_error_server');
+    expect(result.current.error).not.toBeNull();
 
     act(() => {
       result.current.resetState();

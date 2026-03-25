@@ -141,7 +141,7 @@ export function useChat(
         sessionService.addMessage(state.conversationId, errorMessage);
       }
     },
-    [state.conversationId]
+    [state.conversationId, currentLanguage]
   );
 
   /**
@@ -273,7 +273,7 @@ export function useChat(
         sessionService.addMessage(state.conversationId, errorMessage);
       }
     },
-    [state.conversationId]
+    [state.conversationId, currentLanguage]
   );
 
   /**

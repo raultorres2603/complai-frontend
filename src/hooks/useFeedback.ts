@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { useTranslation } from './useTranslation';
 import { complaiService, ApiError } from '../services/apiService';
+import { parseOpenRouterError } from '../services/errorService';
 
 export function useFeedback(jwtToken: string | null): {
   isLoading: boolean;
@@ -41,22 +42,11 @@ export function useFeedback(jwtToken: string | null): {
         setSuccess(true);
         setIsLoading(false);
       } catch (err) {
-        if (err instanceof ApiError) {
-          switch (err.status) {
-            case 400:
-              setError(t('feedback_error_validation'));
-              break;
-            case 401:
-              setError(t('feedback_error_unauthorized'));
-              break;
-            case 500:
-            default:
-              setError(t('feedback_error_server'));
-              break;
-          }
-        } else {
-          setError(t('feedback_error_server'));
-        }
+        // Use error service to get parsed error
+        const parsedError = parseOpenRouterError(err);
+        
+        // Use the parsed error message which is now user-friendly
+        setError(parsedError.message);
         setIsLoading(false);
       }
     },

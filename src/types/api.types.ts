@@ -15,9 +15,28 @@ export const ErrorCode = {
   UPSTREAM: 3,     // Upstream service unavailable (OpenRouter)
   INTERNAL: 4,     // Internal server error
   UNKNOWN: 5,      // Unknown error
+  RATE_LIMIT: 6,   // HTTP 429 - Rate limit exceeded
+  INVALID_REQUEST: 7,   // Malformed request body, unknown parameters
+  AUTHENTICATION_FAILED: 8,  // JWT invalid/expired
+  FORBIDDEN: 9,    // Insufficient permissions
+  SERVICE_UNAVAILABLE: 10,   // 502, 503, 504 or OpenRouter service down
+  MODEL_UNAVAILABLE: 11,     // OpenRouter model not available for request
+  CONTEXT_LENGTH_EXCEEDED: 12,  // Request too large for model context
+  TIMEOUT: 13,     // Request timeout or processing timeout
 } as const;
 
 export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
+
+/**
+ * Parsed and localized error information
+ */
+export interface ParsedError {
+  code: ErrorCode | number;
+  message: string;
+  isRetryable: boolean;
+  details?: Record<string, unknown>;
+  originalError?: unknown;
+}
 
 /**
  * Output format for complaint redaction
@@ -95,6 +114,7 @@ export interface ApiError {
   errorCode: ErrorCode | number;
   message: string;
   body?: OpenRouterPublicDto;
+  isRetryable?: boolean;
 }
 
 /**

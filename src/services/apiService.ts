@@ -5,6 +5,7 @@
 import type { Language } from '../types/accessibility.types';
 import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest, FeedbackRequest } from '../types/api.types';
 import { ErrorCode } from '../types/api.types';
+import { parseOpenRouterError } from './errorService';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
@@ -102,28 +103,16 @@ class ApiClient {
   private createApiError(status: number, data: unknown): ApiError {
     const apiResponse = typeof data === 'object' && data !== null ? (data as OpenRouterPublicDto) : null;
 
-    let errorCode: ErrorCode | number = ErrorCode.INTERNAL;
-    let message = '';
+    // Parse the error using error service to get user-friendly message
+    const parsedError = parseOpenRouterError({ status, body: apiResponse, message: data });
 
-    if (apiResponse) {
-      errorCode = typeof apiResponse.errorCode === 'number' ? apiResponse.errorCode : ErrorCode.INTERNAL;
-      message = apiResponse.error || apiResponse.message || 'Unknown error';
-    } else if (typeof data === 'string') {
-      message = data;
-    } else {
-      message = `HTTP ${status}`;
-    }
-
-    // Map HTTP status to error code if not specified
-    if (status === 422) {
-      errorCode = ErrorCode.REFUSAL as number;
-    } else if (status === 400) {
-      errorCode = ErrorCode.VALIDATION as number;
-    } else if (status === 502 || status === 503) {
-      errorCode = ErrorCode.UPSTREAM as number;
-    }
-
-    return new ApiError(status, errorCode, message, apiResponse || undefined);
+    return new ApiError(
+      status,
+      parsedError.code,
+      parsedError.message,
+      apiResponse || undefined,
+      parsedError.isRetryable
+    );
   }
 
   /**
@@ -302,13 +291,21 @@ export class ApiError extends Error implements Error {
   status: number;
   errorCode: ErrorCode | number;
   body?: OpenRouterPublicDto;
+  isRetryable?: boolean;
 
-  constructor(status: number, errorCode: ErrorCode | number, message: string, body?: OpenRouterPublicDto) {
+  constructor(
+    status: number,
+    errorCode: ErrorCode | number,
+    message: string,
+    body?: OpenRouterPublicDto,
+    isRetryable?: boolean
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.errorCode = errorCode;
     this.body = body;
+    this.isRetryable = isRetryable;
     Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
