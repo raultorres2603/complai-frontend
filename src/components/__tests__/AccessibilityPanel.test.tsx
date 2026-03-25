@@ -15,7 +15,7 @@ describe('AccessibilityPanel', () => {
 
   it('should render when isVisible is true', () => {
     render(<AccessibilityPanel isVisible={true} />);
-    expect(screen.getByText('Configuración de Accesibilidad')).toBeInTheDocument();
+    expect(screen.getByText(/Configuraci[oó]n de Accesibilidad|Accessibility Settings|Configuració d'Accessibilitat/i)).toBeInTheDocument();
   });
 
   it('should not render when isVisible is false', () => {
@@ -26,7 +26,7 @@ describe('AccessibilityPanel', () => {
   it('should call onClose when close button is clicked', () => {
     const handleClose = vi.fn();
     render(<AccessibilityPanel isVisible={true} onClose={handleClose} />);
-    const closeButton = screen.getByLabelText('Cerrar');
+    const closeButton = screen.getByLabelText(/^Cerrar$|^Close$|^Tancar$/i);
     closeButton.click();
     expect(handleClose).toHaveBeenCalled();
   });
@@ -42,7 +42,7 @@ describe('AccessibilityPanel', () => {
   it('should not call onClose when panel content is clicked', () => {
     const handleClose = vi.fn();
     render(<AccessibilityPanel isVisible={true} onClose={handleClose} />);
-    const title = screen.getByText('Configuración de Accesibilidad');
+    const title = screen.getByText(/Configuraci[oó]n de Accesibilidad|Accessibility Settings|Configuració d'Accessibilitat/i);
     title.click();
     expect(handleClose).not.toHaveBeenCalled();
   });
@@ -62,14 +62,14 @@ describe('AccessibilityPanel', () => {
 
   it('should display section headers for all features', () => {
     render(<AccessibilityPanel isVisible={true} />);
-    expect(screen.getByText('Filtro de Daltonismo')).toBeInTheDocument();
-    expect(screen.getByText('Texto a Voz')).toBeInTheDocument();
+    expect(screen.getByText(/Filtro de Daltonismo|Color Blindness Filter|Filtre de Daltonisme/i)).toBeInTheDocument();
+    expect(screen.getByText(/Texto a Voz|Text[- ]to[- ]Speech|Text a Veu/i)).toBeInTheDocument();
   });
 
   it('should have color blindness section expanded by default', () => {
     render(<AccessibilityPanel isVisible={true} />);
     const buttons = screen.getAllByRole('button');
-    const daltonismButton = buttons.find((btn: HTMLElement) => btn.textContent.includes('Filtro de Daltonismo'));
+    const daltonismButton = buttons.find((btn: HTMLElement) => /Filtro de Daltonismo|Color Blindness Filter|Filtre de Daltonisme/.test(btn.textContent));
     expect(daltonismButton).toHaveAttribute('aria-expanded', 'true');
   });
 
@@ -87,7 +87,7 @@ describe('AccessibilityPanel', () => {
   it('should show preview of selected color blindness filter', () => {
     render(<AccessibilityPanel isVisible={true} />);
     // Check for preview element by looking for the preview label text
-    const previewElements = screen.queryAllByText((content) => content.includes('Vista Previa') || content.includes('Preview'));
+    const previewElements = screen.queryAllByText((content) => content.includes('Vista Previa') || content.includes('Preview') || content.includes('Vista Prèvia'));
     expect(previewElements.length).toBeGreaterThan(0);
   });
 

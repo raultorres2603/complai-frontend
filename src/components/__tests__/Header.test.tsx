@@ -17,15 +17,15 @@ describe('Header Component', () => {
   it('should display "Ask a question" button text when not in complaint mode', () => {
     render(<Header isComplaintMode={false} onToggleComplaint={() => {}} />);
     
-    // Should display the Spanish translation by default
-    expect(screen.getByText(/Hacer una pregunta|Ask a question/i)).toBeInTheDocument();
+    // Should display the Spanish/Catalan translation by default
+    expect(screen.getByText(/Hacer una pregunta|Ask a question|Fer una pregunta/i)).toBeInTheDocument();
   });
 
   it('should display "Complaint mode" button text when in complaint mode', () => {
     render(<Header isComplaintMode={true} onToggleComplaint={() => {}} />);
     
-    // Should display the Spanish translation by default
-    expect(screen.getByText(/Modo de Reclamación|Complaint mode/i)).toBeInTheDocument();
+    // Should display the Spanish/Catalan translation by default
+    expect(screen.getByText(/Modo de Reclamaci[oó]n|Complaint mode|Mode de Reclamació/i)).toBeInTheDocument();
   });
 
   it('should call onToggleComplaint when mode button is clicked', async () => {
@@ -46,7 +46,7 @@ describe('Header Component', () => {
   it('should have accessibility settings button', () => {
     render(<Header isComplaintMode={false} onToggleComplaint={() => {}} />);
     
-    const a11yButton = screen.getByRole('button', { name: /Configuración de Accesibilidad|Accessibility Settings/i });
+    const a11yButton = screen.getByRole('button', { name: /Configuraci[oó]n de Accesibilidad|Accessibility Settings|Configuració d/i });
     expect(a11yButton).toBeInTheDocument();
   });
 

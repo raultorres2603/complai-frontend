@@ -25,7 +25,7 @@ describe('MessageInput Component Translation', () => {
     );
 
     // Should render textarea with question mode placeholder
-    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question/i);
+    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question|Fes una pregunta/i);
     expect(textarea).toBeInTheDocument();
   });
 
@@ -39,7 +39,7 @@ describe('MessageInput Component Translation', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question/i);
+    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question|Fes una pregunta/i);
     expect(textarea).toBeInTheDocument();
     expect(textarea).toHaveAttribute('placeholder');
   });
@@ -54,7 +54,7 @@ describe('MessageInput Component Translation', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Describe tu reclamación|Describe your complaint/i);
+    const textarea = screen.getByPlaceholderText(/Describe tu reclamaci[oó]n|Describe your complaint|Descriu la teva reclamació/i);
     expect(textarea).toBeInTheDocument();
   });
 
@@ -83,7 +83,7 @@ describe('MessageInput Component Translation', () => {
     );
 
     // Should display Requester Information section
-    expect(screen.getByText(/Información del Solicitante|Requester Information/i)).toBeInTheDocument();
+    expect(screen.getByText(/Informaci[oó]n del Solicitante|Requester Information|Informació del Solicitant/i)).toBeInTheDocument();
   });
 
   it('should display translated input field labels in complaint mode', () => {
@@ -105,7 +105,7 @@ describe('MessageInput Component Translation', () => {
       .map(input => input.getAttribute('placeholder'))
       .join('|');
 
-    expect(placeholders.toLowerCase()).toMatch(/nombre|name/i);
+    expect(placeholders.toLowerCase()).toMatch(/nombre|name|nom/i);
   });
 
   it('should display translated "Output Format:" label in complaint mode', () => {
@@ -118,7 +118,7 @@ describe('MessageInput Component Translation', () => {
       />
     );
 
-    expect(screen.getByText(/Formato de Salida|Output Format/i)).toBeInTheDocument();
+    expect(screen.getByText(/Formato de Salida|Output Format|Format de Sortida/i)).toBeInTheDocument();
   });
 
   it('should have translated send button tooltip', () => {
@@ -146,7 +146,7 @@ describe('MessageInput Component Translation', () => {
       />
     );
 
-    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question/i);
+    const textarea = screen.getByPlaceholderText(/Haz una pregunta|Ask a question|Fes una pregunta/i);
     const sendButton = screen.getByRole('button', { name: /Enviar|Send/i });
 
     // Type message using user event
