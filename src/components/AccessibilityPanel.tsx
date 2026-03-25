@@ -15,7 +15,7 @@ export interface AccessibilityPanelProps {
 
 /**
  * Accessibility panel for managing user accessibility preferences
- * Includes color blindness filter, TTS, and STT
+ * Includes color blindness filter and TTS
  */
 export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
   isVisible,
@@ -172,61 +172,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({
             )}
           </div>
 
-          {/* Speech-to-Text Section */}
-          <div className={styles.section} data-section="stt">
-            <button
-              className={styles.sectionHeader}
-              onClick={() => toggleSection('stt')}
-              aria-expanded={expandedSections.has('stt')}
-              aria-controls="stt-content"
-            >
-              <span className={styles.sectionTitle}>
-                <span className={styles.icon}>🎤</span>
-                {t('speech_recognition')}
-              </span>
-              <span className={styles.expandIcon}>
-                {expandedSections.has('stt') ? '▼' : '▶'}
-              </span>
-            </button>
 
-            {expandedSections.has('stt') && (
-              <div id="stt-content" className={styles.sectionContent}>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={settings.sttEnabled}
-                    onChange={(e) => updateSettings({ sttEnabled: e.target.checked })}
-                    aria-label={t('enable_stt')}
-                  />
-                  <span>{t('enable_stt')}</span>
-                </label>
-
-                {settings.sttEnabled && (
-                  <div className={styles.subOptions}>
-                    <label htmlFor="stt-language" className={styles.label}>
-                      Language:
-                    </label>
-                    <select
-                      id="stt-language"
-                      value={settings.sttLanguage}
-                      onChange={(e) => updateSettings({ sttLanguage: e.target.value })}
-                      className={styles.select}
-                      aria-label="Speech-to-text language"
-                    >
-                      <option value="en-US">English (US)</option>
-                      <option value="en-GB">English (UK)</option>
-                      <option value="es-ES">Spanish</option>
-                      <option value="ca-ES">Catalan</option>
-                      <option value="fr-FR">French</option>
-                      <option value="de-DE">German</option>
-                      <option value="it-IT">Italian</option>
-                      <option value="pt-BR">Portuguese (Brazil)</option>
-                    </select>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
         </div>
 
         <div className={styles.footer}>
