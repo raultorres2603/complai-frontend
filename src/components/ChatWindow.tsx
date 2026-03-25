@@ -21,7 +21,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   isLoading,
 }) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-tour="chat-window">
       {/* Message List */}
       <MessageList messages={messages} loading={isLoading} />
     </div>

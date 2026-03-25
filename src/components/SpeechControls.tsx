@@ -63,7 +63,7 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
   // Compact mode: horizontal layout with play/stop/voice select only
   if (isCompact) {
     return (
-      <div className={`${styles.container} ${styles.compact}`}>
+      <div className={`${styles.container} ${styles.compact}`} data-tour="speech-controls">
         <div className={styles.compactControls}>
           {state.isPlaying && (
             <button
@@ -109,7 +109,7 @@ export const SpeechControls: React.FC<SpeechControlsProps> = ({
 
   // Desktop mode: full layout
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-tour="speech-controls">
       <div className={styles.header}>
         <h3 className={styles.title}>🔊 Text-to-Speech</h3>
         {state.isPlaying && (

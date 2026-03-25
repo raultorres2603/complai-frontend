@@ -55,7 +55,7 @@ describe('MicrophoneButton Component Translation', () => {
     // Find the button with the microphone icon
     const buttons = screen.getAllByRole('button');
     const microButton = buttons.find(btn => btn.textContent?.includes('🎤'));
-    expect(microButton).toHaveAttribute('title', expect.stringMatching(/Comenzar escucha|Start listening/i));
+    expect(microButton).toHaveAttribute('title', expect.stringMatching(/Comenzar escucha|Start listening|Iniciar escolta/i));
   });
 
   it('should have translated aria-label for accessibility', () => {
@@ -70,7 +70,7 @@ describe('MicrophoneButton Component Translation', () => {
     // Find the button with the microphone icon
     const buttons = screen.getAllByRole('button');
     const microButton = buttons.find(btn => btn.textContent?.includes('🎤'));
-    expect(microButton).toHaveAttribute('aria-label', expect.stringMatching(/Comenzar escucha|Start listening/i));
+    expect(microButton).toHaveAttribute('aria-label', expect.stringMatching(/Comenzar escucha|Start listening|Iniciar escolta/i));
   });
 
   it('should display microphone icon', () => {

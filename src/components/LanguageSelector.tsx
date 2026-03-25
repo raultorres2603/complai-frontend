@@ -108,7 +108,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-tour="language-selector">
       {/* Trigger button */}
       <button
         ref={triggerRef}

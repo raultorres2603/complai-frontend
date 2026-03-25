@@ -1,0 +1,191 @@
+/* Intro.js Dark Theme Overrides for ComplAI */
+
+/* Overlay - dark semi-transparent background */
+.introjs-overlay {
+  background: rgba(15, 26, 46, 0.7);
+}
+
+/* Main tooltip container */
+.introjs-tooltip {
+  background: #2d3a52;
+  color: #f8fafc;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(14, 165, 233, 0.3);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  padding: 16px;
+}
+
+/* Tooltip title styling */
+.introjs-tooltip-title {
+  color: #f8fafc;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/* Tooltip content text */
+.introjs-tooltip-content {
+  color: #cbd5e1;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+/* Helper layer - cyan glow around highlighted element */
+.introjs-helperLayer {
+  border: 2px solid #0ea5e9;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 9999px rgba(15, 26, 46, 0.7),
+    0 0 20px rgba(14, 165, 233, 0.5),
+    inset 0 0 20px rgba(14, 165, 233, 0.2);
+}
+
+/* Highlight box around target element */
+.introjs-box {
+  border: 2px solid #0ea5e9;
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+/* Button base styling */
+.introjs-button {
+  background: #1a2844;
+  color: #f8fafc;
+  border: 1px solid #3f4a5f;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin: 0 4px;
+}
+
+/* Button hover state */
+.introjs-button:hover,
+.introjs-button:focus {
+  background: #2d3a52;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.3);
+  color: #0ea5e9;
+  outline: none;
+}
+
+/* Next button - primary styling with cyan accent */
+.introjs-button.introjs-nextbutton {
+  background: #0ea5e9;
+  color: #0f1a2e;
+  border-color: #0ea5e9;
+  font-weight: 600;
+}
+
+.introjs-button.introjs-nextbutton:hover,
+.introjs-button.introjs-nextbutton:focus {
+  background: #06b6d4;
+  border-color: #06b6d4;
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.5);
+  color: #0f1a2e;
+}
+
+/* Skip button - lower prominence */
+.introjs-button.introjs-skipbutton {
+  background: transparent;
+  color: #cbd5e1;
+  border: 1px solid #475569;
+}
+
+.introjs-button.introjs-skipbutton:hover,
+.introjs-button.introjs-skipbutton:focus {
+  background: transparent;
+  color: #f8fafc;
+  border-color: #f8fafc;
+  box-shadow: none;
+}
+
+/* Progress bullets */
+.introjs-bullet {
+  background: #0ea5e9;
+  border: 2px solid #0ea5e9;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.introjs-bullet.active {
+  background: #f8fafc;
+  border-color: #0ea5e9;
+}
+
+/* Bullet list container */
+.introjs-bullets {
+  padding: 8px 0;
+}
+
+/* Arrow styling - pointing from tooltip to element */
+.introjs-arrow {
+  border-color: #0ea5e9;
+}
+
+/* Top arrow */
+.introjs-arrow.top {
+  border-top-color: #2d3a52;
+}
+
+/* Bottom arrow */
+.introjs-arrow.bottom {
+  border-bottom-color: #2d3a52;
+}
+
+/* Left arrow */
+.introjs-arrow.left {
+  border-left-color: #2d3a52;
+}
+
+/* Right arrow */
+.introjs-arrow.right {
+  border-right-color: #2d3a52;
+}
+
+/* Floating element (tooltip container) */
+.introjsFloatingElement {
+  z-index: 9998;
+}
+
+/* Progress text */
+.introjs-progress {
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+/* Tooltip element general styling */
+.introjs-tooltip-element {
+  z-index: 9999;
+}
+
+/* Disabled button state */
+.introjs-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.introjs-button:disabled:hover {
+  background: #1a2844;
+  border-color: #3f4a5f;
+  box-shadow: none;
+  color: #f8fafc;
+}
+
+/* Focus state for accessibility */
+.introjs-button:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* Tooltip close button if present */
+.introjs-tooltip .introjs-button:last-child {
+  margin-right: 0;
+}
