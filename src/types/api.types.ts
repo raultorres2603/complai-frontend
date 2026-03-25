@@ -79,6 +79,15 @@ export interface RedactRequest {
 }
 
 /**
+ * Feedback endpoint request
+ */
+export interface FeedbackRequest {
+  userName: string;
+  idUser: string;
+  message: string;
+}
+
+/**
  * API error response
  */
 export interface ApiError {
