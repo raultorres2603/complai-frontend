@@ -46,7 +46,10 @@ export function useChat(
    */
   const sendQuestion = useCallback(
     async (text: string, jwtToken: string) => {
-      if (!state.conversationId || !jwtToken) {
+      // Extract current conversationId at function start to avoid stale closure
+      const conversationId = state.conversationId;
+
+      if (!conversationId || !jwtToken) {
         setState((prev) => ({
           ...prev,
           currentError: {
@@ -73,13 +76,13 @@ export function useChat(
       }));
 
       // Save to session
-      sessionService.addMessage(state.conversationId, userMessage);
+      sessionService.addMessage(conversationId, userMessage);
 
       try {
         // Call API with current language
         const response = await complaiService.askQuestion(
           text,
-          state.conversationId,
+          conversationId,
           jwtToken,
           currentLanguage,
           60000
@@ -102,7 +105,7 @@ export function useChat(
         }));
 
         // Save to session
-        sessionService.addMessage(state.conversationId, assistantMessage);
+        sessionService.addMessage(conversationId, assistantMessage);
       } catch (error) {
         const errorMsg = error instanceof ApiError
           ? error.message
@@ -138,7 +141,7 @@ export function useChat(
           messages: [...prev.messages, errorMessage],
         }));
 
-        sessionService.addMessage(state.conversationId, errorMessage);
+        sessionService.addMessage(conversationId, errorMessage);
       }
     },
     [state.conversationId, currentLanguage]
@@ -156,7 +159,10 @@ export function useChat(
       requesterIdNumber: string | undefined,
       jwtToken: string
     ) => {
-      if (!state.conversationId || !jwtToken) {
+      // Extract current conversationId at function start to avoid stale closure
+      const conversationId = state.conversationId;
+
+      if (!conversationId || !jwtToken) {
         setState((prev) => ({
           ...prev,
           currentError: {
@@ -181,13 +187,13 @@ export function useChat(
         currentError: null,
       }));
 
-      sessionService.addMessage(state.conversationId, userMessage);
+      sessionService.addMessage(conversationId, userMessage);
 
       try {
         const response = await complaiService.redactComplaint(
           text,
           format,
-          state.conversationId,
+          conversationId,
           requesterName,
           requesterSurname,
           requesterIdNumber,
@@ -199,7 +205,7 @@ export function useChat(
         // Check if response is async (202 Accepted)
         if (response.pdfUrl) {
           setRedactContext({
-            conversationId: state.conversationId,
+            conversationId: conversationId,
             format: format as any,
             requesterName,
             requesterSurname,
@@ -235,7 +241,7 @@ export function useChat(
           lastMessageTimestamp: Date.now(),
         }));
 
-        sessionService.addMessage(state.conversationId, assistantMessage);
+        sessionService.addMessage(conversationId, assistantMessage);
       } catch (error) {
         const errorMsg = error instanceof ApiError
           ? error.message
@@ -270,7 +276,7 @@ export function useChat(
           messages: [...prev.messages, errorMessage],
         }));
 
-        sessionService.addMessage(state.conversationId, errorMessage);
+        sessionService.addMessage(conversationId, errorMessage);
       }
     },
     [state.conversationId, currentLanguage]
@@ -303,12 +309,15 @@ export function useChat(
    * Add message manually (for testing)
    */
   const addMessage = useCallback((message: ChatMessage) => {
+    // Extract current conversationId at function start to avoid stale closure
+    const conversationId = state.conversationId;
+
     setState((prev) => ({
       ...prev,
       messages: [...prev.messages, message],
     }));
-    if (state.conversationId) {
-      sessionService.addMessage(state.conversationId, message);
+    if (conversationId) {
+      sessionService.addMessage(conversationId, message);
     }
   }, [state.conversationId]);
 

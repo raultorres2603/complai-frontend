@@ -101,11 +101,21 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   const handleTranscript = (transcript: string) => {
-    if (textareaRef.current) {
-      const newText = text ? `${text} ${transcript}` : transcript;
-      if (newText.length <= MAX_MESSAGE_LENGTH) {
-        setText(newText);
-        textareaRef.current.focus();
+    const newText = text ? `${text} ${transcript}` : transcript;
+    if (newText.length <= MAX_MESSAGE_LENGTH) {
+      // Auto-send the message immediately when voice transcript completes
+      onSend(newText.trim(), format);
+      // Reset UI state
+      setText('');
+      setComplaintInfo({ name: '', surname: '', idNumber: '' });
+      if (textareaRef.current) {
+        if (isMobileDevice) {
+          requestAnimationFrame(() => {
+            textareaRef.current?.focus();
+          });
+        } else {
+          textareaRef.current.focus();
+        }
       }
     }
   };
