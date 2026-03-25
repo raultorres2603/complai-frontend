@@ -60,6 +60,15 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken
           </>
         ) : (
           <>
+            <div className={styles.privacyNotice}>
+              <h3 className={styles.privacyNoticeTitle}>
+                {t('feedback_privacy_notice_title')}
+              </h3>
+              <p className={styles.privacyNoticeDescription}>
+                {t('feedback_privacy_notice_description')}
+              </p>
+            </div>
+
             <div className={styles.formGroup}>
               <label htmlFor="feedback-iduser" className={styles.label}>
                 {t('feedback_label_id')}
@@ -72,7 +81,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken
                 onChange={(e) => setIdUser(e.target.value)}
                 placeholder={t('feedback_placeholder_id')}
                 disabled={isLoading}
+                aria-describedby="feedback-iduser-helper"
               />
+              <div id="feedback-iduser-helper" className={styles.helperText}>
+                {t('feedback_id_helper_text')}
+              </div>
             </div>
 
             <div className={styles.formGroup}>

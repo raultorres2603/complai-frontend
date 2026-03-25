@@ -35,6 +35,9 @@ vi.mock('../../hooks/useTranslation', () => ({
         feedback_submit: 'Enviar',
         feedback_cancel: 'Cancelar',
         feedback_success: 'Tu comentario ha sido enviado correctamente. ¡Gracias!',
+        feedback_privacy_notice_title: 'Aviso de Privacidad',
+        feedback_privacy_notice_description: 'Por tu seguridad, no ingreses un número de identificación real. Puedes usar un número ficticio o dejarlo en blanco.',
+        feedback_id_helper_text: 'No ingreses datos reales. Puedes usar un número ficticio para propósitos de demostración.',
         close: 'Cerrar',
       };
       return map[key] ?? key;
@@ -204,5 +207,26 @@ describe('FeedbackModal', () => {
     fireEvent.click(cancelButton);
     expect(mockResetState).toHaveBeenCalled();
     expect(defaultProps.onClose).toHaveBeenCalled();
+  });
+
+  it('renders privacy notice title with correct translation', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    expect(screen.getByText('Aviso de Privacidad')).toBeInTheDocument();
+  });
+
+  it('renders privacy notice description with correct translation', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    expect(screen.getByText('Por tu seguridad, no ingreses un número de identificación real. Puedes usar un número ficticio o dejarlo en blanco.')).toBeInTheDocument();
+  });
+
+  it('renders helper text below idUser input field', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    expect(screen.getByText('No ingreses datos reales. Puedes usar un número ficticio para propósitos de demostración.')).toBeInTheDocument();
+  });
+
+  it('idUser input has aria-describedby attribute pointing to helper text', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación');
+    expect(idUserInput).toHaveAttribute('aria-describedby', 'feedback-iduser-helper');
   });
 });

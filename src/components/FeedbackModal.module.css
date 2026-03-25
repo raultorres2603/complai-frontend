@@ -121,3 +121,32 @@
   font-size: var(--font-size-sm);
   margin: 0;
 }
+
+.privacyNotice {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.privacyNoticeTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.privacyNoticeDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.helperText {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-secondary, #666);
+  margin-top: var(--spacing-xs, 0.25rem);
+  line-height: 1.4;
+}
