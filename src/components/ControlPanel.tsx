@@ -97,7 +97,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Header - hidden on mobile (MobileHeader and drawer handle mobile header) */}
       {!isMobile && (
         <div className={styles.header}>
-          <Header isComplaintMode={isComplaintMode} onToggleComplaint={onToggleComplaint} isMobile={isMobile} />
+          <Header isComplaintMode={isComplaintMode} onToggleComplaint={onToggleComplaint} isMobile={isMobile} jwtToken={jwtToken} />
         </div>
       )}
 

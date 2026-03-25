@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import AccessibilityPanel from './AccessibilityPanel';
 import { LanguageSelector } from './LanguageSelector';
+import FeedbackButton from './FeedbackButton';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslation } from '../hooks/useTranslation';
 import styles from './Header.module.css';
@@ -14,9 +15,10 @@ interface HeaderProps {
   isComplaintMode?: boolean;
   onToggleComplaint?: () => void;
   isMobile?: boolean;
+  jwtToken?: string | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false }) => {
+export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false, jwtToken = null }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const { t } = useTranslation();
@@ -53,6 +55,8 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
               onSelectLanguage={setLanguage}
               availableLanguages={availableLanguages}
             />
+
+            <FeedbackButton jwtToken={jwtToken} />
 
             <button
               className={`${styles.modeButton} ${isComplaintMode ? styles.on : ''}`}

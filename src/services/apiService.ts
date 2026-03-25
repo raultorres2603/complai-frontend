@@ -3,7 +3,7 @@
  */
 
 import type { Language } from '../types/accessibility.types';
-import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest } from '../types/api.types';
+import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest, FeedbackRequest } from '../types/api.types';
 import { ErrorCode } from '../types/api.types';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
@@ -226,6 +226,29 @@ export const complaiService = {
       body: request as unknown as Record<string, unknown>,
       jwtToken,
       timeout,
+    });
+  },
+
+  /**
+   * Submit user feedback
+   * POST /complai/feedback
+   *
+   * @param userName - Display name extracted from JWT claims
+   * @param idUser   - User ID (JWT `sub` claim)
+   * @param message  - Feedback text
+   * @param jwtToken - JWT authentication token
+   */
+  async sendFeedback(
+    userName: string,
+    idUser: string,
+    message: string,
+    jwtToken: string
+  ): Promise<void> {
+    const client = getApiClient();
+    const request: FeedbackRequest = { userName, idUser, message };
+    await client.request<OpenRouterPublicDto>('POST', '/complai/feedback', {
+      body: request as unknown as Record<string, unknown>,
+      jwtToken,
     });
   },
 
