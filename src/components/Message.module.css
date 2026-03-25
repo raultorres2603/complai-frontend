@@ -76,21 +76,34 @@
     margin: 0;
     line-height: 1.35;
     white-space: pre-wrap;
+    text-align: left;
 }
 
-.text p,
+.text ul,
+.text ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    text-align: left;
+}
+
+.text li {
+    margin: 0.25rem 0;
+    text-align: left;
+}
+
+.text p {
+    margin: 0.5rem 0;
+    text-align: left;
+}
+
 .text h1,
 .text h2,
 .text h3,
 .text h4,
 .text h5,
-.text h6,
-.text ul,
-.text ol,
-.text li {
-    margin: 0;
-    padding: 0;
-    line-height: 1.35;
+.text h6 {
+    margin: 0.5rem 0;
+    text-align: left;
 }
 
 .timestamp {
