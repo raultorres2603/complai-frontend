@@ -8,9 +8,12 @@ import { useSpeechToText } from '../hooks/useSpeechToText';
 import { useTranslation } from '../hooks/useTranslation';
 import styles from './MicrophoneButton.module.css';
 
-interface MicrophoneButtonProps {
+  interface MicrophoneButtonProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
+  /**
+   * @deprecated STT is now always enabled. This prop is kept for backward compatibility but is ignored.
+   */
   sttEnabled?: boolean;
 }
 
@@ -50,9 +53,7 @@ export const MicrophoneButton: React.FC<MicrophoneButtonProps> = ({
     }
   };
 
-  if (!sttEnabled) {
-    return null;
-  }
+  // STT is now always enabled - microphone button always renders
 
   return (
     <div className={styles.container}>

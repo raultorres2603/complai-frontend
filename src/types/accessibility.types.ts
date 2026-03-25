@@ -95,6 +95,9 @@ export interface AccessibilitySettings {
   ttsRate: number;           // 0.5 to 2.0
   ttsVoiceUri?: string;
   ttsPitch: number;          // 0.5 to 2.0
+  /**
+   * @deprecated STT is now always enabled. This field is kept for backward compatibility.
+   */
   sttEnabled: boolean;
   sttLanguage: string;       // e.g., 'en-US'
   sttAutoSendConfidence?: number; // Auto-send if confidence > this threshold
@@ -109,7 +112,7 @@ export const DEFAULT_ACCESSIBILITY_SETTINGS: AccessibilitySettings = {
   ttsEnabled: false,
   ttsRate: 1.0,
   ttsPitch: 1.0,
-  sttEnabled: false,
+  sttEnabled: true, // STT is now always enabled
   sttLanguage: 'en-US',
   sttAutoSendConfidence: 0.8,
 };

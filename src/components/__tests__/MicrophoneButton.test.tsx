@@ -28,7 +28,7 @@ describe('MicrophoneButton Component Translation', () => {
     expect(microButton).toBeInTheDocument();
   });
 
-  it('should not render when STT is disabled', () => {
+  it('should always render the microphone button (STT is now always enabled)', () => {
     const { container } = render(
       <MicrophoneButton
         onTranscript={mockOnTranscript}
@@ -37,7 +37,10 @@ describe('MicrophoneButton Component Translation', () => {
       />
     );
 
-    expect(container.firstChild).toBeNull();
+    // Button should render even if sttEnabled={false} is passed (for backward compatibility)
+    const buttons = screen.getAllByRole('button');
+    const microButton = buttons.find(btn => btn.textContent?.includes('🎤'));
+    expect(microButton).toBeInTheDocument();
   });
 
   it('should have translated tooltip for start listening', () => {

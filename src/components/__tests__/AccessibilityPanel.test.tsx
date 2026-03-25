@@ -64,7 +64,6 @@ describe('AccessibilityPanel', () => {
     render(<AccessibilityPanel isVisible={true} />);
     expect(screen.getByText('Filtro de Daltonismo')).toBeInTheDocument();
     expect(screen.getByText('Texto a Voz')).toBeInTheDocument();
-    expect(screen.getByText('Reconocimiento de Voz')).toBeInTheDocument();
   });
 
   it('should have color blindness section expanded by default', () => {

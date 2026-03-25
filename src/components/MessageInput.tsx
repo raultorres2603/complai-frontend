@@ -6,7 +6,6 @@
 import { useState, useRef } from 'react';
 import type { OutputFormat } from '../types/api.types';
 import { OutputFormat as OutputFormatEnum } from '../types/api.types';
-import { useAccessibility } from '../hooks/useAccessibility';
 import { useTranslation } from '../hooks/useTranslation';
 import { MicrophoneButton } from './MicrophoneButton';
 import styles from './MessageInput.module.css';
@@ -32,7 +31,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onComplaintInfoChange,
   isCompact = false,
 }) => {
-  const { settings } = useAccessibility();
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [format, setFormat] = useState<OutputFormat>(OutputFormatEnum.AUTO);
@@ -112,6 +110,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
+  // STT is now always enabled - no longer gated by accessibility settings
+
   const isSubmitDisabled = disabled || !text.trim();
 
   return (
@@ -180,7 +180,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <MicrophoneButton
             onTranscript={handleTranscript}
             disabled={disabled}
-            sttEnabled={settings.sttEnabled}
+            sttEnabled={true}
           />
         </div>
         <div className={styles.footer}>
