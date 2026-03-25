@@ -3,7 +3,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useAuth } from './useAuth';
 import { useTranslation } from './useTranslation';
 import { complaiService, ApiError } from '../services/apiService';
 import { parseOpenRouterError } from '../services/errorService';
@@ -12,26 +11,27 @@ export function useFeedback(jwtToken: string | null): {
   isLoading: boolean;
   error: string | null;
   success: boolean;
-  submitFeedback: (message: string) => Promise<void>;
+  submitFeedback: (idUser: string, userName: string, message: string) => Promise<void>;
   resetState: () => void;
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const { decodeToken } = useAuth();
   const { t } = useTranslation();
 
   const submitFeedback = useCallback(
-    async (message: string) => {
+    async (idUser: string, userName: string, message: string) => {
       if (jwtToken === null) {
         setError(t('feedback_error_unauthorized'));
         return;
       }
 
-      const claims = decodeToken(jwtToken);
-      const idUser = (claims?.sub as string) ?? '';
-      const userName = (claims?.name as string) ?? (claims?.userName as string) ?? idUser;
+      // Validate all fields are non-empty
+      if (!idUser.trim() || !userName.trim() || !message.trim()) {
+        setError(t('feedback_error_validation'));
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
@@ -50,7 +50,7 @@ export function useFeedback(jwtToken: string | null): {
         setIsLoading(false);
       }
     },
-    [jwtToken, decodeToken, t]
+    [jwtToken, t]
   );
 
   const resetState = useCallback(() => {

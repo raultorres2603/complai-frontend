@@ -27,6 +27,10 @@ vi.mock('../../hooks/useTranslation', () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
         feedback_modal_title: 'Enviar Comentario',
+        feedback_label_name: 'Nombre Completo',
+        feedback_placeholder_name: 'Ingresa tu nombre completo',
+        feedback_label_id: 'Número de Identificación',
+        feedback_placeholder_id: 'Ingresa tu número de identificación',
         feedback_message_placeholder: '¿Cómo podemos mejorar?',
         feedback_submit: 'Enviar',
         feedback_cancel: 'Cancelar',
@@ -68,31 +72,96 @@ describe('FeedbackModal', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('submit button is disabled when textarea is empty', () => {
+  it('renders idUser input field with correct label and placeholder', () => {
     render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación') as HTMLInputElement;
+    expect(idUserInput).toBeInTheDocument();
+    const label = screen.getByText('Número de Identificación');
+    expect(label).toBeInTheDocument();
+  });
+
+  it('renders userName input field with correct label and placeholder', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo') as HTMLInputElement;
+    expect(userNameInput).toBeInTheDocument();
+    const label = screen.getByText('Nombre Completo');
+    expect(label).toBeInTheDocument();
+  });
+
+  it('updates idUser state on input change', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación') as HTMLInputElement;
+    fireEvent.change(idUserInput, { target: { value: '123456' } });
+    expect(idUserInput.value).toBe('123456');
+  });
+
+  it('updates userName state on input change', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo') as HTMLInputElement;
+    fireEvent.change(userNameInput, { target: { value: 'John Doe' } });
+    expect(userNameInput.value).toBe('John Doe');
+  });
+
+  it('submit button is disabled when idUser is empty', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo');
+    const messageInput = screen.getByPlaceholderText('¿Cómo podemos mejorar?');
+    fireEvent.change(userNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(messageInput, { target: { value: 'feedback' } });
     const submitButton = screen.getByText('Enviar');
     expect(submitButton).toBeDisabled();
   });
 
-  it('submit button becomes enabled after typing', () => {
+  it('submit button is disabled when userName is empty', () => {
     render(<FeedbackModal {...defaultProps} />);
-    const textarea = screen.getByRole('textbox');
-    fireEvent.change(textarea, { target: { value: 'some feedback' } });
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación');
+    const messageInput = screen.getByPlaceholderText('¿Cómo podemos mejorar?');
+    fireEvent.change(idUserInput, { target: { value: '123456' } });
+    fireEvent.change(messageInput, { target: { value: 'feedback' } });
+    const submitButton = screen.getByText('Enviar');
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('submit button is disabled when message is empty', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación');
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo');
+    fireEvent.change(idUserInput, { target: { value: '123456' } });
+    fireEvent.change(userNameInput, { target: { value: 'John Doe' } });
+    const submitButton = screen.getByText('Enviar');
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('submit button is enabled when all three fields are filled', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación');
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo');
+    const messageInput = screen.getByPlaceholderText('¿Cómo podemos mejorar?');
+    
+    fireEvent.change(idUserInput, { target: { value: '123456' } });
+    fireEvent.change(userNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(messageInput, { target: { value: 'feedback' } });
+    
     const submitButton = screen.getByText('Enviar');
     expect(submitButton).not.toBeDisabled();
   });
 
-  it('calls submitFeedback with trimmed message on submit', async () => {
+  it('calls submitFeedback with all three parameters', async () => {
     mockSubmitFeedback.mockResolvedValueOnce(undefined);
 
     render(<FeedbackModal {...defaultProps} />);
-    const textarea = screen.getByRole('textbox');
-    fireEvent.change(textarea, { target: { value: ' hello world ' } });
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación');
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo');
+    const messageInput = screen.getByPlaceholderText('¿Cómo podemos mejorar?');
+    
+    fireEvent.change(idUserInput, { target: { value: ' 123456 ' } });
+    fireEvent.change(userNameInput, { target: { value: ' John Doe ' } });
+    fireEvent.change(messageInput, { target: { value: ' hello world ' } });
 
     const submitButton = screen.getByText('Enviar');
     fireEvent.click(submitButton);
 
-    expect(mockSubmitFeedback).toHaveBeenCalledWith('hello world');
+    expect(mockSubmitFeedback).toHaveBeenCalledWith('123456', 'John Doe', 'hello world');
   });
 
   it('displays error message when hook returns error', () => {
@@ -101,13 +170,32 @@ describe('FeedbackModal', () => {
     expect(screen.getByText('some error')).toBeInTheDocument();
   });
 
-  it('displays success message and hides textarea when success=true', () => {
+  it('displays success message and hides form inputs when success=true', () => {
     mockHookState = { ...mockHookState, success: true };
     render(<FeedbackModal {...defaultProps} />);
     expect(
       screen.getByText('Tu comentario ha sido enviado correctamente. ¡Gracias!')
     ).toBeInTheDocument();
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Ingresa tu número de identificación')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Ingresa tu nombre completo')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('¿Cómo podemos mejorar?')).not.toBeInTheDocument();
+  });
+
+  it('resets all three field values on modal close', () => {
+    render(<FeedbackModal {...defaultProps} />);
+    const idUserInput = screen.getByPlaceholderText('Ingresa tu número de identificación') as HTMLInputElement;
+    const userNameInput = screen.getByPlaceholderText('Ingresa tu nombre completo') as HTMLInputElement;
+    const messageInput = screen.getByPlaceholderText('¿Cómo podemos mejorar?') as HTMLInputElement;
+    
+    fireEvent.change(idUserInput, { target: { value: '123456' } });
+    fireEvent.change(userNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(messageInput, { target: { value: 'feedback' } });
+    
+    const cancelButton = screen.getByText('Cancelar');
+    fireEvent.click(cancelButton);
+    
+    expect(mockResetState).toHaveBeenCalled();
+    expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
   it('calls onClose and resetState when cancel clicked', () => {

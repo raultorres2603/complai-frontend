@@ -14,6 +14,8 @@ interface FeedbackModalProps {
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken }) => {
+  const [idUser, setIdUser] = useState('');
+  const [userName, setUserName] = useState('');
   const [message, setMessage] = useState('');
   const { isLoading, error, success, submitFeedback, resetState } = useFeedback(jwtToken);
   const { t } = useTranslation();
@@ -23,12 +25,15 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken
   }
 
   const handleClose = () => {
+    setIdUser('');
+    setUserName('');
+    setMessage('');
     resetState();
     onClose();
   };
 
   const handleSubmit = async () => {
-    await submitFeedback(message.trim());
+    await submitFeedback(idUser.trim(), userName.trim(), message.trim());
   };
 
   return (
@@ -55,13 +60,45 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken
           </>
         ) : (
           <>
-            <textarea
-              className={styles.textarea}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={t('feedback_message_placeholder')}
-              disabled={isLoading}
-            />
+            <div className={styles.formGroup}>
+              <label htmlFor="feedback-iduser" className={styles.label}>
+                {t('feedback_label_id')}
+              </label>
+              <input
+                id="feedback-iduser"
+                type="text"
+                className={styles.input}
+                value={idUser}
+                onChange={(e) => setIdUser(e.target.value)}
+                placeholder={t('feedback_placeholder_id')}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="feedback-username" className={styles.label}>
+                {t('feedback_label_name')}
+              </label>
+              <input
+                id="feedback-username"
+                type="text"
+                className={styles.input}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder={t('feedback_placeholder_name')}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <textarea
+                className={styles.textarea}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={t('feedback_message_placeholder')}
+                disabled={isLoading}
+              />
+            </div>
             {error && <p className={styles.errorMessage}>{error}</p>}
             <div className={styles.actions}>
               <button
@@ -74,7 +111,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken
               <button
                 className={styles.submitButton}
                 onClick={handleSubmit}
-                disabled={message.trim() === '' || isLoading}
+                disabled={idUser.trim() === '' || userName.trim() === '' || message.trim() === '' || isLoading}
               >
                 {t('feedback_submit')}
               </button>

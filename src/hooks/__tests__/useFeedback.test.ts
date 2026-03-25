@@ -19,13 +19,6 @@ vi.mock('../../services/apiService', () => ({
   },
 }));
 
-vi.mock('../useAuth', () => ({
-  useAuth: () => ({
-    jwtToken: 'mock-token',
-    decodeToken: (_token: string) => ({ sub: 'user-123', name: 'Alice' }),
-  }),
-}));
-
 vi.mock('../useTranslation', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -56,12 +49,13 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.success).toBe(true);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
+    expect(complaiService.sendFeedback).toHaveBeenCalledWith('Alice', 'user-123', 'hello', 'test-token');
   });
 
   it('isLoading is true during async call', async () => {
@@ -75,7 +69,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     act(() => {
-      result.current.submitFeedback('hello');
+      result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.isLoading).toBe(true);
@@ -88,6 +82,39 @@ describe('useFeedback', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
+  it('sets error when idUser is empty', async () => {
+    const { result } = renderHook(() => useFeedback('test-token'));
+
+    await act(async () => {
+      await result.current.submitFeedback('', 'Alice', 'hello');
+    });
+
+    expect(result.current.error).toBe('feedback_error_validation');
+    expect(complaiService.sendFeedback).not.toHaveBeenCalled();
+  });
+
+  it('sets error when userName is empty', async () => {
+    const { result } = renderHook(() => useFeedback('test-token'));
+
+    await act(async () => {
+      await result.current.submitFeedback('user-123', '', 'hello');
+    });
+
+    expect(result.current.error).toBe('feedback_error_validation');
+    expect(complaiService.sendFeedback).not.toHaveBeenCalled();
+  });
+
+  it('sets error when message is empty', async () => {
+    const { result } = renderHook(() => useFeedback('test-token'));
+
+    await act(async () => {
+      await result.current.submitFeedback('user-123', 'Alice', '');
+    });
+
+    expect(result.current.error).toBe('feedback_error_validation');
+    expect(complaiService.sendFeedback).not.toHaveBeenCalled();
+  });
+
   it('uses parseOpenRouterError to parse errors', async () => {
     const mockError = new ApiError(400, 2, 'Bad Request');
     vi.mocked(complaiService.sendFeedback).mockRejectedValueOnce(mockError);
@@ -95,7 +122,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(parseOpenRouterError).toHaveBeenCalledWith(mockError);
@@ -114,7 +141,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).toBe('Your request could not be processed. Please check your input and try again.');
@@ -134,7 +161,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).toBe('You\'ve sent too many requests. Please wait a moment before trying again.');
@@ -153,7 +180,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).toBe('Authentication required. Please log in.');
@@ -172,7 +199,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).toBe('The service is temporarily unavailable. Please try again in a few moments.');
@@ -182,7 +209,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback(null));
 
     await act(async () => {
-      await result.current.submitFeedback('test');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).toBe('feedback_error_unauthorized');
@@ -202,7 +229,7 @@ describe('useFeedback', () => {
     const { result } = renderHook(() => useFeedback('test-token'));
 
     await act(async () => {
-      await result.current.submitFeedback('hello');
+      await result.current.submitFeedback('user-123', 'Alice', 'hello');
     });
 
     expect(result.current.error).not.toBeNull();
