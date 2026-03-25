@@ -18,7 +18,7 @@ export function useTour(): { startTour: () => void } {
   const startTour = useCallback(() => {
     try {
       introJs()
-        .setOptions({ steps: tourSteps, exitOnOverlayClick: true, showProgress: true, showBullets: false })
+        .setOptions({ steps: tourSteps as any, exitOnOverlayClick: true, showProgress: true, showBullets: false })
         .oncomplete(() => {
           storageService.set('tour_completed', true);
         })

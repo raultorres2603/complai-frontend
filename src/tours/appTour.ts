@@ -3,7 +3,7 @@ export interface TourStep {
   element?: string;
   intro: string;
   title?: string;
-  position?: string;
+  position?: 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'auto';
 }
 
 import { translations } from '../translations/languages';

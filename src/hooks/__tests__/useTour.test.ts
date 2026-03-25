@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act } from '@testing-library/react';
 import { renderHook } from '../../__tests__/test-utils';
 import { useTour } from '../useTour';
+import type { Language } from '../../types/accessibility.types';
 
 const {
   mockOnComplete,
@@ -37,8 +38,8 @@ vi.mock('../../services/storageService', () => ({
 }));
 
 const { mockUseLanguage } = vi.hoisted(() => ({
-  mockUseLanguage: vi.fn(() => ({
-    currentLanguage: 'ca' as const,
+  mockUseLanguage: vi.fn((): { currentLanguage: Language; setLanguage: any; locale: string; availableLanguages: never[] } => ({
+    currentLanguage: 'ca',
     setLanguage: vi.fn(),
     locale: 'ca-ES',
     availableLanguages: [],
@@ -58,7 +59,7 @@ beforeEach(() => {
   mockStart.mockReturnThis();
   mockSetOptions.mockReturnThis();
   mockUseLanguage.mockReturnValue({
-    currentLanguage: 'ca' as const,
+    currentLanguage: 'ca' as Language,
     setLanguage: vi.fn(),
     locale: 'ca-ES',
     availableLanguages: [],
@@ -132,7 +133,7 @@ describe('useTour', () => {
   it('uses Spanish steps when language is Spanish', () => {
     mockHas.mockReturnValue(true);
     mockUseLanguage.mockReturnValue({
-      currentLanguage: 'es' as const,
+      currentLanguage: 'es' as Language,
       setLanguage: vi.fn(),
       locale: 'es-ES',
       availableLanguages: [],
@@ -155,7 +156,7 @@ describe('useTour', () => {
   it('uses English steps when language is English', () => {
     mockHas.mockReturnValue(true);
     mockUseLanguage.mockReturnValue({
-      currentLanguage: 'en' as const,
+      currentLanguage: 'en' as Language,
       setLanguage: vi.fn(),
       locale: 'en-US',
       availableLanguages: [],
