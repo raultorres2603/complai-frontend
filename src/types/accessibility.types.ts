@@ -108,7 +108,7 @@ export interface AccessibilitySettings {
  */
 export const DEFAULT_ACCESSIBILITY_SETTINGS: AccessibilitySettings = {
   colorBlindnessType: 'normal',
-  language: 'es', // Default to Spanish
+  language: 'ca', // Default to Catalan
   ttsEnabled: false,
   ttsRate: 1.0,
   ttsPitch: 1.0,

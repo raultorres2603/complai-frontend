@@ -16,6 +16,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { ControlPanel } from './components/ControlPanel';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { TabConflictModal } from './components/TabConflictModal';
+import TourButton from './components/TourButton';
 import './App.css';
 
 function App() {
@@ -198,6 +199,7 @@ function App() {
         jwtToken={jwtToken}
         cityId={cityId}
       />
+      <TourButton />
     </ErrorBoundary>
   );
 }

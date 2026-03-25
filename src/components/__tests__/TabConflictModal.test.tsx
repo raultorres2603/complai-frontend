@@ -32,14 +32,14 @@ describe('TabConflictModal', () => {
   it('should render modal content when isVisible is true', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    expect(screen.getByText(/detectaron múltiples pestañas|Multiple Tabs Detected/i)).toBeInTheDocument();
-    expect(screen.getByText(/solo permite una sesión activa|only allows one active session/i)).toBeInTheDocument();
+    expect(screen.getByText(/detectaron múltiples pestañas|Multiple Tabs Detected|han detectat múltiples pestanyes/i)).toBeInTheDocument();
+    expect(screen.getByText(/solo permite una sesión activa|only allows one active session|només permet una sessió activa/i)).toBeInTheDocument();
   });
 
   it('should show initial button text with translation', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     expect(button).toBeInTheDocument();
   });
 
@@ -51,7 +51,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
@@ -65,7 +65,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     // After button click, parent provides closure info (this would be async in real code)
@@ -74,7 +74,7 @@ describe('TabConflictModal', () => {
     );
 
     // Button text should change to translated "Closing tabs..." (when closingTabCount > 0)
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should disable button during closure', async () => {
@@ -84,7 +84,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     // Button should be disabled
@@ -98,7 +98,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     // Simulate parent providing closure context  
@@ -110,7 +110,7 @@ describe('TabConflictModal', () => {
     // (In real app, this would happen via useEffect after 3 seconds)
     // For now, just verify the error message appears when tabs don't close
     // The component's timeout logic will be tested through component e2e tests
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should show translated "Retry" button after timeout', async () => {
@@ -120,7 +120,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -128,7 +128,7 @@ describe('TabConflictModal', () => {
     );
 
     // Verify closing state is displayed
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should allow retry after error', async () => {
@@ -139,7 +139,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    const firstButton = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const firstButton = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(firstButton);
 
     rerender(
@@ -147,7 +147,7 @@ describe('TabConflictModal', () => {
     );
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should enable retry button (not disabled)', async () => {
@@ -157,14 +157,14 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={1} closedTabCount={0} />
     );
 
-    const closingButton = screen.getByText(/Cerrando pestañas|Closing tabs/i)  as HTMLButtonElement;
+    const closingButton = screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)  as HTMLButtonElement;
     expect(closingButton.disabled).toBe(true);
   });
 
@@ -175,7 +175,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -186,13 +186,13 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab/i)).toBeInTheDocument();
+    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i)).toBeInTheDocument();
   });
 
   it('should have proper accessibility attributes', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     expect(button).toHaveAttribute('aria-label');
   });
 
@@ -203,7 +203,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -211,14 +211,14 @@ describe('TabConflictModal', () => {
     );
     
     // When closingTabCount > 0, button shows "Cerrando pestañas..." (without "otras")
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should not show spinner before closure starts', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
     // Spinner should not be visible initially
-    expect(screen.queryByText(/Cerrando pestaña|Closing tabs/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Cerrando pestaña|Closing tabs|Tancant pestanya/i)).not.toBeInTheDocument();
   });
 
   it('should display error message with warning icon', async () => {
@@ -228,14 +228,14 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} closingTabCount={2} closedTabCount={0} />
     );
 
-    const closingButton = screen.getByText(/Cerrando pestañas|Closing tabs/i);
+    const closingButton = screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i);
     expect(closingButton).toBeInTheDocument();
   });
 
@@ -247,7 +247,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    let button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    let button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -255,7 +255,7 @@ describe('TabConflictModal', () => {
     );
 
     // Verify closing state is displayed
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
     expect(mockCallback).toHaveBeenCalledTimes(1);
   });
 
@@ -266,7 +266,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     // Unmount immediately - should not cause errors

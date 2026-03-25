@@ -22,6 +22,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ jwtToken }) => {
         onClick={() => setIsModalOpen(true)}
         aria-label={t('feedback_button_label')}
         title={t('feedback_button_label')}
+        data-tour="feedback-button"
       >
         {t('feedback_button_label')}
       </button>

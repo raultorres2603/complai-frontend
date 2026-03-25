@@ -62,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
               className={`${styles.modeButton} ${isComplaintMode ? styles.on : ''}`}
               onClick={() => onToggleComplaint?.()}
               aria-pressed={isComplaintMode}
+              data-tour="complaint-toggle"
             >
               {isComplaintMode ? t('complaint_mode') : t('ask_question')}
             </button>

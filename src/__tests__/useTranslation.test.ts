@@ -11,10 +11,10 @@ describe('useTranslation', () => {
     localStorage.clear();
   });
 
-  it('returns Spanish translations by default', () => {
+  it('returns Catalan translations by default', () => {
     const { result } = renderHook(() => useTranslation());
-    expect(result.current.t('accessibility_settings')).toBe('Configuración de Accesibilidad');
-    expect(result.current.t('color_blindness_filter')).toBe('Filtro de Daltonismo');
+    expect(result.current.t('accessibility_settings')).toBe('Configuració d\'Accessibilitat');
+    expect(result.current.t('color_blindness_filter')).toBe('Filtre de Daltonisme');
   });
 
   it('returns English translations when language is English', () => {

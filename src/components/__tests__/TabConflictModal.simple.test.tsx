@@ -19,14 +19,14 @@ describe('TabConflictModal', () => {
   it('should render modal content when isVisible is true', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    expect(screen.getByText(/Se detectaron múltiples pestañas|Multiple Tabs Detected/i)).toBeInTheDocument();
-    expect(screen.getByText(/solo permite una sesión activa|only allows one active session/i)).toBeInTheDocument();
+    expect(screen.getByText(/Se detectaron múltiples pestañas|Multiple Tabs Detected|S'han detectat múltiples pestanyes/i)).toBeInTheDocument();
+    expect(screen.getByText(/solo permite una sesión activa|only allows one active session|només permet una sessió activa/i)).toBeInTheDocument();
   });
 
   it('should show initial button text', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     expect(button).toBeInTheDocument();
   });
 
@@ -38,7 +38,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
@@ -52,7 +52,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -61,7 +61,7 @@ describe('TabConflictModal', () => {
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
     // When closingTabCount > 0, button shows "Cerrando pestañas..." (without "otras")
-    expect(screen.getByText(/Cerrando pestañas|Closing tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cerrando pestañas|Closing tabs|Tancant pestanyes/i)).toBeInTheDocument();
   });
 
   it('should disable button during closure', async () => {
@@ -71,7 +71,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={() => {}} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     expect(button).toBeDisabled();
@@ -80,7 +80,7 @@ describe('TabConflictModal', () => {
   it('should have accessibility attributes', () => {
     render(<TabConflictModal isVisible={true} onContinueThisTab={() => {}} />);
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     expect(button).toHaveAttribute('aria-label');
   });
 
@@ -92,7 +92,7 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab/i);
+    const button = screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i);
     await user.click(button);
 
     rerender(
@@ -103,6 +103,6 @@ describe('TabConflictModal', () => {
       <TabConflictModal isVisible={true} onContinueThisTab={mockCallback} closingTabCount={0} closedTabCount={0} />
     );
 
-    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab/i)).toBeInTheDocument();
+    expect(screen.getByText(/Continuar con esta pestaña|Continue with this tab|Continuar amb aquesta pestanya/i)).toBeInTheDocument();
   });
 });

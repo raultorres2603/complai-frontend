@@ -125,7 +125,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const isSubmitDisabled = disabled || !text.trim();
 
   return (
-    <form className={`${styles.form} ${isCompact ? styles.compact : ''}`} onSubmit={handleSubmit}>
+    <form className={`${styles.form} ${isCompact ? styles.compact : ''}`} onSubmit={handleSubmit} data-tour="message-input">
       {/* Complaint section - hidden in compact mode */}
       <div className={`${styles.complaintSection} ${isComplaintMode ? styles.visible : styles.hidden}`}>
         <h3 className={styles.sectionTitle}>{t('requester_information')} {t('optional')}</h3>

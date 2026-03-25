@@ -64,6 +64,7 @@ export const MicrophoneButton: React.FC<MicrophoneButtonProps> = ({
         disabled={disabled}
         title={state.isListening ? t('stop_listening') : t('start_listening')}
         aria-label={state.isListening ? t('stop_listening') : t('start_listening')}
+        data-tour="microphone-button"
       >
         <span className={styles.icon}>🎤</span>
       </button>
