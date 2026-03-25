@@ -5,8 +5,9 @@
 /**
  * Normalize text by trimming whitespace and reducing excessive newlines
  * - Trims leading/trailing whitespace from entire text
- * - Replaces 3+ consecutive newlines (with possible spaces/tabs in between) with exactly 2 newlines
- * - Preserves single and double newlines for normal paragraph breaks
+ * - Replaces 2+ consecutive newlines (with possible spaces/tabs in between) with exactly 2 newlines
+ * - Removes trailing spaces/tabs before newlines
+ * - Preserves single newlines for normal line breaks
  *
  * @param text - The text to normalize
  * @returns Normalized text string
@@ -14,5 +15,6 @@
 export function normalizeText(text: string): string {
   return text
     .trim() // Remove leading/trailing whitespace
-    .replace(/\n[\s]*\n[\s]*\n[\s]*/g, '\n\n'); // Replace 3+ newlines (with possible whitespace) with exactly 2
+    .replace(/\n(\s*\n)+/g, '\n\n') // Replace 2+ newlines (with optional whitespace) with exactly 2
+    .replace(/[ \t]+\n/g, '\n');    // Remove trailing spaces/tabs before newlines
 }

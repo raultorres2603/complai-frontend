@@ -76,4 +76,18 @@ Però et puc indicar...
 Consulta la pàgina web...`;
     expect(normalizeText(input)).toBe(expected);
   });
+
+  // Test case 9: Newlines with spaces between them
+  it('should normalize newlines with spaces between them', () => {
+    const input = 'Paragraph 1\n \n \nParagraph 2';
+    const expected = 'Paragraph 1\n\nParagraph 2';
+    expect(normalizeText(input)).toBe(expected);
+  });
+
+  // Test case 10: Trailing spaces/tabs before newlines
+  it('should remove trailing spaces/tabs before newlines', () => {
+    const input = 'Line 1  \nLine 2\t\nLine 3';
+    const expected = 'Line 1\nLine 2\nLine 3';
+    expect(normalizeText(input)).toBe(expected);
+  });
 });
