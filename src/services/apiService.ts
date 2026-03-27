@@ -405,6 +405,45 @@ export const complaiService = {
       const decoder = new TextDecoder();
       let buffer = '';
 
+      // Peek at the first chunk: real SSE never starts with '{'.
+      // If the body starts with '{', the backend returned a Lambda/API Gateway
+      // JSON wrapper despite advertising text/event-stream — unwrap it instead.
+      const firstRead = await reader.read();
+      if (!firstRead.done && firstRead.value) {
+        const firstChunk = decoder.decode(firstRead.value, { stream: true });
+        if (firstChunk.trimStart().startsWith('{')) {
+          // Accumulate the full body
+          let fullBody = firstChunk;
+          let next = await reader.read();
+          while (!next.done) {
+            fullBody += decoder.decode(next.value, { stream: true });
+            next = await reader.read();
+          }
+          // Try to parse as Lambda wrapper
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(fullBody);
+          } catch {
+            callbacks.onError('Received text/event-stream with unparseable JSON body');
+            return;
+          }
+          const wrappedBody = unwrapWrappedResponseBody(parsed);
+          if (wrappedBody) {
+            handleWrappedSSEBody(wrappedBody.bodyText, callbacks);
+            return;
+          }
+          if (isOpenRouterPublicDto(parsed)) {
+            callbacks.onChunk(parsed.message || '');
+            callbacks.onDone();
+            return;
+          }
+          callbacks.onError('Received text/event-stream with unrecognized JSON body');
+          return;
+        }
+        // Normal SSE — seed the buffer with the first chunk
+        buffer = firstChunk;
+      }
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
