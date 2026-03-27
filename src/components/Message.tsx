@@ -33,6 +33,10 @@ export const Message: React.FC<MessageProps> = ({ message }) => {
           <p className={styles.text}>{normalizeText(message.content)}</p>
         )}
 
+        {message.loading && message.role === 'assistant' && (
+          <span className={styles.streamingCursor} aria-hidden="true">▌</span>
+        )}
+
         {/* Render sources if available */}
         {message.sources && message.sources.length > 0 && (
           <div className={styles.sources}>

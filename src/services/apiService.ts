@@ -3,9 +3,10 @@
  */
 
 import type { Language } from '../types/accessibility.types';
-import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest, FeedbackRequest } from '../types/api.types';
+import type { OpenRouterPublicDto, RedactAsyncResponse, AskRequest, RedactRequest, FeedbackRequest, SSECallbacks, SSEEvent } from '../types/api.types';
 import { ErrorCode } from '../types/api.types';
 import { parseOpenRouterError } from './errorService';
+import { parseSSELines } from './sseParser';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
@@ -171,6 +172,102 @@ export const complaiService = {
       jwtToken,
       timeout,
     });
+  },
+
+  /**
+   * Ask a question using SSE streaming
+   * POST /complai/ask with Accept: text/event-stream
+   */
+  async askQuestionStream(
+    text: string,
+    conversationId: string | undefined,
+    jwtToken: string,
+    language: Language = 'es',
+    callbacks: SSECallbacks,
+    signal?: AbortSignal
+  ): Promise<void> {
+    const url = getApiClient()['backendUrl'] + '/complai/ask';
+
+    const request: AskRequest = {
+      text,
+      language,
+      ...(conversationId && { conversationId }),
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+        body: JSON.stringify(request),
+        signal,
+      });
+
+      if (!response.ok) {
+        let errorMessage = `HTTP ${response.status}`;
+        let errorCode: number | undefined;
+        try {
+          const errorBody = await response.json();
+          errorMessage = errorBody.error || errorBody.message || errorMessage;
+          errorCode = errorBody.errorCode;
+        } catch {
+          // ignore parse failure
+        }
+        callbacks.onError(errorMessage, errorCode);
+        return;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('text/event-stream')) {
+        // Fallback: non-SSE response (JSON)
+        const data = await response.json() as OpenRouterPublicDto;
+        callbacks.onChunk(data.message || '');
+        callbacks.onDone();
+        return;
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          // Parse any remaining buffer
+          if (buffer.trim()) {
+            const { events } = parseSSELines(buffer + '\n\n');
+            for (const event of events) {
+              switch (event.type) {
+                case 'chunk': callbacks.onChunk(event.content); break;
+                case 'sources': callbacks.onSources?.(event.sources); break;
+                case 'done': callbacks.onDone(event.conversationId); return;
+                case 'error': callbacks.onError(event.error, event.errorCode); return;
+              }
+            }
+          }
+          break;
+        }
+        buffer += decoder.decode(value, { stream: true });
+        const { events, remaining } = parseSSELines(buffer);
+        buffer = remaining;
+        for (const event of events) {
+          switch (event.type) {
+            case 'chunk': callbacks.onChunk(event.content); break;
+            case 'sources': callbacks.onSources?.(event.sources); break;
+            case 'done': callbacks.onDone(event.conversationId); return;
+            case 'error': callbacks.onError(event.error, event.errorCode); return;
+          }
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return; // User-initiated cancel
+      }
+      callbacks.onError(error instanceof Error ? error.message : 'Stream interrupted');
+    }
   },
 
   /**

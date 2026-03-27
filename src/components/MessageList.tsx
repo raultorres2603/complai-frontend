@@ -37,7 +37,9 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, loading }) =
           {messages.map((message) => (
             <Message key={message.id} message={message} />
           ))}
-          {loading && <LoadingSpinner message="Waiting for response..." size="small" />}
+          {loading && !(messages.length > 0 && messages[messages.length - 1].role === 'assistant' && messages[messages.length - 1].loading === true) && (
+            <LoadingSpinner message="Waiting for response..." size="small" />
+          )}
         </div>
       )}
     </div>

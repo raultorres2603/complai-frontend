@@ -2,8 +2,10 @@
  * useChat Hook - Chat state management and logic
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ChatMessage, ChatState, ComplaintRedactContext } from '../types/domain.types';
+import type { SSECallbacks } from '../types/api.types';
+import type { Source } from '../types/api.types';
 import { complaiService, ApiError } from '../services/apiService';
 import { sessionService } from '../services/sessionService';
 import { useLanguage } from './useLanguage';
@@ -27,6 +29,11 @@ export function useChat(
 
   const [redactContext, setRedactContext] = useState<ComplaintRedactContext | null>(null);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup: abort stream on unmount
+  useEffect(() => () => { abortControllerRef.current?.abort(); }, []);
+
   // Initialize conversation on mount or when conversationId changes
   useEffect(() => {
     if (initialConversationId && cityId) {
@@ -42,10 +49,15 @@ export function useChat(
   }, [initialConversationId, cityId]);
 
   /**
-   * Send a question to the chatbot
+   * Send a question to the chatbot (SSE streaming)
    */
   const sendQuestion = useCallback(
     async (text: string, jwtToken: string) => {
+      // Abort any previous stream
+      abortControllerRef.current?.abort();
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       // Extract current conversationId at function start to avoid stale closure
       const conversationId = state.conversationId;
 
@@ -68,80 +80,103 @@ export function useChat(
         timestamp: Date.now(),
       };
 
+      // Create streaming placeholder
+      const streamingMessageId = generateMessageId();
+      const placeholderMessage: ChatMessage = {
+        id: streamingMessageId,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        loading: true,
+      };
+
       setState((prev) => ({
         ...prev,
-        messages: [...prev.messages, userMessage],
+        messages: [...prev.messages, userMessage, placeholderMessage],
         isLoading: true,
         currentError: null,
       }));
 
-      // Save to session
+      // Save user message to session
       sessionService.addMessage(conversationId, userMessage);
 
+      // Track accumulated content to avoid stale closure
+      let accumulatedContent = '';
+      let accumulatedSources: Source[] | undefined;
+
+      const callbacks: SSECallbacks = {
+        onChunk(content) {
+          accumulatedContent += content;
+          setState((prev) => ({
+            ...prev,
+            messages: prev.messages.map((m) =>
+              m.id === streamingMessageId ? { ...m, content: m.content + content } : m
+            ),
+          }));
+        },
+        onSources(sources) {
+          accumulatedSources = sources;
+          setState((prev) => ({
+            ...prev,
+            messages: prev.messages.map((m) =>
+              m.id === streamingMessageId ? { ...m, sources } : m
+            ),
+          }));
+        },
+        onDone(_conversationId) {
+          const finalMessage: ChatMessage = {
+            id: streamingMessageId,
+            role: 'assistant',
+            content: accumulatedContent,
+            timestamp: Date.now(),
+            sources: accumulatedSources,
+            loading: false,
+          };
+          setState((prev) => ({
+            ...prev,
+            messages: prev.messages.map((m) =>
+              m.id === streamingMessageId ? finalMessage : m
+            ),
+            isLoading: false,
+            lastMessageTimestamp: Date.now(),
+          }));
+          sessionService.addMessage(conversationId, finalMessage);
+          abortControllerRef.current = null;
+        },
+        onError(error, errorCode) {
+          const code = errorCode ?? 4;
+          setState((prev) => ({
+            ...prev,
+            messages: prev.messages.map((m) =>
+              m.id === streamingMessageId
+                ? { ...m, loading: false, content: m.content || `Error: ${error}`, error: { code, message: error } }
+                : m
+            ),
+            isLoading: false,
+            currentError: { code, message: error },
+          }));
+          sessionService.addMessage(conversationId, {
+            id: streamingMessageId,
+            role: 'assistant',
+            content: accumulatedContent || `Error: ${error}`,
+            timestamp: Date.now(),
+            error: { code, message: error },
+          });
+          abortControllerRef.current = null;
+        },
+      };
+
       try {
-        // Call API with current language
-        const response = await complaiService.askQuestion(
+        await complaiService.askQuestionStream(
           text,
           conversationId,
           jwtToken,
           currentLanguage,
-          60000
+          callbacks,
+          abortController.signal
         );
-
-        // Add assistant message
-        const assistantMessage: ChatMessage = {
-          id: generateMessageId(),
-          role: 'assistant',
-          content: response.message || '',
-          timestamp: Date.now(),
-          sources: response.sources,
-        };
-
-        setState((prev) => ({
-          ...prev,
-          messages: [...prev.messages, assistantMessage],
-          isLoading: false,
-          lastMessageTimestamp: Date.now(),
-        }));
-
-        // Save to session
-        sessionService.addMessage(conversationId, assistantMessage);
-      } catch (error) {
-        const errorMsg = error instanceof ApiError
-          ? error.message
-          : error instanceof Error
-            ? error.message
-            : 'Unknown error occurred';
-
-        const errorCode = error instanceof ApiError ? error.errorCode : 4;
-
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          currentError: {
-            code: errorCode,
-            message: errorMsg,
-          },
-        }));
-
-        // Add error message to chat
-        const errorMessage: ChatMessage = {
-          id: generateMessageId(),
-          role: 'assistant',
-          content: `Error: ${errorMsg}`,
-          timestamp: Date.now(),
-          error: {
-            code: errorCode,
-            message: errorMsg,
-          },
-        };
-
-        setState((prev) => ({
-          ...prev,
-          messages: [...prev.messages, errorMessage],
-        }));
-
-        sessionService.addMessage(conversationId, errorMessage);
+      } catch {
+        // onError callback already handles errors; this catch handles unexpected throws
       }
     },
     [state.conversationId, currentLanguage]

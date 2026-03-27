@@ -126,3 +126,35 @@ export interface ConversationMessage {
   timestamp: number;  // Unix timestamp
   sources?: Source[];
 }
+
+/** SSE event types from POST /complai/ask streaming endpoint */
+export interface SSEChunkEvent {
+  type: 'chunk';
+  content: string;
+}
+
+export interface SSESourcesEvent {
+  type: 'sources';
+  sources: Source[];
+}
+
+export interface SSEDoneEvent {
+  type: 'done';
+  conversationId?: string;
+}
+
+export interface SSEErrorEvent {
+  type: 'error';
+  error: string;
+  errorCode?: ErrorCode | number;
+}
+
+export type SSEEvent = SSEChunkEvent | SSESourcesEvent | SSEDoneEvent | SSEErrorEvent;
+
+/** Callbacks for streaming SSE consumption */
+export interface SSECallbacks {
+  onChunk: (content: string) => void;
+  onSources?: (sources: Source[]) => void;
+  onDone: (conversationId?: string) => void;
+  onError: (error: string, errorCode?: ErrorCode | number) => void;
+}
