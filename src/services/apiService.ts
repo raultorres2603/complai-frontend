@@ -10,6 +10,156 @@ import { parseSSELines } from './sseParser';
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
+interface WrappedStreamResponse {
+  statusCode?: number;
+  headers?: Record<string, string>;
+  multiValueHeaders?: Record<string, string[]>;
+  body?: string;
+  isBase64Encoded?: boolean;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return isRecord(value) && Object.values(value).every((entry) => typeof entry === 'string');
+}
+
+function isStringArrayRecord(value: unknown): value is Record<string, string[]> {
+  return isRecord(value)
+    && Object.values(value).every(
+      (entry) => Array.isArray(entry) && entry.every((item) => typeof item === 'string')
+    );
+}
+
+function isWrappedStreamResponse(payload: unknown): payload is WrappedStreamResponse {
+  if (!isRecord(payload) || typeof payload.body !== 'string') {
+    return false;
+  }
+
+  if ('statusCode' in payload && typeof payload.statusCode !== 'number') {
+    return false;
+  }
+
+  if ('headers' in payload && payload.headers !== undefined && !isStringRecord(payload.headers)) {
+    return false;
+  }
+
+  if (
+    'multiValueHeaders' in payload
+    && payload.multiValueHeaders !== undefined
+    && !isStringArrayRecord(payload.multiValueHeaders)
+  ) {
+    return false;
+  }
+
+  if (
+    'isBase64Encoded' in payload
+    && payload.isBase64Encoded !== undefined
+    && typeof payload.isBase64Encoded !== 'boolean'
+  ) {
+    return false;
+  }
+
+  return 'statusCode' in payload
+    || 'headers' in payload
+    || 'multiValueHeaders' in payload
+    || 'isBase64Encoded' in payload;
+}
+
+function normalizeHeaders(
+  headers?: Record<string, string>,
+  multiValueHeaders?: Record<string, string[]>
+): Record<string, string> {
+  const normalized: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(headers || {})) {
+    normalized[key.toLowerCase()] = value;
+  }
+
+  for (const [key, values] of Object.entries(multiValueHeaders || {})) {
+    if (values.length > 0) {
+      normalized[key.toLowerCase()] = values.join(', ');
+    }
+  }
+
+  return normalized;
+}
+
+function decodeBase64Body(value: string): string {
+  if (typeof globalThis.atob !== 'function') {
+    throw new Error('Base64 decoding is not available in this environment');
+  }
+
+  return globalThis.atob(value);
+}
+
+function unwrapWrappedResponseBody(payload: unknown): { contentType: string; bodyText: string } | null {
+  if (!isWrappedStreamResponse(payload)) {
+    return null;
+  }
+
+  const bodyText = payload.isBase64Encoded ? decodeBase64Body(payload.body) : payload.body;
+  const normalizedHeaders = normalizeHeaders(payload.headers, payload.multiValueHeaders);
+
+  return {
+    contentType: normalizedHeaders['content-type'] || '',
+    bodyText,
+  };
+}
+
+function isOpenRouterPublicDto(payload: unknown): payload is OpenRouterPublicDto {
+  return isRecord(payload)
+    && typeof payload.success === 'boolean'
+    && (typeof payload.message === 'string' || payload.message === null)
+    && (typeof payload.error === 'string' || payload.error === null)
+    && typeof payload.errorCode === 'number'
+    && Array.isArray(payload.sources);
+}
+
+function looksLikeSSEPayload(bodyText: string): boolean {
+  return /^\s*(event:[^\n]*\n)?data:/m.test(bodyText);
+}
+
+function dispatchSSEEvents(events: SSEEvent[], callbacks: SSECallbacks): boolean {
+  for (const event of events) {
+    switch (event.type) {
+      case 'chunk':
+        callbacks.onChunk(event.content);
+        break;
+      case 'sources':
+        callbacks.onSources?.(event.sources);
+        break;
+      case 'done':
+        callbacks.onDone(event.conversationId);
+        return true;
+      case 'error':
+        callbacks.onError(event.error, event.errorCode);
+        return true;
+    }
+  }
+
+  return false;
+}
+
+function handleWrappedSSEBody(bodyText: string, callbacks: SSECallbacks): void {
+  if (!bodyText.trim()) {
+    callbacks.onError('Wrapped SSE response body was empty');
+    return;
+  }
+
+  const normalizedBuffer = bodyText.endsWith('\n\n') ? bodyText : `${bodyText}\n\n`;
+  const { events } = parseSSELines(normalizedBuffer);
+
+  if (events.length === 0) {
+    callbacks.onError('Wrapped SSE response body did not contain valid SSE events');
+    return;
+  }
+
+  dispatchSSEEvents(events, callbacks);
+}
+
 /**
  * API client with JWT token injection and error handling
  */
@@ -222,10 +372,32 @@ export const complaiService = {
 
       const contentType = response.headers.get('content-type') || '';
       if (!contentType.includes('text/event-stream')) {
-        // Fallback: non-SSE response (JSON)
-        const data = await response.json() as OpenRouterPublicDto;
+        const payload = await response.json() as unknown;
+        const wrappedBody = unwrapWrappedResponseBody(payload);
+
+        if (wrappedBody) {
+          if (wrappedBody.contentType.includes('text/event-stream') || looksLikeSSEPayload(wrappedBody.bodyText)) {
+            handleWrappedSSEBody(wrappedBody.bodyText, callbacks);
+            return;
+          }
+
+          callbacks.onError('Wrapped response body did not contain an SSE payload');
+          return;
+        }
+
+        if (!isOpenRouterPublicDto(payload)) {
+          callbacks.onError('Unexpected response payload from /complai/ask');
+          return;
+        }
+
+        const data = payload;
         callbacks.onChunk(data.message || '');
         callbacks.onDone();
+        return;
+      }
+
+      if (!response.body) {
+        callbacks.onError('Streaming response body was missing');
         return;
       }
 
@@ -239,13 +411,8 @@ export const complaiService = {
           // Parse any remaining buffer
           if (buffer.trim()) {
             const { events } = parseSSELines(buffer + '\n\n');
-            for (const event of events) {
-              switch (event.type) {
-                case 'chunk': callbacks.onChunk(event.content); break;
-                case 'sources': callbacks.onSources?.(event.sources); break;
-                case 'done': callbacks.onDone(event.conversationId); return;
-                case 'error': callbacks.onError(event.error, event.errorCode); return;
-              }
+            if (dispatchSSEEvents(events, callbacks)) {
+              return;
             }
           }
           break;
@@ -253,13 +420,8 @@ export const complaiService = {
         buffer += decoder.decode(value, { stream: true });
         const { events, remaining } = parseSSELines(buffer);
         buffer = remaining;
-        for (const event of events) {
-          switch (event.type) {
-            case 'chunk': callbacks.onChunk(event.content); break;
-            case 'sources': callbacks.onSources?.(event.sources); break;
-            case 'done': callbacks.onDone(event.conversationId); return;
-            case 'error': callbacks.onError(event.error, event.errorCode); return;
-          }
+        if (dispatchSSEEvents(events, callbacks)) {
+          return;
         }
       }
     } catch (error: unknown) {

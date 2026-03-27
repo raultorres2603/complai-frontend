@@ -34,6 +34,10 @@ function createMockCallbacks(): SSECallbacks & {
   };
 }
 
+function encodeBase64(value: string): string {
+  return globalThis.btoa(value);
+}
+
 describe('complaiService.askQuestionStream', () => {
   const originalFetch = global.fetch;
 
@@ -155,6 +159,102 @@ describe('complaiService.askQuestionStream', () => {
     expect(callbacks.onChunk).toHaveBeenCalledWith('Non-streaming response');
     expect(callbacks.onDone).toHaveBeenCalledTimes(1);
     expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it('should process wrapped JSON responses whose body contains SSE text', async () => {
+    const callbacks = createMockCallbacks();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: vi.fn().mockResolvedValue({
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'text/event-stream',
+        },
+        body: [
+          'data: {"type":"chunk","content":"Hola"}\n\n',
+          'data: {"type":"sources","sources":[{"url":"http://example.com","title":"Example"}]}\n\n',
+          'data: {"type":"done","conversationId":"conv-wrapped"}\n\n',
+        ].join(''),
+        isBase64Encoded: false,
+      }),
+    });
+
+    await complaiService.askQuestionStream('test', 'conv-1', 'jwt', 'es', callbacks);
+
+    expect(callbacks.onChunk).toHaveBeenCalledWith('Hola');
+    expect(callbacks.onSources).toHaveBeenCalledWith([{ url: 'http://example.com', title: 'Example' }]);
+    expect(callbacks.onDone).toHaveBeenCalledWith('conv-wrapped');
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it('should process wrapped base64-encoded SSE responses', async () => {
+    const callbacks = createMockCallbacks();
+    const sseBody = [
+      'data: {"type":"chunk","content":"Base"}\n\n',
+      'data: {"type":"chunk","content":"64"}\n\n',
+      'data: {"type":"done","conversationId":"conv-b64"}\n\n',
+    ].join('');
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: vi.fn().mockResolvedValue({
+        statusCode: 200,
+        multiValueHeaders: {
+          'content-type': ['text/event-stream'],
+        },
+        body: encodeBase64(sseBody),
+        isBase64Encoded: true,
+      }),
+    });
+
+    await complaiService.askQuestionStream('test', 'conv-1', 'jwt', 'es', callbacks);
+
+    expect(callbacks.onChunk).toHaveBeenNthCalledWith(1, 'Base');
+    expect(callbacks.onChunk).toHaveBeenNthCalledWith(2, '64');
+    expect(callbacks.onDone).toHaveBeenCalledWith('conv-b64');
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it('should report malformed wrapped base64 payloads', async () => {
+    const callbacks = createMockCallbacks();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: vi.fn().mockResolvedValue({
+        statusCode: 200,
+        headers: {
+          'content-type': 'text/event-stream',
+        },
+        body: '%%%not-base64%%%',
+        isBase64Encoded: true,
+      }),
+    });
+
+    await complaiService.askQuestionStream('test', 'conv-1', 'jwt', 'es', callbacks);
+
+    expect(callbacks.onError).toHaveBeenCalledTimes(1);
+    expect(callbacks.onDone).not.toHaveBeenCalled();
+  });
+
+  it('should report unexpected JSON payloads that are neither wrapped SSE nor OpenRouter DTOs', async () => {
+    const callbacks = createMockCallbacks();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: vi.fn().mockResolvedValue({
+        foo: 'bar',
+      }),
+    });
+
+    await complaiService.askQuestionStream('test', 'conv-1', 'jwt', 'es', callbacks);
+
+    expect(callbacks.onError).toHaveBeenCalledWith('Unexpected response payload from /complai/ask');
+    expect(callbacks.onDone).not.toHaveBeenCalled();
   });
 
   it('should not call onError when signal is aborted', async () => {
