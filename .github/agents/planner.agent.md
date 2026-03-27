@@ -1,7 +1,6 @@
 ---
 name: planner-agent
 description: "Use when creating or updating task.md, planning a feature, breaking down requirements, or designing architecture for ComplAI frontend (React, TypeScript, Vite). Produces a structured task.md plan for builder-agent. Triggers: plan, design, task.md, requirements, architecture, break down."
-model: Claude Sonnet 4.6 (copilot)
 tools: [read, edit, search]
 user-invocable: false
 ---

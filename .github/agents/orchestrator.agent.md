@@ -1,7 +1,6 @@
 ---
 name: orchestrator-agent
 description: "Use when implementing a new feature, fixing a bug, or adding functionality to ComplAI frontend end-to-end. Coordinates planner-agent and builder-agent through a strict plan->build->verify loop. Triggers: implement, develop, add feature, fix bug, refactor."
-model: Claude Sonnet 4.6 (copilot)
 tools: [read, search, agent]
 agents: ["planner-agent", "builder-agent"]
 user-invocable: true

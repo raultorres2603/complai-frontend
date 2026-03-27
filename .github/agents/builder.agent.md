@@ -1,7 +1,6 @@
 ---
 name: builder-agent
 description: "Use when implementing features from an approved task.md: writing React/TypeScript code, creating Vitest/React Testing Library tests, running npm test or npm run type-check, and reporting build results. Triggers: implement, build, write code, run tests."
-model: Claude Sonnet 4.6 (copilot)
 tools: [execute, read, edit, search, todo]
 user-invocable: false
 ---
