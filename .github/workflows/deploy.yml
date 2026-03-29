@@ -1,10 +1,6 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
-      - development
   workflow_dispatch:
     inputs:
       environment:
@@ -14,10 +10,15 @@ on:
         options:
           - development
           - production
+      branch:
+        description: 'Branch to deploy from'
+        required: true
+        default: 'main'
+        type: string
 
 jobs:
   deploy-dev:
-    if: github.ref == 'refs/heads/development' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'development')
+    if: github.event.inputs.environment == 'development'
     runs-on: ubuntu-latest
     environment: development
     permissions:
@@ -28,6 +29,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -62,7 +65,7 @@ jobs:
           commit_message: 'Deploy development build to GitHub Pages'
 
   deploy-prod:
-    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    if: github.event.inputs.environment == 'production'
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -73,6 +76,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
