@@ -33,7 +33,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const { t } = useTranslation();
   const [text, setText] = useState('');
-  const [format, setFormat] = useState<OutputFormat>(OutputFormatEnum.AUTO);
   const [complaintInfo, setComplaintInfo] = useState({
     name: '',
     surname: '',
@@ -54,7 +53,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       return;
     }
 
-    onSend(text.trim(), format);
+    onSend(text.trim(), OutputFormatEnum.PDF);
     setText('');
     setComplaintInfo({ name: '', surname: '', idNumber: '' });
 
@@ -104,7 +103,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     const newText = text ? `${text} ${transcript}` : transcript;
     if (newText.length <= MAX_MESSAGE_LENGTH) {
       // Auto-send the message immediately when voice transcript completes
-      onSend(newText.trim(), format);
+      onSend(newText.trim(), OutputFormatEnum.PDF);
       // Reset UI state
       setText('');
       setComplaintInfo({ name: '', surname: '', idNumber: '' });
@@ -156,22 +155,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           />
         </div>
 
-        <div className={styles.formatSection}>
-          <label className={styles.label}>{t('output_format_label')}</label>
-          <div className={styles.formatButtons}>
-            {Object.values(OutputFormatEnum).map((fmt) => (
-              <button
-                key={fmt as string}
-                type="button"
-                className={`${styles.formatButton} ${format === fmt ? styles.active : ''}`}
-                onClick={() => setFormat(fmt)}
-                disabled={disabled}
-              >
-                {fmt as string}
-              </button>
-            ))}
-          </div>
-        </div>
+
       </div>
 
       <div className={styles.inputContainer}>
