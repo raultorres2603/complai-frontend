@@ -85,7 +85,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         />
 
         {/* Chat area - fills space between header and footer */}
-        <main className={styles.mobileMain} data-testid="mobile-main">{chatWindow}</main>
+        <main 
+          className={styles.mobileMain} 
+          data-testid="mobile-main"
+          style={{ marginBottom: isComplaintMode ? 'max(160px, calc(160px + env(safe-area-inset-bottom)))' : undefined }}
+        >{chatWindow}</main>
 
         {/* Fixed input footer - pass handlers and state */}
         <MobileInputFooter

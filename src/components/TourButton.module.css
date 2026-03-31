@@ -28,3 +28,14 @@
   outline: 2px solid var(--color-primary, #0ea5e9);
   outline-offset: 3px;
 }
+
+/* On mobile, push the button above the fixed input footer */
+@media (max-width: 767px) {
+  .button {
+    bottom: calc(10rem + env(safe-area-inset-bottom, 0px));
+    right: 0.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+}

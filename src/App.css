@@ -196,6 +196,15 @@ select:disabled {
   cursor: not-allowed;
 }
 
+/* Prevent iOS Safari auto-zoom: font-size must be >= 16px on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 1rem;
+  }
+}
+
 #next-steps ul {
   list-style: none;
   padding: 0;

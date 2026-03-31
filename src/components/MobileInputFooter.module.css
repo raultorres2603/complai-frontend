@@ -84,3 +84,11 @@
         display: none;
     }
 }
+
+/* Landscape adjustments already handled above */
+/* Prevent footer from dominating small screens in portrait */
+@media (max-width: 768px) and (orientation: portrait) {
+  .footer {
+    max-height: 75vh;
+  }
+}
