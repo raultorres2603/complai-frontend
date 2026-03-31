@@ -8,6 +8,7 @@ import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
 import { useTabDetection } from './hooks/useTabDetection';
 import { useAccessibility } from './hooks/useAccessibility';
+import { useTranslation } from './hooks/useTranslation';
 import { useMobileLayout } from './hooks/useMobileLayout';
 import { complaiService } from './services/apiService';
 import { sessionService } from './services/sessionService';
@@ -22,6 +23,7 @@ import './App.css';
 function App() {
   const { jwtToken, isInitialized, getCityFromToken } = useAuth();
   const { settings: _settings } = useAccessibility(); // Initialize accessibility hook
+  const { t } = useTranslation();
 
   // Mobile layout state
   const { isMobile, isDrawerOpen, toggleDrawer, closeDrawer } = useMobileLayout();
@@ -87,23 +89,13 @@ function App() {
       onSuccess: (blob: Blob) => {
         try {
           const msgId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-          const fileId = 'file-' + msgId;
           const fileUrl = URL.createObjectURL(blob);
 
           const message = {
             id: msgId,
             role: 'assistant',
-            content: 'Complaint PDF generated',
+            content: `<a href="${fileUrl}" target="_blank" rel="noopener noreferrer">${t('complaint_pdf_ready')}</a>`,
             timestamp: Date.now(),
-            files: [
-              {
-                id: fileId,
-                name: 'complaint.pdf',
-                url: fileUrl,
-                type: 'pdf',
-                createdAt: Date.now(),
-              },
-            ],
           } as any;
 
           chatState.addMessage(message);

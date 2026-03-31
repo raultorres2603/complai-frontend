@@ -121,6 +121,7 @@ export const translations = {
     error_unknown_message: 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.',
     error_network_error: 'Error de conexión de red. Por favor, comprueba tu internet e inténtalo de nuevo.',
     error_server_error_generic: 'Error del servidor. Por favor, inténtalo más tarde.',
+    complaint_pdf_ready: 'Reclamación procesada. Haz clic aquí para verla 📄',
   },
   en: {
     accessibility_settings: 'Accessibility Settings',
@@ -237,6 +238,7 @@ export const translations = {
     error_unknown_message: 'An unexpected error occurred. Please try again.',
     error_network_error: 'Network connection error. Please check your internet and try again.',
     error_server_error_generic: 'Server error. Please try again later.',
+    complaint_pdf_ready: 'Complaint processed. Click here to view it 📄',
   },
   ca: {
     accessibility_settings: 'Configuració d\'Accessibilitat',
@@ -353,6 +355,7 @@ export const translations = {
     error_unknown_message: 'Ha ocorregut un error inesperat. Si us plau, torna-ho a intentar.',
     error_network_error: 'Error de connexió de xarxa. Si us plau, verifica la teva connexió a internet i torna-ho a intentar.',
     error_server_error_generic: 'Error del servidor. Si us plau, intenta-ho més tard.',
+    complaint_pdf_ready: 'Reclamació processada. Fes clic aquí per veure-la 📄',
   },
 } as const;
 
