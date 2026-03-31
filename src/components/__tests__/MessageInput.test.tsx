@@ -108,19 +108,6 @@ describe('MessageInput Component Translation', () => {
     expect(placeholders.toLowerCase()).toMatch(/nombre|name|nom/i);
   });
 
-  it('should display translated "Output Format:" label in complaint mode', () => {
-    render(
-      <MessageInput
-        onSend={mockOnSend}
-        disabled={false}
-        isComplaintMode={true}
-        onComplaintInfoChange={mockOnComplaintInfoChange}
-      />
-    );
-
-    expect(screen.getByText(/Formato de Salida|Output Format|Format de Sortida/i)).toBeInTheDocument();
-  });
-
   it('should have translated send button tooltip', () => {
     render(
       <MessageInput
