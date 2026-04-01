@@ -17,8 +17,11 @@ export function useTour(): { startTour: () => void } {
 
   const startTour = useCallback(() => {
     try {
+      const visibleSteps = tourSteps.filter(
+        step => !step.element || document.querySelector(step.element) !== null
+      );
       introJs()
-        .setOptions({ steps: tourSteps as any, exitOnOverlayClick: true, showProgress: true, showBullets: false })
+        .setOptions({ steps: visibleSteps as any, exitOnOverlayClick: true, showProgress: true, showBullets: false })
         .oncomplete(() => {
           storageService.set('tour_completed', true);
         })

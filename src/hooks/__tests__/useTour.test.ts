@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act } from '@testing-library/react';
 import { renderHook } from '../../__tests__/test-utils';
 import { useTour } from '../useTour';
@@ -54,6 +54,7 @@ import introJs from 'intro.js';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
   mockOnComplete.mockReturnThis();
   mockOnExit.mockReturnThis();
   mockStart.mockReturnThis();
@@ -64,6 +65,10 @@ beforeEach(() => {
     locale: 'ca-ES',
     availableLanguages: [],
   });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('useTour', () => {
