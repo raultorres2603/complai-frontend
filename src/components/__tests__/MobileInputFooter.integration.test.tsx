@@ -29,7 +29,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -57,7 +57,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -85,7 +85,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -123,7 +123,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={true}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -153,7 +153,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -176,7 +176,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={true}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -208,7 +208,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={true}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -235,7 +235,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -251,7 +251,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -270,7 +270,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -288,7 +288,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -310,7 +310,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -326,7 +326,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -345,7 +345,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -365,7 +365,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={false}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -384,7 +384,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -404,7 +404,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -428,7 +428,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+          apiKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
         />
       );
 
@@ -444,7 +444,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken={null}
+          apiKey={null}
         />
       );
 
@@ -483,7 +483,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -512,7 +512,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -540,7 +540,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -576,7 +576,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -592,7 +592,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -617,7 +617,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={true}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -649,7 +649,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 
@@ -683,7 +683,7 @@ describe('MobileInputFooter Integration', () => {
           isComplaintMode={false}
           messages={[]}
           ttsEnabled={true}
-          jwtToken="test-token"
+          apiKey="test-token"
         />
       );
 

@@ -33,16 +33,16 @@ interface ControlPanelProps {
   error: any | null;
   isComplaintMode?: boolean;
   onToggleComplaint?: () => void;
-  onSendQuestion: (text: string, jwtToken: string) => void;
+  onSendQuestion: (text: string, apiKey: string) => void;
   onSendComplaint: (
     text: string,
     format: string,
     name: string | undefined,
     surname: string | undefined,
     idNumber: string | undefined,
-    jwtToken: string
+    apiKey: string
   ) => void;
-  jwtToken: string | null;
+  apiKey: string | null;
   onClearHistory: () => void;
   isMobile?: boolean;
 }
@@ -55,7 +55,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onToggleComplaint,
   onSendQuestion,
   onSendComplaint,
-  jwtToken,
+  apiKey,
   onClearHistory,
   isMobile = false,
 }) => {
@@ -85,10 +85,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         complaintInfo.name,
         complaintInfo.surname,
         complaintInfo.idNumber,
-        jwtToken || ''
+        apiKey || ''
       );
     } else {
-      onSendQuestion(text, jwtToken || '');
+      onSendQuestion(text, apiKey || '');
     }
   };
 
@@ -97,7 +97,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Header - hidden on mobile (MobileHeader and drawer handle mobile header) */}
       {!isMobile && (
         <div className={styles.header}>
-          <Header isComplaintMode={isComplaintMode} onToggleComplaint={onToggleComplaint} isMobile={isMobile} jwtToken={jwtToken} />
+          <Header isComplaintMode={isComplaintMode} onToggleComplaint={onToggleComplaint} isMobile={isMobile} apiKey={apiKey} />
         </div>
       )}
 

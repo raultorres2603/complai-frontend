@@ -32,7 +32,7 @@ describe('complaiService.sendFeedback', () => {
 
     expect(url).toContain('/complai/feedback');
     expect(options.method).toBe('POST');
-    expect(options.headers['Authorization']).toBe('Bearer jwt-token');
+    expect(options.headers['X-Api-Key']).toBe('jwt-token');
     expect(options.body).toBe(
       JSON.stringify({ userName: 'Alice', idUser: 'user-123', message: 'Great app' })
     );

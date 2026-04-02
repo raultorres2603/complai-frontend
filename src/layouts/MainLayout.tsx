@@ -36,17 +36,17 @@ interface MainLayoutProps {
   disabled?: boolean;
   error?: any | null;
   messages?: any[];
-  jwtToken?: string | null;
+  apiKey?: string | null;
   onDismissError?: () => void;
   // New props for mobile message sending
-  handleSendQuestion?: (text: string, jwtToken: string) => void;
+  handleSendQuestion?: (text: string, apiKey: string) => void;
   handleSendComplaint?: (
     text: string,
     format: string,
     name: string | undefined,
     surname: string | undefined,
     idNumber: string | undefined,
-    jwtToken: string
+    apiKey: string
   ) => void;
   isLoading?: boolean;
   cityId?: string;
@@ -67,7 +67,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   handleSendQuestion,
   handleSendComplaint,
   isLoading = false,
-  jwtToken,
+  apiKey,
 }) => {
   const { currentLanguage, availableLanguages, setLanguage } = useLanguage();
   const { t } = useTranslation();
@@ -94,20 +94,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {/* Fixed input footer - pass handlers and state */}
         <MobileInputFooter
           onSend={(text, format) => {
-            if (handleSendQuestion && jwtToken) {
-              handleSendQuestion(text, jwtToken);
+            if (handleSendQuestion && apiKey) {
+              handleSendQuestion(text, apiKey);
             }
           }}
           onSendComplaint={(text, format, name, surname, idNumber) => {
-            if (handleSendComplaint && jwtToken) {
-              handleSendComplaint(text, format, name, surname, idNumber, jwtToken);
+            if (handleSendComplaint && apiKey) {
+              handleSendComplaint(text, format, name, surname, idNumber, apiKey);
             }
           }}
           disabled={isLoading}
           isComplaintMode={isComplaintMode}
           messages={messages}
           ttsEnabled={true}
-          jwtToken={jwtToken || null}
+          apiKey={apiKey || null}
         />
 
         {/* Drawer with secondary controls */}

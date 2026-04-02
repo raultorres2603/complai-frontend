@@ -51,7 +51,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -81,7 +81,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -111,7 +111,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -136,7 +136,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -163,7 +163,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -187,7 +187,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -205,7 +205,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -225,7 +225,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={true}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -243,7 +243,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -261,7 +261,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -278,7 +278,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={true}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -295,7 +295,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -315,7 +315,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -332,7 +332,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={true}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -347,8 +347,8 @@ describe('MainLayout Integration', () => {
     });
   });
 
-  describe('JWT Token handling', () => {
-    it('should pass jwtToken to handlers on mobile', async () => {
+  describe('API Key handling', () => {
+    it('should pass apiKey to handlers on mobile', async () => {
       const user = userEvent.setup();
 
       render(
@@ -359,7 +359,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="abc123testtoken"
+          apiKey="abc123testtoken"
           messages={[]}
         />
       );
@@ -377,7 +377,7 @@ describe('MainLayout Integration', () => {
       });
     });
 
-    it('should handle null jwtToken gracefully', async () => {
+    it('should handle null apiKey gracefully', async () => {
       const user = userEvent.setup();
 
       render(
@@ -388,7 +388,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken={null}
+          apiKey={null}
           messages={[]}
         />
       );
@@ -420,7 +420,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -444,7 +444,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -464,7 +464,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -482,7 +482,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -506,7 +506,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={messages}
         />
       );
@@ -528,7 +528,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -558,7 +558,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
         />
       );
@@ -587,7 +587,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
           cityId="elprat"
         />
@@ -607,7 +607,7 @@ describe('MainLayout Integration', () => {
           handleSendQuestion={mockHandleSendQuestion}
           handleSendComplaint={mockHandleSendComplaint}
           isLoading={false}
-          jwtToken="test-token"
+          apiKey="test-token"
           messages={[]}
           error={{ message: 'Test error' }}
         />

@@ -90,7 +90,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -109,7 +109,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -130,7 +130,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -148,7 +148,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -167,7 +167,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -185,7 +185,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -203,7 +203,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -221,7 +221,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -240,7 +240,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -261,7 +261,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -280,7 +280,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -299,7 +299,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -318,7 +318,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -336,7 +336,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -353,7 +353,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -372,7 +372,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -393,7 +393,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken={null}
+        apiKey={null}
         onClearHistory={mockOnClearHistory}
       />
     );
@@ -412,7 +412,7 @@ describe('ControlPanel Component', () => {
         onToggleComplaint={mockOnToggleComplaint}
         onSendQuestion={mockOnSendQuestion}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="test-token"
+        apiKey="test-token"
         onClearHistory={mockOnClearHistory}
       />
     );

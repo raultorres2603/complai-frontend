@@ -52,7 +52,7 @@ export function useChat(
    * Send a question to the chatbot (SSE streaming)
    */
   const sendQuestion = useCallback(
-    async (text: string, jwtToken: string) => {
+    async (text: string, apiKey: string) => {
       // Abort any previous stream
       abortControllerRef.current?.abort();
       const abortController = new AbortController();
@@ -61,12 +61,12 @@ export function useChat(
       // Extract current conversationId at function start to avoid stale closure
       const conversationId = state.conversationId;
 
-      if (!conversationId || !jwtToken) {
+      if (!conversationId || !apiKey) {
         setState((prev) => ({
           ...prev,
           currentError: {
             code: 2,
-            message: 'Missing conversation ID or JWT token',
+            message: 'Missing conversation ID or API key',
           },
         }));
         return;
@@ -170,7 +170,7 @@ export function useChat(
         await complaiService.askQuestionStream(
           text,
           conversationId,
-          jwtToken,
+          apiKey,
           currentLanguage,
           callbacks,
           abortController.signal
@@ -192,17 +192,17 @@ export function useChat(
       requesterName: string | undefined,
       requesterSurname: string | undefined,
       requesterIdNumber: string | undefined,
-      jwtToken: string
+      apiKey: string
     ) => {
       // Extract current conversationId at function start to avoid stale closure
       const conversationId = state.conversationId;
 
-      if (!conversationId || !jwtToken) {
+      if (!conversationId || !apiKey) {
         setState((prev) => ({
           ...prev,
           currentError: {
             code: 2,
-            message: 'Missing conversation ID or JWT token',
+            message: 'Missing conversation ID or API key',
           },
         }));
         return;
@@ -232,7 +232,7 @@ export function useChat(
           requesterName,
           requesterSurname,
           requesterIdNumber,
-          jwtToken,
+          apiKey,
           currentLanguage,
           90000
         );

@@ -11,7 +11,7 @@
  * - onComplaintInfoChange: Callback for complaint info changes
  * - messages: Chat message history
  * - ttsEnabled: Whether text-to-speech is enabled
- * - jwtToken: JWT token for API requests (passed through to handlers)
+ * - jwtToken: API key for API requests (passed through to handlers)
  * 
  * Features:
  * - Fixed at bottom of viewport
@@ -55,8 +55,8 @@ interface MobileInputFooterProps {
   messages: any[];
   /** Whether text-to-speech is enabled */
   ttsEnabled?: boolean;
-  /** JWT token for API requests */
-  jwtToken: string | null;
+  /** API key for API requests */
+  apiKey: string | null;
 }
 
 /**
@@ -72,7 +72,7 @@ export const MobileInputFooter: React.FC<MobileInputFooterProps> = ({
   onComplaintInfoChange,
   messages,
   ttsEnabled = true,
-  jwtToken,
+  apiKey: _apiKey,
 }) => {
   const [complaintInfo, setComplaintInfo] = useState<{
     name?: string;

@@ -63,7 +63,7 @@ export const storageService = {
 
 // Storage keys
 export const STORAGE_KEYS = {
-  JWT_TOKEN: 'complai_jwt_token',
+  API_KEY: 'complai_api_key',
   CITY_ID: 'complai_city_id',
   CONVERSATION_ID: 'complai_conversation_id',
   CONVERSATIONS: 'complai_conversations',

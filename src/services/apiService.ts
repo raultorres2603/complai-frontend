@@ -178,20 +178,20 @@ class ApiClient {
     path: string,
     options: {
       body?: Record<string, unknown>;
-      jwtToken?: string;
+      apiKey?: string;
       timeout?: number;
     } = {}
   ): Promise<T> {
-    const { body, jwtToken, timeout = DEFAULT_TIMEOUT } = options;
+    const { body, apiKey, timeout = DEFAULT_TIMEOUT } = options;
 
     const url = `${this.backendUrl}${path}`;
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
-    // Add JWT token if provided
-    if (jwtToken) {
-      headers['Authorization'] = `Bearer ${jwtToken}`;
+    // Add API key if provided
+    if (apiKey) {
+      headers['X-Api-Key'] = apiKey;
     }
 
     const fetchOptions: RequestInit = {
@@ -298,14 +298,14 @@ export const complaiService = {
    * 
    * @param text - The question text
    * @param conversationId - Optional conversation ID for multi-turn context
-   * @param jwtToken - JWT authentication token
+   * @param apiKey - API Key for authentication
    * @param language - Language code (es, en, ca) for API communication
    * @param timeout - Optional request timeout in milliseconds
    */
   async askQuestion(
     text: string,
     conversationId: string | undefined,
-    jwtToken: string,
+    apiKey: string,
     language: Language = 'es',
     timeout?: number
   ): Promise<OpenRouterPublicDto> {
@@ -319,7 +319,7 @@ export const complaiService = {
 
     return client.request<OpenRouterPublicDto>('POST', '/complai/ask', {
       body: request as unknown as Record<string, unknown>,
-      jwtToken,
+      apiKey,
       timeout,
     });
   },
@@ -331,7 +331,7 @@ export const complaiService = {
   async askQuestionStream(
     text: string,
     conversationId: string | undefined,
-    jwtToken: string,
+    apiKey: string,
     language: Language = 'es',
     callbacks: SSECallbacks,
     signal?: AbortSignal
@@ -350,7 +350,7 @@ export const complaiService = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
-          'Authorization': 'Bearer ' + jwtToken,
+          'X-Api-Key': apiKey,
         },
         body: JSON.stringify(request),
         signal,
@@ -482,7 +482,7 @@ export const complaiService = {
    * @param requesterName - Optional requester first name
    * @param requesterSurname - Optional requester last name
    * @param requesterIdNumber - Optional requester ID number
-   * @param jwtToken - JWT authentication token
+   * @param apiKey - API Key for authentication
    * @param language - Language code (es, en, ca) for API communication
    * @param timeout - Optional request timeout in milliseconds
    */
@@ -493,7 +493,7 @@ export const complaiService = {
     requesterName: string | undefined,
     requesterSurname: string | undefined,
     requesterIdNumber: string | undefined,
-    jwtToken: string,
+    apiKey: string,
     language: Language = 'es',
     timeout?: number
   ): Promise<RedactAsyncResponse> {
@@ -511,7 +511,7 @@ export const complaiService = {
 
     return client.request<RedactAsyncResponse>('POST', '/complai/redact', {
       body: request as unknown as Record<string, unknown>,
-      jwtToken,
+      apiKey,
       timeout,
     });
   },
@@ -520,22 +520,22 @@ export const complaiService = {
    * Submit user feedback
    * POST /complai/feedback
    *
-   * @param userName - Display name extracted from JWT claims
-   * @param idUser   - User ID (JWT `sub` claim)
+   * @param userName - Display name
+   * @param idUser   - User ID
    * @param message  - Feedback text
-   * @param jwtToken - JWT authentication token
+   * @param apiKey - API Key for authentication
    */
   async sendFeedback(
     userName: string,
     idUser: string,
     message: string,
-    jwtToken: string
+    apiKey: string
   ): Promise<void> {
     const client = getApiClient();
     const request: FeedbackRequest = { userName, idUser, message };
     await client.request<OpenRouterPublicDto>('POST', '/complai/feedback', {
       body: request as unknown as Record<string, unknown>,
-      jwtToken,
+      apiKey,
     });
   },
 

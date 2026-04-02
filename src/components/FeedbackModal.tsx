@@ -10,14 +10,14 @@ import styles from './FeedbackModal.module.css';
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
-  jwtToken: string | null;
+  apiKey: string | null;
 }
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, jwtToken }) => {
+const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, apiKey }) => {
   const [idUser, setIdUser] = useState('');
   const [userName, setUserName] = useState('');
   const [message, setMessage] = useState('');
-  const { isLoading, error, success, submitFeedback, resetState } = useFeedback(jwtToken);
+  const { isLoading, error, success, submitFeedback, resetState } = useFeedback(apiKey);
   const { t } = useTranslation();
 
   if (!isOpen) {

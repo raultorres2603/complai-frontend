@@ -8,10 +8,10 @@ import { useTranslation } from '../hooks/useTranslation';
 import styles from './FeedbackButton.module.css';
 
 interface FeedbackButtonProps {
-  jwtToken: string | null;
+  apiKey: string | null;
 }
 
-const FeedbackButton: React.FC<FeedbackButtonProps> = ({ jwtToken }) => {
+const FeedbackButton: React.FC<FeedbackButtonProps> = ({ apiKey }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -29,7 +29,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ jwtToken }) => {
       <FeedbackModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        jwtToken={jwtToken}
+        apiKey={apiKey}
       />
     </>
   );

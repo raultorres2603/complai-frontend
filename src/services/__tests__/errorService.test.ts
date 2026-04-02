@@ -332,12 +332,12 @@ describe('parseOpenRouterError', () => {
     it('should not expose sensitive data', () => {
       const error = {
         status: 401,
-        jwtToken: 'very-secret-token-xyz',
+        apiKey: 'very-secret-token-xyz',
         message: 'Authentication failed',
       };
       const parsed = parseOpenRouterError(error);
       
-      // The message should not contain the JWT token
+      // The message should not contain the API key
       expect(parsed.message).not.toContain('very-secret-token');
     });
   });

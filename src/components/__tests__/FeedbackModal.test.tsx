@@ -48,7 +48,7 @@ vi.mock('../../hooks/useTranslation', () => ({
 const defaultProps = {
   isOpen: true,
   onClose: vi.fn(),
-  jwtToken: 'test-token',
+  apiKey: 'test-token',
 };
 
 describe('FeedbackModal', () => {
@@ -65,7 +65,7 @@ describe('FeedbackModal', () => {
   });
 
   it('renders nothing when isOpen=false', () => {
-    render(<FeedbackModal isOpen={false} onClose={vi.fn()} jwtToken={null} />);
+    render(<FeedbackModal isOpen={false} onClose={vi.fn()} apiKey={null} />);
     expect(screen.queryByText('Enviar Comentario')).not.toBeInTheDocument();
   });
 

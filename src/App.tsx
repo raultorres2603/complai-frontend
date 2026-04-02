@@ -21,15 +21,15 @@ import TourButton from './components/TourButton';
 import './App.css';
 
 function App() {
-  const { jwtToken, isInitialized, getCityFromToken } = useAuth();
+  const { apiKey, isInitialized } = useAuth();
   const { settings: _settings } = useAccessibility(); // Initialize accessibility hook
   const { t } = useTranslation();
 
   // Mobile layout state
   const { isMobile, isDrawerOpen, toggleDrawer, closeDrawer } = useMobileLayout();
 
-  // Determine city from JWT token
-  const cityId = (jwtToken && getCityFromToken(jwtToken)) || 'elprat';
+  // Determine city from environment variable
+  const cityId = import.meta.env.VITE_CITY_ID || 'elprat';
 
   // Chat state hook (must be initialized early)
   const chatState = useChat(undefined, cityId);
@@ -143,7 +143,7 @@ function App() {
       }}
       onSendQuestion={handleSendQuestion}
       onSendComplaint={handleSendComplaint}
-      jwtToken={jwtToken}
+      apiKey={apiKey}
       onClearHistory={chatState.clearMessages}
       isMobile={isMobile}
     />
@@ -188,7 +188,7 @@ function App() {
         handleSendQuestion={handleSendQuestion}
         handleSendComplaint={handleSendComplaint}
         isLoading={chatState.state.isLoading}
-        jwtToken={jwtToken}
+        apiKey={apiKey}
         cityId={cityId}
       />
       <TourButton />

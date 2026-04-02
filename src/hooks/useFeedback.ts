@@ -7,7 +7,7 @@ import { useTranslation } from './useTranslation';
 import { complaiService, ApiError } from '../services/apiService';
 import { parseOpenRouterError } from '../services/errorService';
 
-export function useFeedback(jwtToken: string | null): {
+export function useFeedback(apiKey: string | null): {
   isLoading: boolean;
   error: string | null;
   success: boolean;
@@ -22,7 +22,7 @@ export function useFeedback(jwtToken: string | null): {
 
   const submitFeedback = useCallback(
     async (idUser: string, userName: string, message: string) => {
-      if (jwtToken === null) {
+      if (apiKey === null) {
         setError(t('feedback_error_unauthorized'));
         return;
       }
@@ -38,7 +38,7 @@ export function useFeedback(jwtToken: string | null): {
       setSuccess(false);
 
       try {
-        await complaiService.sendFeedback(userName, idUser, message, jwtToken);
+        await complaiService.sendFeedback(userName, idUser, message, apiKey);
         setSuccess(true);
         setIsLoading(false);
       } catch (err) {
@@ -50,7 +50,7 @@ export function useFeedback(jwtToken: string | null): {
         setIsLoading(false);
       }
     },
-    [jwtToken, t]
+    [apiKey, t]
   );
 
   const resetState = useCallback(() => {

@@ -27,7 +27,7 @@ describe('MobileInputFooter', () => {
       isComplaintMode: false,
       messages: [],
       ttsEnabled: true,
-      jwtToken: 'test-token',
+      apiKey: 'test-token',
     };
   });
 
@@ -289,7 +289,7 @@ describe('MobileInputFooter', () => {
         {...defaultProps}
         onSend={mockOnSend}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken="valid-token"
+        apiKey="valid-token"
       />
     );
 
@@ -302,7 +302,7 @@ describe('MobileInputFooter', () => {
         {...defaultProps}
         onSend={mockOnSend}
         onSendComplaint={mockOnSendComplaint}
-        jwtToken={null}
+        apiKey={null}
       />
     );
 

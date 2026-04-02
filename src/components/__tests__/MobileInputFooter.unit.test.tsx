@@ -47,7 +47,7 @@ describe('MobileInputFooter Component', () => {
       onSendComplaint: vi.fn(),
       disabled: false,
       messages: [],
-      jwtToken: 'test-token',
+      apiKey: 'test-token',
     };
   });
 

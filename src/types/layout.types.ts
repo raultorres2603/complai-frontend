@@ -11,9 +11,9 @@ export interface MainLayoutHandlers {
   /**
    * Handler for sending regular questions/messages
    * @param text The message text
-   * @param jwtToken JWT authentication token
+   * @param apiKey API key for authentication
    */
-  onSendQuestion: (text: string, jwtToken: string) => void;
+  onSendQuestion: (text: string, apiKey: string) => void;
 
   /**
    * Handler for sending complaint redactions
@@ -22,7 +22,7 @@ export interface MainLayoutHandlers {
    * @param name Optional requester name
    * @param surname Optional requester surname
    * @param idNumber Optional requester ID number
-   * @param jwtToken JWT authentication token
+   * @param apiKey API key for authentication
    */
   onSendComplaint: (
     text: string,
@@ -30,7 +30,7 @@ export interface MainLayoutHandlers {
     name: string | undefined,
     surname: string | undefined,
     idNumber: string | undefined,
-    jwtToken: string
+    apiKey: string
   ) => void;
 }
 
@@ -69,6 +69,6 @@ export interface MobileInputFooterProps {
   /** Whether text-to-speech is enabled */
   ttsEnabled?: boolean;
 
-  /** JWT token for API requests */
-  jwtToken: string | null;
+  /** API key for requests */
+  apiKey: string | null;
 }

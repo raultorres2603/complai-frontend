@@ -90,7 +90,7 @@ export interface City {
  * User/Auth state
  */
 export interface AuthState {
-  jwtToken: string | null;
+  apiKey: string | null;
   cityId: string | null;
   isAuthenticated: boolean;
   tokenExpiry?: number;           // Unix timestamp

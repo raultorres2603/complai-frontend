@@ -15,10 +15,10 @@ interface HeaderProps {
   isComplaintMode?: boolean;
   onToggleComplaint?: () => void;
   isMobile?: boolean;
-  jwtToken?: string | null;
+  apiKey?: string | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false, jwtToken = null }) => {
+export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false, apiKey = null }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const { t } = useTranslation();
@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
               availableLanguages={availableLanguages}
             />
 
-            <FeedbackButton jwtToken={jwtToken} />
+            <FeedbackButton apiKey={apiKey} />
 
             <button
               className={`${styles.modeButton} ${isComplaintMode ? styles.on : ''}`}

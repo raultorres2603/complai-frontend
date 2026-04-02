@@ -205,7 +205,7 @@ describe('useFeedback', () => {
     expect(result.current.error).toBe('The service is temporarily unavailable. Please try again in a few moments.');
   });
 
-  it('returns error when jwtToken is null', async () => {
+  it('returns error when apiKey is null', async () => {
     const { result } = renderHook(() => useFeedback(null));
 
     await act(async () => {
