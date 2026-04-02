@@ -51,8 +51,8 @@ jobs:
         run: npm run build
         env:
           VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
-          VITE_DEFAULT_CITY: ${{ vars.VITE_DEFAULT_CITY }}
-          VITE_JWT_TOKEN: ${{ secrets.VITE_JWT_TOKEN }}
+          VITE_CITY_ID: ${{ vars.VITE_CITY_ID }}
+          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
           VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'ComplAI' }}
           VITE_DEPLOYMENT_ENV: development
 
@@ -98,8 +98,8 @@ jobs:
         run: npm run build
         env:
           VITE_BACKEND_URL: ${{ vars.VITE_BACKEND_URL }}
-          VITE_DEFAULT_CITY: ${{ vars.VITE_DEFAULT_CITY }}
-          VITE_JWT_TOKEN: ${{ secrets.VITE_JWT_TOKEN }}
+          VITE_CITY_ID: ${{ vars.VITE_CITY_ID }}
+          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
           VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'ComplAI' }}
           VITE_DEPLOYMENT_ENV: production
 
