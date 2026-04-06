@@ -52,7 +52,10 @@ describe('getAppTourSteps', () => {
       expectedStepIds.forEach((stepId, index) => {
         const step = steps[index];
         const titleKey = `tour_${stepId}_title` as const;
-        const descKey = `tour_${stepId}_description` as const;
+        // Special case: message_input now uses the _with_enter description key
+        const descKey = stepId === 'message_input'
+          ? `tour_${stepId}_description_with_enter` as const
+          : `tour_${stepId}_description` as const;
         const expectedTitle = langTranslations[titleKey as keyof typeof langTranslations];
         const expectedDescription = langTranslations[descKey as keyof typeof langTranslations];
         

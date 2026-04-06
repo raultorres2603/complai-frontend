@@ -178,7 +178,7 @@ describe('MessageInput Component - Mobile Scenarios', () => {
       });
     });
 
-    it('should NOT submit on plain Enter (desktop)', async () => {
+    it('should submit on plain Enter (desktop)', async () => {
       render(
         <MessageInput
           onSend={mockOnSend}
@@ -192,10 +192,13 @@ describe('MessageInput Component - Mobile Scenarios', () => {
       await userEvent.type(textarea, 'Test message');
 
       // Simulate plain Enter press (no modifiers)
+      // NEW BEHAVIOR: plain Enter now submits on all devices
       fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter' });
 
-      // onSend should NOT be called on desktop with plain Enter
-      expect(mockOnSend).not.toHaveBeenCalled();
+      // onSend should now be called with plain Enter
+      await waitFor(() => {
+        expect(mockOnSend).toHaveBeenCalledWith('Test message', expect.any(String));
+      });
     });
   });
 

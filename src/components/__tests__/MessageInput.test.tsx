@@ -123,7 +123,7 @@ describe('MessageInput Component Translation', () => {
     expect(title).toMatch(/mensaje|message|Ctrl/i);
   });
 
-  it('should call onSend when message is submitted', async () => {
+  it('should call onSend when message is submitted via button click', async () => {
     const { container, user } = render(
       <MessageInput
         onSend={mockOnSend}
@@ -144,5 +144,164 @@ describe('MessageInput Component Translation', () => {
 
     // onSend should be called
     expect(mockOnSend).toHaveBeenCalled();
+  });
+
+  describe('Enter key behavior', () => {
+    it('should send message when Enter key is pressed', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type message
+      await user.type(textarea, 'Test message');
+
+      // Press Enter
+      await user.type(textarea, '{Enter}');
+
+      // onSend should be called
+      expect(mockOnSend).toHaveBeenCalledWith('Test message', expect.anything());
+    });
+
+    it('should create a new line when Shift+Enter is pressed', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type first line
+      await user.type(textarea, 'First line');
+
+      // Press Shift+Enter to create new line
+      await user.keyboard('{Shift>}{Enter}{/Shift}');
+
+      // Type second line
+      await user.type(textarea, 'Second line');
+
+      // onSend should NOT be called yet
+      expect(mockOnSend).not.toHaveBeenCalled();
+
+      // Textarea should contain both lines
+      expect(textarea).toHaveValue('First line\nSecond line');
+    });
+
+    it('should send message when Ctrl+Enter is pressed (backward compatibility)', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type message
+      await user.type(textarea, 'Test message');
+
+      // Press Ctrl+Enter
+      await user.keyboard('{Control>}{Enter}{/Control}');
+
+      // onSend should be called
+      expect(mockOnSend).toHaveBeenCalledWith('Test message', expect.anything());
+    });
+
+    it('should not send when Enter is pressed with disabled=true', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={true}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type message
+      await user.type(textarea, 'Test message');
+
+      // Press Enter
+      await user.type(textarea, '{Enter}');
+
+      // onSend should NOT be called
+      expect(mockOnSend).not.toHaveBeenCalled();
+    });
+
+    it('should not send when Enter is pressed with empty message', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Press Enter without typing anything
+      await user.type(textarea, '{Enter}');
+
+      // onSend should NOT be called
+      expect(mockOnSend).not.toHaveBeenCalled();
+    });
+
+    it('should not send when Enter is pressed with only whitespace', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type only spaces
+      await user.type(textarea, '   ');
+
+      // Press Enter
+      await user.type(textarea, '{Enter}');
+
+      // onSend should NOT be called
+      expect(mockOnSend).not.toHaveBeenCalled();
+    });
+
+    it('should clear textarea after sending via Enter', async () => {
+      const { user } = render(
+        <MessageInput
+          onSend={mockOnSend}
+          disabled={false}
+          isComplaintMode={false}
+          onComplaintInfoChange={mockOnComplaintInfoChange}
+        />
+      );
+
+      const textarea = screen.getByTestId('message-input-textarea');
+
+      // Type message
+      await user.type(textarea, 'Test message');
+
+      // Press Enter
+      await user.type(textarea, '{Enter}');
+
+      // Textarea should be cleared
+      expect(textarea).toHaveValue('');
+    });
   });
 });

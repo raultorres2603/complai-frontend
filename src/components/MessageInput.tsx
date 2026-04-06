@@ -46,7 +46,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     return /iPhone|iPad|Android/i.test(navigator.userAgent);
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
 
     if (!text.trim()) {
@@ -71,17 +71,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   // Handle keyboard events for form submission
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Mobile: Enter submits (but not Shift+Enter)
-    if (isMobileDevice && e.key === 'Enter' && !e.shiftKey) {
+    // Enter key (alone, not with Shift) submits the message
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      handleSubmit(e);
       return;
     }
 
-    // Desktop: Ctrl+Enter or Cmd+Enter submits
-    if (!isMobileDevice && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    // Shift+Enter allows newline (default textarea behavior is preserved)
+    // Ctrl+Enter or Cmd+Enter also submits (backward compatibility)
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      handleSubmit(e);
       return;
     }
   };

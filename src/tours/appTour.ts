@@ -31,7 +31,7 @@ export function getAppTourSteps(language: Language): TourStep[] {
     {
       element: '[data-tour="message-input"]',
       title: langTranslations.tour_message_input_title,
-      intro: langTranslations.tour_message_input_description,
+      intro: langTranslations.tour_message_input_description_with_enter,
       position: 'top',
     },
     {
