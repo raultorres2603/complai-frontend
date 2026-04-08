@@ -1,6 +1,8 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { ChatWidget } from './ChatWidget';
+import elpratBg from '../assets/elprat-bg.png';
+import elpratLogo from '../assets/elprat-logo.svg';
 import styles from './ElPratDemo.module.css';
 
 interface ElPratDemoProps {
@@ -25,7 +27,7 @@ export const ElPratDemo: React.FC<ElPratDemoProps> = ({ layout }) => {
           {/* Logo */}
           <a href="#" className={styles.logo}>
             <img
-              src="/elprat-logo.svg"
+              src={elpratLogo}
               alt="Ajuntament del Prat de Llobregat"
               className={styles.logoImg}
             />
@@ -64,7 +66,7 @@ export const ElPratDemo: React.FC<ElPratDemoProps> = ({ layout }) => {
       {/* ── Hero section ──────────────────────────────────────────── */}
       <section className={styles.hero}>
         <img
-          src="/elprat-bg.png"
+          src={elpratBg}
           alt=""
           className={styles.heroBg}
           aria-hidden="true"
