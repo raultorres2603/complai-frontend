@@ -17,7 +17,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { ControlPanel } from './components/ControlPanel';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { TabConflictModal } from './components/TabConflictModal';
-import TourButton from './components/TourButton';
+import { ElPratDemo } from './components/ElPratDemo';
 import './App.css';
 
 function App() {
@@ -149,17 +149,36 @@ function App() {
     />
   );
 
+  // Create MainLayout for the chat widget panel (always desktop mode)
+  const widgetLayout = (
+    <MainLayout
+      chatWindow={chatWindowComponent}
+      controlPanel={controlPanelComponent}
+      isMobile={false}
+      isComplaintMode={isComplaintMode}
+      onToggleComplaint={() => setIsComplaintMode((v) => !v)}
+      onClearHistory={chatState.clearMessages}
+      disabled={chatState.state.isLoading}
+      error={chatState.state.currentError}
+      messages={chatState.state.messages}
+      onDismissError={chatState.clearCurrentError}
+      handleSendQuestion={handleSendQuestion}
+      handleSendComplaint={handleSendComplaint}
+      isLoading={chatState.state.isLoading}
+      apiKey={apiKey}
+      cityId={cityId}
+    />
+  );
+
   return (
     <ErrorBoundary>
       <TabConflictModal
         isVisible={tabDetection.isMultipleTabsDetected && !tabConflictDismissed}
         onContinueThisTab={() => {
           tabDetection.forceTabActive().then(() => {
-            // Closure completed (either success or timeout), dismiss modal
             setTabConflictDismissed(true);
           }).catch((err) => {
             console.error('Closure error:', err);
-            // Even on error, allow dismissal after a moment
             setTimeout(() => setTabConflictDismissed(true), 2000);
           });
         }}
@@ -167,31 +186,7 @@ function App() {
         closedTabCount={tabDetection.closedTabCount}
         closureFailureMessage={tabDetection.closureFailureMessage}
       />
-      <MainLayout
-        chatWindow={chatWindowComponent}
-        controlPanel={controlPanelComponent}
-        isMobile={isMobile}
-        isDrawerOpen={isDrawerOpen}
-        onToggleDrawer={toggleDrawer}
-        isComplaintMode={isComplaintMode}
-        onToggleComplaint={() => {
-          setIsComplaintMode((v) => !v);
-          if (isMobile && isDrawerOpen) {
-            closeDrawer();
-          }
-        }}
-        onClearHistory={chatState.clearMessages}
-        disabled={chatState.state.isLoading}
-        error={chatState.state.currentError}
-        messages={chatState.state.messages}
-        onDismissError={chatState.clearCurrentError}
-        handleSendQuestion={handleSendQuestion}
-        handleSendComplaint={handleSendComplaint}
-        isLoading={chatState.state.isLoading}
-        apiKey={apiKey}
-        cityId={cityId}
-      />
-      <TourButton />
+      <ElPratDemo layout={widgetLayout} />
     </ErrorBoundary>
   );
 }
