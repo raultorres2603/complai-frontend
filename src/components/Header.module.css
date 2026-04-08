@@ -22,6 +22,39 @@
     border-bottom: 1px solid var(--color-border);
 }
 
+.brandRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.collapseToggle {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    margin-top: 2px;
+}
+
+.collapseToggle:hover {
+    background: var(--color-surface-light);
+    color: var(--color-text);
+}
+
+.collapseToggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
 .title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -41,6 +74,18 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 0.5rem;
     width: 100%;
+    overflow: hidden;
+    max-height: 200px;
+    transition: max-height 0.28s ease, opacity 0.22s ease, margin-top 0.22s ease;
+    opacity: 1;
+    margin-top: 0;
+}
+
+.controlsCollapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: -0.5rem;
+    pointer-events: none;
 }
 
 .accessibilityButton {

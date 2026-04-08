@@ -1,0 +1,416 @@
+/* ============================================================================
+   ElPratDemo — full-viewport facsimile of elprat.cat with chat widget overlay
+   ============================================================================ */
+
+/* Makes the demo escape the constrained #root container */
+.demo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  background: #f5f5f5;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ── Top bar (language selector) ────────────────────────────────────────── */
+.topBar {
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 4px 0;
+}
+
+.topBarInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.langLink {
+  color: #1d4e8b;
+  text-decoration: none;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.langLink:hover {
+  text-decoration: underline;
+}
+
+.langSeparator {
+  color: #ccc;
+  font-size: 12px;
+}
+
+/* ── Main header ────────────────────────────────────────────────────────── */
+.header {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+
+.headerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 70px;
+}
+
+/* Logo box */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #1d4e8b;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  height: 36px;
+  width: auto;
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem a {
+  display: block;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navItem a:hover {
+  background: #f0f4f9;
+  color: #1d4e8b;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #555;
+  transition: background 0.15s;
+}
+
+.searchIcon:hover {
+  background: #f0f4f9;
+  color: #1d4e8b;
+}
+
+/* ── Hero section ───────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 380px;
+  overflow: hidden;
+  background: #2d4a2a;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  filter: brightness(0.75);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.1) 60%,
+    transparent 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.heroText {
+  font-size: 130px;
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: -2px;
+  line-height: 1;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+  margin-top: -20px;
+  font-family: 'Segoe UI', Georgia, serif;
+}
+
+/* Weather widget */
+.heroWeather {
+  position: absolute;
+  top: 24px;
+  right: 80px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.heroWeatherTemp {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+/* Social icons strip */
+.heroSocial {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 12px 6px;
+}
+
+.socialIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 13px;
+  color: #1d4e8b;
+}
+
+.socialIcon:hover {
+  background: #fff;
+}
+
+/* ── Blue search section ────────────────────────────────────────────────── */
+.searchSection {
+  background: linear-gradient(135deg, #1d4e8b 0%, #2563a8 100%);
+  padding: 40px 24px;
+}
+
+.searchSectionInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  align-items: start;
+}
+
+.searchBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.searchInput {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 52px;
+}
+
+.searchInput span {
+  flex: 1;
+  font-size: 15px;
+  color: #aaa;
+}
+
+.searchInput svg {
+  color: #1d4e8b;
+  flex-shrink: 0;
+}
+
+.searchHint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.searchHint a {
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.searchCita {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.searchCita a {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Most consulted sidebar */
+.mostConsulted {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.mostConsultedTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 14px;
+}
+
+.mostConsultedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mostConsultedList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.mostConsultedList li::before {
+  content: '→';
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.mostConsultedList li:hover {
+  color: #fff;
+}
+
+/* ── Content cards section ──────────────────────────────────────────────── */
+.cardsSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.cardImg {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: #d1d8e0;
+  display: block;
+}
+
+.cardImgPlaceholder {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.cardBody {
+  padding: 16px;
+}
+
+.cardLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d4e8b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.4;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.footer {
+  background: #1d4e8b;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 32px 24px;
+  font-size: 13px;
+  text-align: center;
+}

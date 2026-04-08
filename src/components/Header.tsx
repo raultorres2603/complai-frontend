@@ -20,6 +20,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggleComplaint, isMobile = false, apiKey = null }) => {
   const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
   const { t } = useTranslation();
   const appName = import.meta.env.VITE_APP_NAME || 'ComplAI';
@@ -33,14 +34,37 @@ export const Header: React.FC<HeaderProps> = ({ isComplaintMode = false, onToggl
     <>
       <header className={styles.header}>
         <div className={styles.container}>
-          {/* Brand/Logo */}
+          {/* Brand/Logo row with collapse toggle */}
           <div className={styles.brand}>
-            <h1 className={styles.title}>{appName}</h1>
-            <p className={styles.subtitle}>Citizen Support Chatbot</p>
+            <div className={styles.brandRow}>
+              <div>
+                <h1 className={styles.title}>{appName}</h1>
+                <p className={styles.subtitle}>Citizen Support Chatbot</p>
+              </div>
+              <button
+                className={styles.collapseToggle}
+                onClick={() => setIsCollapsed((v) => !v)}
+                aria-expanded={!isCollapsed}
+                aria-label={isCollapsed ? 'Expand controls' : 'Collapse controls'}
+                title={isCollapsed ? 'Expand controls' : 'Collapse controls'}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.25s ease' }}
+                >
+                  <path d="M2 4.5L7 9.5L12 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* Right controls - accessibility, language, and complaint mode */}
-          <div className={styles.controls}>
+          {/* Controls - accessibility, language, feedback and mode toggle */}
+          <div className={`${styles.controls} ${isCollapsed ? styles.controlsCollapsed : ''}`}>
             <button
               className={styles.accessibilityButton}
               onClick={() => setIsAccessibilityPanelOpen(true)}
