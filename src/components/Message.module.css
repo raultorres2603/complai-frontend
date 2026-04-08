@@ -44,6 +44,7 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-sizing: border-box;
 }
 
 .content:hover {
@@ -77,6 +78,12 @@
     line-height: 1.35;
     white-space: pre-wrap;
     text-align: left;
+}
+
+.text a {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    display: inline-block;
 }
 
 .text ul,
