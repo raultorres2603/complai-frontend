@@ -162,3 +162,27 @@
 .panelBody :global([data-testid="layout"]) {
   height: 100%;
 }
+
+/* ── Mobile: full-screen panel ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh; /* fallback for browsers without dvh support */
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  /* Hide the floating trigger while the full-screen panel is open */
+  .triggerHidden {
+    display: none;
+  }
+
+  /* Shrink default trigger padding/position on small screens */
+  .trigger {
+    bottom: 16px;
+    right: 16px;
+  }
+}

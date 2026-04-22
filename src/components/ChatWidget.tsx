@@ -42,7 +42,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ layout }) => {
 
       {/* ── Trigger button ────────────────────────────────────────── */}
       <button
-        className={styles.trigger}
+        className={`${styles.trigger} ${isOpen ? styles.triggerHidden : ''}`}
         onClick={() => setIsOpen((v) => !v)}
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Tancar l\'assistent virtual' : 'Obrir l\'assistent virtual'}
