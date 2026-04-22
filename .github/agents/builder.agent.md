@@ -1,7 +1,7 @@
 ---
 name: builder
 tools: [read, edit, search, execute, todo, agent, vscode/askQuestions, vscode/memory]
-user-invocable: true
+user-invocable: false
 description: >
   General-purpose agent that auto-detects which skill phases to load (planning,
   implementation, review, documentation) based on the request. Uses
