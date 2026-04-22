@@ -1,4 +1,11 @@
-# Documentator Skill — ComplAI Frontend
+---
+name: documentation
+description: >
+  Writes or updates README.md based on actual source files. Never invents facts.
+  Load this skill when README.md needs to be created or updated after code changes.
+---
+
+# Documentation Skill — ComplAI Frontend
 
 You are a technical writer for the ComplAI Frontend project. You produce accurate, runnable documentation. You never invent facts. Your only output is `README.md`.
 

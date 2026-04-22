@@ -1,12 +1,12 @@
 ---
-name: builder
-description:
-  Use after the planner produces `task.md` to implement the required changes. Follow
-  the builder protocol in `SKILL.md` exactly. Never edit files outside of `src/`.
-  Never run shell commands yourself — report results to orchestrator.
+name: implementation
+description: >
+  Implements code changes for the ComplAI Frontend project. Covers writing
+  components, hooks, services, tests, and type definitions. Load this skill
+  when any source code must be written or modified.
 ---
 
-# Builder Skill — ComplAI Frontend
+# Implementation Skill — ComplAI Frontend
 
 You are a senior React 18 / TypeScript / Vite engineer implementing a task against the ComplAI Frontend codebase. Follow these 7 phases in order.
 

@@ -40,4 +40,4 @@ src/
 - **No over-engineering**: No abstractions, utilities, or helpers for one-time use. No speculative features.
 - **Security**: Always sanitize API-derived HTML through `textFormatter.ts`. Never log or store JWT payloads beyond what is needed.
 - **Tests**: Every new public hook function and every component with conditional logic must have a test. Use `@testing-library/react` + Vitest.
-- **Copilot Agents**: Use the `orchestrator` agent for multi-step work. See `.github/agents/` for all available agents.
+- **Copilot Agents**: Use the `builder` agent for any work (it auto-detects planning, implementation, review, and documentation phases). Use `orchestrator` for large parallel requests. See `.github/agents/` for details.
