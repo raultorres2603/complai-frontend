@@ -149,12 +149,14 @@ function App() {
     />
   );
 
-  // Create MainLayout for the chat widget panel (always desktop mode)
+  // Create MainLayout for the chat widget panel
   const widgetLayout = (
     <MainLayout
       chatWindow={chatWindowComponent}
       controlPanel={controlPanelComponent}
-      isMobile={false}
+      isMobile={isMobile}
+      isDrawerOpen={isDrawerOpen}
+      onToggleDrawer={toggleDrawer}
       isComplaintMode={isComplaintMode}
       onToggleComplaint={() => setIsComplaintMode((v) => !v)}
       onClearHistory={chatState.clearMessages}
