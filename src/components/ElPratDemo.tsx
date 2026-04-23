@@ -7,9 +7,15 @@ import styles from './ElPratDemo.module.css';
 
 interface ElPratDemoProps {
   layout: ReactNode;
+  isComplaintMode?: boolean;
+  onToggleComplaint?: () => void;
 }
 
-export const ElPratDemo: React.FC<ElPratDemoProps> = ({ layout }) => {
+export const ElPratDemo: React.FC<ElPratDemoProps> = ({ 
+  layout, 
+  isComplaintMode = false,
+  onToggleComplaint,
+}) => {
   return (
     <div className={styles.demo}>
       {/* ── Top language bar ──────────────────────────────────────── */}
@@ -199,7 +205,11 @@ export const ElPratDemo: React.FC<ElPratDemoProps> = ({ layout }) => {
       </footer>
 
       {/* ── Floating chat widget ───────────────────────────────────── */}
-      <ChatWidget layout={layout} />
+      <ChatWidget 
+        layout={layout} 
+        isComplaintMode={isComplaintMode}
+        onToggleComplaint={onToggleComplaint}
+      />
     </div>
   );
 };

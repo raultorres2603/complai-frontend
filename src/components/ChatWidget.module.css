@@ -149,6 +149,99 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
+/* ── Mobile hamburger menu button (visible on mobile < 640px only) ────────── */
+.mobileMenuButton {
+  display: none; /* Hidden by default, shown on mobile in media query */
+  flex-direction: column;
+  gap: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.2s ease;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobileMenuButton:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.hamburgerLine {
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+
+.mobileMenuButtonOpen .hamburgerLine:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.mobileMenuButtonOpen .hamburgerLine:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+.mobileMenuButtonOpen .hamburgerLine:nth-child(3) {
+  transform: rotate(-45deg) translate(8px, -8px);
+}
+
+/* ── Mobile controls menu dropdown ──────────────────────────────────────── */
+.mobileMenu {
+  display: none; /* Hidden by default, shown on mobile in media query */
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobileMenu .modeButton,
+.mobileMenu .accessibilityButton {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.mobileMenu .modeButton:active,
+.mobileMenu .accessibilityButton:active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.98);
+}
+
+.modeButtonActive {
+  background: rgba(74, 222, 128, 0.2) !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
+  color: #4ade80;
+}
+
 /* ── Panel body — hosts MainLayout desktop ──────────────────────────────── */
 .panelBody {
   width: 100%;
@@ -186,3 +279,26 @@
     right: 16px;
   }
 }
+
+/* ── Small screens: show mobile hamburger menu (< 640px) ──────────────────── */
+@media (max-width: 640px) {
+  .panelHeader {
+    gap: 8px;
+  }
+
+  .panelTitle {
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+  }
+
+  /* Show hamburger button on mobile */
+  .mobileMenuButton {
+    display: flex;
+  }
+
+  /* Show mobile menu dropdown */
+  .mobileMenu {
+    display: flex;
+  }
+}
+

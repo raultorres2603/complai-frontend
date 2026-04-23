@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
 import type { ReactNode } from 'react';
+import AccessibilityPanel from './AccessibilityPanel';
 import TourButton from './TourButton';
+import { useTranslation } from '../hooks/useTranslation';
 import styles from './ChatWidget.module.css';
 
 interface ChatWidgetProps {
   layout: ReactNode;
+  isComplaintMode?: boolean;
+  onToggleComplaint?: () => void;
 }
 
-export const ChatWidget: React.FC<ChatWidgetProps> = ({ layout }) => {
+export const ChatWidget: React.FC<ChatWidgetProps> = ({ 
+  layout, 
+  isComplaintMode = false,
+  onToggleComplaint,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAccessibilityPanelOpen, setIsAccessibilityPanelOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -24,6 +35,20 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ layout }) => {
             <span className={styles.panelTitleDot} aria-hidden="true" />
             Assistent Virtual · Ajuntament del Prat de Llobregat
           </div>
+
+          {/* Mobile hamburger menu button */}
+          <button
+            className={`${styles.mobileMenuButton} ${isMobileMenuOpen ? styles.mobileMenuButtonOpen : ''}`}
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
+            aria-label={isMobileMenuOpen ? t('close_menu') : t('open_menu')}
+            aria-expanded={isMobileMenuOpen}
+            title={isMobileMenuOpen ? t('close_menu') : t('open_menu')}
+          >
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+          </button>
+
           <button
             className={styles.panelClose}
             onClick={() => setIsOpen(false)}
@@ -34,11 +59,46 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ layout }) => {
           </button>
         </header>
 
+        {/* Mobile controls menu - slides down below header on mobile */}
+        {isMobileMenuOpen && (
+          <div className={styles.mobileMenu}>
+            <button
+              className={`${styles.modeButton} ${isComplaintMode ? styles.modeButtonActive : ''}`}
+              onClick={() => {
+                onToggleComplaint?.();
+                setIsMobileMenuOpen(false); // Close menu after selection
+              }}
+              aria-pressed={isComplaintMode}
+              title={isComplaintMode ? t('complaint_mode') : t('ask_question')}
+            >
+              {isComplaintMode ? t('complaint_mode') : t('ask_question')}
+            </button>
+
+            <button
+              className={styles.accessibilityButton}
+              onClick={() => {
+                setIsAccessibilityPanelOpen(true);
+                // Keep menu open so user can still access other options
+              }}
+              aria-label={t('accessibility_tooltip')}
+              title={t('accessibility_tooltip')}
+            >
+              ♿ {t('accessibility_settings')}
+            </button>
+          </div>
+        )}
+
         <div className={styles.panelBody}>
           {layout}
           <TourButton />
         </div>
       </div>
+
+      {/* Accessibility Panel Modal - rendered at ChatWidget level */}
+      <AccessibilityPanel
+        isVisible={isAccessibilityPanelOpen}
+        onClose={() => setIsAccessibilityPanelOpen(false)}
+      />
 
       {/* ── Trigger button ────────────────────────────────────────── */}
       <button

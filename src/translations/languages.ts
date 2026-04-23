@@ -9,6 +9,8 @@ export const translations = {
   es: {
     accessibility_settings: 'Configuración de Accesibilidad',
     close: 'Cerrar',
+    close_menu: 'Cerrar menú',
+    open_menu: 'Abrir menú',
     color_blindness_filter: 'Filtro de Daltonismo',
     vision_type: 'Tipo de Visión:',
     preview: 'Vista Previa:',
@@ -127,6 +129,8 @@ export const translations = {
   en: {
     accessibility_settings: 'Accessibility Settings',
     close: 'Close',
+    close_menu: 'Close menu',
+    open_menu: 'Open menu',
     color_blindness_filter: 'Color Blindness Filter',
     vision_type: 'Vision Type:',
     preview: 'Preview:',
@@ -245,6 +249,8 @@ export const translations = {
   ca: {
     accessibility_settings: 'Configuració d\'Accessibilitat',
     close: 'Tancar',
+    close_menu: 'Tancar menú',
+    open_menu: 'Obrir menú',
     color_blindness_filter: 'Filtre de Daltonisme',
     vision_type: 'Tipus de Visió:',
     preview: 'Vista Prèvia:',

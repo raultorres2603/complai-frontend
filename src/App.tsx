@@ -186,7 +186,11 @@ function App() {
         closedTabCount={tabDetection.closedTabCount}
         closureFailureMessage={tabDetection.closureFailureMessage}
       />
-      <ElPratDemo layout={widgetLayout} />
+      <ElPratDemo 
+        layout={widgetLayout}
+        isComplaintMode={isComplaintMode}
+        onToggleComplaint={() => setIsComplaintMode((v) => !v)}
+      />
     </ErrorBoundary>
   );
 }
