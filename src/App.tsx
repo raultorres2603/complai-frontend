@@ -158,7 +158,7 @@ function App() {
       isDrawerOpen={isDrawerOpen}
       onToggleDrawer={toggleDrawer}
       isComplaintMode={isComplaintMode}
-      onToggleComplaint={() => setIsComplaintMode((v) => !v)}
+      onToggleComplaint={() => { setIsComplaintMode((v) => !v); closeDrawer(); }}
       onClearHistory={chatState.clearMessages}
       disabled={chatState.state.isLoading}
       error={chatState.state.currentError}
